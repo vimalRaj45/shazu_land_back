@@ -390,15 +390,28 @@ html.dark [class*="text-[#17211D]"] {
   color: #f8fafc !important;
 }
 
-/* Brand Accent & Links in Dark Mode */
+/* Brand Accent & Links in Dark Mode - High Contrast Mint Green */
 html.dark .text-brand-green,
 html.dark [class*="text-[#123B32]"] {
-  color: #527A68 !important;
+  color: #6EE7B7 !important; /* Bright mint green for crystal clear legibility on dark navy */
 }
 
 html.dark a.text-brand-green:hover,
 html.dark a[class*="text-[#123B32]"]:hover {
-  color: #C47D4C !important;
+  color: #FDBA74 !important; /* Bright warm accent on hover */
+}
+
+/* Header Brand Logo & Text in Dark Mode */
+html.dark header a span,
+html.dark header a div span,
+html.dark header .brand-title {
+  color: #FFFFFF !important;
+}
+
+html.dark header a span.text-slate-500,
+html.dark header a span.text-slate-400,
+html.dark header a span.text-brand-secText {
+  color: #A7F3D0 !important; /* Bright mint green subtitle */
 }
 
 /* Background Surface Inversions */
@@ -452,18 +465,20 @@ html.dark header {
 }
 
 html.dark .nav-link-pill:not(.active) {
-  color: #cbd5e1 !important;
+  color: #E2E8F0 !important;
   background-color: transparent !important;
 }
 
 html.dark .nav-link-pill:not(.active):hover {
-  color: #C47D4C !important;
-  background-color: #1e293b !important;
+  color: #6EE7B7 !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 html.dark .nav-link-pill.active {
-  color: #a7f3d0 !important;
-  background-color: #123B32 !important;
+  color: #123B32 !important;
+  background-color: #E8EFEB !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(232, 239, 235, 0.25) !important;
 }
 
 /* Hamburger Bars in Dark Mode */
