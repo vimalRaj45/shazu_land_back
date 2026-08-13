@@ -1,0 +1,25 @@
+{
+  "name": "shazu-soft-backend",
+  "version": "1.0.0",
+  "description": "Dynamic Content Management System & Fastify Backend for Shazu Soft Technologies",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "npx nodemon server.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.2",
+    "@fastify/helmet": "^13.1.0",
+    "@fastify/jwt": "^9.0.4",
+    "@fastify/rate-limit": "^11.2.0",
+    "@fastify/static": "^8.1.1",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "pg": "^8.13.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

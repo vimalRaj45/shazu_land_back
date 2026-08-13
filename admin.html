@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Control Panel | Shazu Soft Technologies</title>
+  
+  <!-- Google Fonts optimized loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              white: '#F5F3EC',        // Warm Off-White
+              cardBg: '#FFFFFF',       // Pure White
+              lightGreen: '#E8EFEB',   // Soft Green Light BG
+              green: '#123B32',        // Primary Dark Green
+              secGreen: '#2F5B4E',     // Secondary Green
+              accent: '#527A68',       // Accent Green
+              copper: '#C47D4C',       // Warm Copper Accent
+              darkText: '#1E292B',     // Charcoal Text
+              secText: '#527A68',      // Muted Secondary Text
+              border: '#E2E8F0'        // Soft Slate Border
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- AOS Animate On Scroll CSS CDN -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link rel="icon" href="https://shazusofttechnologies.org/sst.svg" type="image/svg+xml">
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #123B32; }
+
+    .nav-tab-pill {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-tab-pill.active {
+      background-color: #123B32;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(18, 59, 50, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 font-sans h-full flex flex-col overflow-hidden antialiased">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+  <!-- 1. LOGIN SCREEN CONTAINER -->
+  <div id="login-view" class="flex items-center justify-center min-h-screen px-4 bg-gradient-to-br from-[#0F172A] via-[#123B32] to-[#1E292B]">
+    <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 backdrop-blur-xl p-8 rounded-3xl shadow-2xl space-y-6">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center justify-center p-3.5 bg-[#123B32]/60 rounded-2xl border border-[#527A68]/40 mb-2 shadow-inner">
+          <img src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-12 w-auto">
+        </div>
+        <h1 class="text-2xl font-extrabold font-heading text-white tracking-tight">SST Admin Control Panel</h1>
+        <p class="text-xs text-slate-400">Authenticated access for dynamic content, Brevo & Neon DB</p>
+      </div>
+
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Admin Email</label>
+          <div class="relative">
+            <i class="bi bi-envelope text-slate-400 absolute left-3.5 top-3 text-sm"></i>
+            <input type="email" id="login-email" required value="admin@shazusofttechnologies.org" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-[#C47D4C] transition-colors font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Password</label>
+          <div class="relative">
+            <i class="bi bi-lock text-slate-400 absolute left-3.5 top-3 text-sm"></i>
+            <input type="password" id="login-password" required value="Admin@SST2026!" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-[#C47D4C] transition-colors font-mono">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-[#123B32] hover:bg-[#2F5B4E] border border-[#527A68]/40 text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-lg shadow-[#123B32]/40 flex items-center justify-center gap-2 cursor-pointer">
+          <i class="bi bi-box-arrow-in-right text-base"></i>
+          <span>Authenticate & Access Dashboard</span>
+        </button>
+
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-800"></div>
+          <span class="flex-shrink mx-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Or Authorized OAuth</span>
+          <div class="flex-grow border-t border-slate-800"></div>
+        </div>
+
+        <a href="/api/auth/google" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm rounded-xl transition-all duration-200 shadow-md flex items-center justify-center gap-2.5 cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Sign in with Google OAuth 2.0</span>
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. MAIN APPLICATION INTERFACE -->
+  <div id="admin-dashboard-view" class="hidden flex flex-col min-h-screen lg:h-screen overflow-y-auto lg:overflow-hidden bg-[#F8FAFC]">
+
+    <!-- TOP HEADER NAVBAR -->
+    <header class="bg-[#123B32] text-white px-4 md:px-6 py-3 flex items-center justify-between border-b border-[#2F5B4E] shadow-md z-30 shrink-0">
+      <!-- Left: Logo & Brand -->
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="flex items-center gap-2 group">
+          <div class="p-1.5 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
+            <img src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-6 w-auto">
+          </div>
+          <span class="font-heading font-extrabold text-sm sm:text-base tracking-tight text-white">SHAZU SOFT</span>
+          <span class="px-2 py-0.5 bg-[#C47D4C] text-[9px] sm:text-[10px] font-mono font-bold uppercase rounded text-white tracking-widest hidden sm:inline">CONTROL PANEL</span>
+        </a>
+      </div>
+
+      <!-- Center: Global Search Bar -->
+      <div class="hidden sm:flex items-center flex-1 max-w-xs md:max-w-md mx-4 md:mx-8">
+        <div class="relative w-full">
+          <i class="bi bi-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+          <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Search leads, titles, events..." class="w-full bg-white/10 border border-white/15 pl-8 pr-8 py-1.5 rounded-lg text-xs text-white placeholder:text-slate-300 focus:outline-none focus:bg-white/20 focus:border-[#C47D4C] transition-all font-sans">
+          <span class="absolute right-2 top-2 text-[9px] font-mono bg-white/10 text-slate-300 px-1 py-0.5 rounded hidden md:inline">⌘K</span>
+        </div>
+      </div>
+
+      <!-- Right: System Status & Profile -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <div class="hidden lg:flex items-center gap-2 text-[11px] bg-white/10 border border-white/15 px-3 py-1 rounded-full text-emerald-300 font-mono">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Brevo Email: Active</span>
+          <span class="text-slate-400 border-l border-white/20 pl-2">Neon DB: Connected</span>
+        </div>
+
+        <button onclick="logout()" title="Logout Admin" class="flex items-center gap-1.5 bg-red-950/50 hover:bg-red-900/80 border border-red-700/50 px-2.5 py-1.5 rounded-lg text-xs text-red-200 font-medium transition-colors cursor-pointer">
+          <i class="bi bi-power"></i>
+          <span class="hidden sm:inline">Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- SUB-HEADER HORIZONTAL NAVIGATION TABS BAR (Touch-scrollable on mobile) -->
+    <div class="bg-white border-b border-slate-200 px-4 md:px-6 py-2 flex items-center justify-between overflow-x-auto whitespace-nowrap shadow-xs z-20 shrink-0">
+      <div class="flex items-center gap-1.5 py-0.5 min-w-max">
+        
+        <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-tab-pill active flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-speedometer2 text-emerald-600"></i>
+          <span>Dashboard & BI</span>
+        </button>
+
+        <button onclick="switchTab('leads')" id="nav-leads" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-funnel-fill text-[#C47D4C]"></i>
+          <span>Leads CRM</span>
+          <span id="badge-leads-count" class="px-1.5 py-0.2 bg-amber-100 text-amber-800 text-[10px] font-mono font-bold rounded-full">0</span>
+        </button>
+
+        <button onclick="switchTab('announcements')" id="nav-announcements" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-megaphone text-blue-600"></i>
+          <span>Announcements</span>
+          <span id="badge-announcements-count" class="px-1.5 py-0.2 bg-blue-100 text-blue-700 text-[10px] font-mono font-bold rounded-full">0</span>
+        </button>
+
+        <button onclick="switchTab('events')" id="nav-events" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-calendar-event text-amber-600"></i>
+          <span>Events</span>
+          <span id="badge-events-count" class="px-1.5 py-0.2 bg-amber-100 text-amber-700 text-[10px] font-mono font-bold rounded-full">0</span>
+        </button>
+
+        <button onclick="switchTab('careers')" id="nav-careers" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-briefcase text-purple-600"></i>
+          <span>Careers</span>
+          <span id="badge-careers-count" class="px-1.5 py-0.2 bg-purple-100 text-purple-700 text-[10px] font-mono font-bold rounded-full">0</span>
+        </button>
+
+        <button onclick="switchTab('applications')" id="nav-applications" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-person-lines-fill text-sky-600"></i>
+          <span>Applications</span>
+          <span id="badge-applications-count" class="px-1.5 py-0.2 bg-sky-100 text-sky-700 text-[10px] font-mono font-bold rounded-full">0</span>
+        </button>
+
+        <button onclick="switchTab('offerings')" id="nav-offerings" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-journal-bookmark text-indigo-600"></i>
+          <span>Courses</span>
+        </button>
+
+        <button onclick="switchTab('registrations')" id="nav-registrations" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-ticket-perforated text-pink-600"></i>
+          <span>Registrations</span>
+          <span id="badge-registrations-count" class="px-1.5 py-0.2 bg-pink-100 text-pink-700 text-[10px] font-mono font-bold rounded-full">0</span>
+        </button>
+      </div>
+
+      <div class="hidden md:flex items-center gap-2 pl-4 border-l border-slate-200">
+        <button onclick="refreshCurrentTab()" title="Refresh Current Tab Data" class="p-1.5 text-slate-500 hover:text-[#123B32] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+          <i id="refresh-spinner" class="bi bi-arrow-clockwise text-sm"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN BODY CONTENT AREA -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden p-4 md:p-6 gap-6">
+
+      <!-- LEFT SECTION (Flex-1) -->
+      <section class="flex-1 flex flex-col space-y-5 overflow-y-auto pr-0 lg:pr-1">
+
+        <!-- TOP METRIC CARDS ROW (Responsive 2 cols on mobile, 5 cols on desktop) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 shrink-0">
+          <div class="bg-white border border-slate-200 p-3.5 sm:p-4 rounded-2xl shadow-xs flex items-center justify-between">
+            <div class="space-y-0.5">
+              <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Leads</span>
+              <div id="stat-leads" class="text-xl sm:text-2xl font-bold font-mono text-[#C47D4C]">0</div>
+              <span class="text-[10px] text-amber-600 font-semibold flex items-center gap-1"><i class="bi bi-funnel"></i> Inquiries</span>
+            </div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center text-base sm:text-lg"><i class="bi bi-envelope-paper"></i></div>
+          </div>
+
+          <div class="bg-white border border-slate-200 p-3.5 sm:p-4 rounded-2xl shadow-xs flex items-center justify-between">
+            <div class="space-y-0.5">
+              <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Applications</span>
+              <div id="stat-apps" class="text-xl sm:text-2xl font-bold font-mono text-slate-900">0</div>
+              <span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><i class="bi bi-graph-up-arrow"></i> Candidates</span>
+            </div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-sky-50 text-sky-700 border border-sky-100 flex items-center justify-center text-base sm:text-lg"><i class="bi bi-people"></i></div>
+          </div>
+
+          <div class="bg-white border border-slate-200 p-3.5 sm:p-4 rounded-2xl shadow-xs flex items-center justify-between">
+            <div class="space-y-0.5">
+              <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Active Events</span>
+              <div id="stat-events" class="text-xl sm:text-2xl font-bold font-mono text-slate-900">0</div>
+              <span class="text-[10px] text-amber-600 font-semibold flex items-center gap-1"><i class="bi bi-calendar-check"></i> Contests</span>
+            </div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center text-base sm:text-lg"><i class="bi bi-calendar-week"></i></div>
+          </div>
+
+          <div class="bg-white border border-slate-200 p-3.5 sm:p-4 rounded-2xl shadow-xs flex items-center justify-between">
+            <div class="space-y-0.5">
+              <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Job Roles</span>
+              <div id="stat-jobs" class="text-xl sm:text-2xl font-bold font-mono text-slate-900">0</div>
+              <span class="text-[10px] text-purple-600 font-semibold flex items-center gap-1"><i class="bi bi-briefcase"></i> Salem Campus</span>
+            </div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center text-base sm:text-lg"><i class="bi bi-briefcase"></i></div>
+          </div>
+
+          <div class="bg-white border border-slate-200 p-3.5 sm:p-4 rounded-2xl shadow-xs flex items-center justify-between col-span-2 sm:col-span-1">
+            <div class="space-y-0.5">
+              <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Page Views</span>
+              <div id="stat-views" class="text-xl sm:text-2xl font-bold font-mono text-slate-900">0</div>
+              <span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><i class="bi bi-eye"></i> Telemetry</span>
+            </div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center text-base sm:text-lg"><i class="bi bi-bar-chart-line"></i></div>
+          </div>
+        </div>
+
+        <!-- MAIN TABLE CONTAINER BOX -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-xs p-4 sm:p-5 space-y-4 flex-1 flex flex-col overflow-hidden">
+          
+          <!-- Section Header & Dynamic Action Button -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100">
+            <div>
+              <h2 id="tab-title" class="text-base sm:text-lg font-bold font-heading text-slate-900">Dashboard Overview</h2>
+              <p id="tab-subtitle" class="text-xs text-slate-500">Manage client leads, announcements, events, and Brevo communications.</p>
+            </div>
+            <div id="action-header-btn" class="flex items-center gap-2"></div>
+          </div>
+
+          <!-- TAB 1: ANALYTICS & DASHBOARD VIEW -->
+          <div id="tab-content-analytics" class="space-y-5 overflow-y-auto pr-1">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div class="bg-[#F8FAFC] border border-slate-200 p-4 sm:p-5 rounded-xl space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
+                  <i class="bi bi-graph-up text-[#123B32]"></i> <span>Most Visited Site Pages</span>
+                </h3>
+                <div id="popular-pages-list" class="space-y-2"></div>
+              </div>
+
+              <div class="bg-[#F8FAFC] border border-slate-200 p-4 sm:p-5 rounded-xl space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
+                  <i class="bi bi-person-plus text-[#C47D4C]"></i> <span>Recent Job Applications</span>
+                </h3>
+                <div id="recent-apps-list" class="space-y-2"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: LEADS CRM INBOX TABLE -->
+          <div id="tab-content-leads" class="hidden flex-1 overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[650px]">
+              <thead class="bg-slate-50 text-slate-500 font-semibold uppercase border-b border-slate-200 sticky top-0">
+                <tr>
+                  <th class="p-3">Date</th>
+                  <th class="p-3">Client / Contact</th>
+                  <th class="p-3">Category & Subject</th>
+                  <th class="p-3">Phone</th>
+                  <th class="p-3">Lead Pipeline Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leads-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            </table>
+          </div>
+
+          <!-- TAB 3: ANNOUNCEMENTS MANAGER TABLE -->
+          <div id="tab-content-announcements" class="hidden flex-1 overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[650px]">
+              <thead class="bg-slate-50 text-slate-500 font-semibold uppercase border-b border-slate-200 sticky top-0">
+                <tr>
+                  <th class="p-3">Priority</th>
+                  <th class="p-3">Badge Tag</th>
+                  <th class="p-3">Title & Message</th>
+                  <th class="p-3">Link Target</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="announcements-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            </table>
+          </div>
+
+          <!-- TAB 4: EVENTS MANAGER TABLE -->
+          <div id="tab-content-events" class="hidden flex-1 overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[700px]">
+              <thead class="bg-slate-50 text-slate-500 font-semibold uppercase border-b border-slate-200 sticky top-0">
+                <tr>
+                  <th class="p-3">Category</th>
+                  <th class="p-3">Title & Overview</th>
+                  <th class="p-3">Date & Time</th>
+                  <th class="p-3">Location</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="events-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            </table>
+          </div>
+
+          <!-- TAB 5: CAREERS MANAGER TABLE -->
+          <div id="tab-content-careers" class="hidden flex-1 overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[650px]">
+              <thead class="bg-slate-50 text-slate-500 font-semibold uppercase border-b border-slate-200 sticky top-0">
+                <tr>
+                  <th class="p-3">Job Title</th>
+                  <th class="p-3">Department</th>
+                  <th class="p-3">Type & Location</th>
+                  <th class="p-3">Salary Band</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="careers-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            </table>
+          </div>
+
+          <!-- TAB 6: APPLICATIONS INBOX TABLE -->
+          <div id="tab-content-applications" class="hidden flex-1 overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[700px]">
+              <thead class="bg-slate-50 text-slate-500 font-semibold uppercase border-b border-slate-200 sticky top-0">
+                <tr>
+                  <th class="p-3">Date</th>
+                  <th class="p-3">Candidate</th>
+                  <th class="p-3">Position</th>
+                  <th class="p-3">Contact Email</th>
+                  <th class="p-3">Pipeline Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="applications-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            </table>
+          </div>
+
+          <!-- TAB 7: COURSES & SERVICES CATALOG TABLE -->
+          <div id="tab-content-offerings" class="hidden flex-1 overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[650px]">
+              <thead class="bg-slate-50 text-slate-500 font-semibold uppercase border-b border-slate-200 sticky top-0">
+                <tr>
+                  <th class="p-3">Type</th>
+                  <th class="p-3">Course / Service Name</th>
+                  <th class="p-3">Price Band</th>
+                  <th class="p-3">Duration</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="offerings-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            </table>
+          </div>
+
+          <!-- TAB 8: EVENT REGISTRATIONS TABLE -->
+          <div id="tab-content-registrations" class="hidden flex-1 overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[750px]">
+              <thead class="bg-slate-50 text-slate-500 font-semibold uppercase border-b border-slate-200 sticky top-0">
+                <tr>
+                  <th class="p-3">Registered Date</th>
+                  <th class="p-3">Attendee Name</th>
+                  <th class="p-3">Event & Fee</th>
+                  <th class="p-3">UTR / Transaction No</th>
+                  <th class="p-3">Payment Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="registrations-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- RIGHT SIDEBAR (Control Panel - Responsive Mobile Block & Desktop Aside) -->
+      <aside class="w-full lg:w-80 bg-white border border-slate-200 rounded-2xl shadow-xs p-5 flex flex-col justify-between shrink-0 space-y-6">
+        <div class="space-y-5">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <span class="block font-heading font-extrabold text-xs tracking-wider text-[#123B32] uppercase">CONTROL PANEL</span>
+              <span class="block text-[11px] text-slate-400">Database & Brevo Config</span>
+            </div>
+            <i class="bi bi-gear-wide-connected text-lg text-[#C47D4C]"></i>
+          </div>
+
+          <div class="bg-[#F8FAFC] border border-slate-200 rounded-xl p-4 space-y-3">
+            <span class="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5"><i class="bi bi-send text-[#C47D4C]"></i> Direct Email Dispatcher</span>
+            <button onclick="openSendEmailModal()" class="w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+              <i class="bi bi-envelope-at"></i> <span>Compose Brevo Email</span>
+            </button>
+          </div>
+
+          <div class="bg-[#F8FAFC] border border-slate-200 rounded-xl p-4 space-y-3">
+            <span class="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5"><i class="bi bi-lightning-charge text-[#C47D4C]"></i> Instant Announcement</span>
+            <form onsubmit="quickPublishAnnouncement(event)" class="space-y-2 text-xs">
+              <input type="text" id="quick-ann-title" required placeholder="Alert Headline..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#123B32]">
+              <textarea id="quick-ann-content" required placeholder="Short announcement message..." class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800 h-14 focus:outline-none focus:border-[#123B32]"></textarea>
+              <button type="submit" class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+                <i class="bi bi-broadcast"></i> <span>Publish Live</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="bg-[#F8FAFC] border border-slate-200 rounded-xl p-4 space-y-2.5">
+            <span class="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5"><i class="bi bi-file-earmark-spreadsheet text-emerald-600"></i> Export Tools</span>
+            <button onclick="exportApplicationsCSV()" class="w-full py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs">
+              <i class="bi bi-download text-slate-500"></i> <span>Export Applications CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 text-[11px] text-slate-400 space-y-1">
+          <div class="flex justify-between"><span>Brevo Transactional:</span><span class="font-mono text-emerald-600 font-bold">Connected</span></div>
+          <div class="flex justify-between"><span>Neon DB Postgres:</span><span class="font-mono text-slate-600">Connected</span></div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- REUSABLE TAILWIND MODAL -->
+  <div id="modal-backdrop" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div id="modal-container" class="bg-white border border-slate-200 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl p-4 sm:p-6 shadow-2xl space-y-5">
+      <!-- Dynamic Modal Content -->
+    </div>
+  </div>
+
+  <!-- TAILWIND CONFIRMATION MODAL -->
+  <div id="confirm-modal-backdrop" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4 text-center">
+      <div id="confirm-modal-icon" class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto text-xl">
+        <i class="bi bi-exclamation-triangle"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 id="confirm-modal-title" class="text-base font-bold text-slate-900">Are you sure?</h3>
+        <p id="confirm-modal-text" class="text-xs text-slate-500">This action cannot be undone.</p>
+      </div>
+      <div class="flex items-center justify-center gap-3 pt-2">
+        <button id="confirm-cancel-btn" onclick="closeConfirmModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">Cancel</button>
+        <button id="confirm-action-btn" class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded-xl shadow-xs">Confirm Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="js/hot-toast.js"></script>
+  
+  <script>
+    AOS.init({ duration: 400, once: true });
+
+    const API_BASE = '';
+    let jwtToken = localStorage.getItem('sst_admin_token') || '';
+    let currentTab = 'analytics';
+    let pendingConfirmAction = null;
+
+    function showToast(message, type = 'success') {
+      if (type === 'error') {
+        toast.error(message, { position: 'top-center' });
+      } else {
+        toast.success(message, { position: 'top-center' });
+      }
+    }
+
+    function showConfirmModal(title, text, confirmBtnText = 'Confirm Delete', actionCallback) {
+      document.getElementById('confirm-modal-title').textContent = title;
+      document.getElementById('confirm-modal-text').textContent = text;
+      const actionBtn = document.getElementById('confirm-action-btn');
+      actionBtn.textContent = confirmBtnText;
+      
+      pendingConfirmAction = actionCallback;
+      actionBtn.onclick = async () => {
+        if (pendingConfirmAction) await pendingConfirmAction();
+        closeConfirmModal();
+      };
+      
+      document.getElementById('confirm-modal-backdrop').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal-backdrop').classList.add('hidden');
+      pendingConfirmAction = null;
+    }
+
+    function getAuthHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`
+      };
+    }
+
+    async function checkAuth() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlToken = urlParams.get('token');
+      const urlError = urlParams.get('error');
+      const userEmail = urlParams.get('email');
+
+      if (urlError) {
+        showToast(decodeURIComponent(urlError), 'error');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      if (urlToken) {
+        jwtToken = urlToken;
+        localStorage.setItem('sst_admin_token', urlToken);
+        showToast(`Signed in as ${userEmail || 'Administrator'} via Google OAuth 2.0`);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      if (!jwtToken) {
+        showLogin();
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/me`, { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Token expired');
+        showDashboard();
+      } catch (err) {
+        logout();
+      }
+    }
+
+    function showLogin() {
+      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('admin-dashboard-view').classList.add('hidden');
+    }
+
+    function showDashboard() {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('admin-dashboard-view').classList.remove('hidden');
+      switchTab('analytics');
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+        jwtToken = data.token;
+        localStorage.setItem('sst_admin_token', jwtToken);
+        showToast('Authenticated successfully!');
+        checkAuth();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    function logout() {
+      jwtToken = '';
+      localStorage.removeItem('sst_admin_token');
+      showLogin();
+      showToast('Logged out');
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      const tabs = ['analytics', 'leads', 'announcements', 'events', 'careers', 'applications', 'offerings', 'registrations'];
+      tabs.forEach(t => {
+        const content = document.getElementById(`tab-content-${t}`);
+        const nav = document.getElementById(`tab-nav-${t}`);
+        if (t === tab) {
+          if (content) content.classList.remove('hidden');
+          if (nav) nav.classList.add('active');
+        } else {
+          if (content) content.classList.add('hidden');
+          if (nav) nav.classList.remove('active');
+        }
+      });
+
+      const titleEl = document.getElementById('tab-title');
+      const subEl = document.getElementById('tab-subtitle');
+      const actionBtn = document.getElementById('action-header-btn');
+      actionBtn.innerHTML = '';
+
+      if (tab === 'analytics') {
+        titleEl.textContent = 'Dashboard & BI Analytics';
+        subEl.textContent = 'Real-time telemetry and overview metrics across all corporate pipelines.';
+        loadAnalytics();
+      } else if (tab === 'leads') {
+        titleEl.textContent = 'Leads CRM Inbox';
+        subEl.textContent = 'Review incoming client contact inquiries, manage pipeline statuses, and dispatch Brevo emails.';
+        loadLeads();
+      } else if (tab === 'announcements') {
+        titleEl.textContent = 'Announcements Manager';
+        subEl.textContent = 'Full CRUD: Publish, update, and toggle active site-wide alert banners.';
+        actionBtn.innerHTML = `<button onclick="openAnnouncementModal()" class="px-3.5 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-plus-lg"></i><span>Add Announcement</span></button>`;
+        loadAnnouncements();
+      } else if (tab === 'events') {
+        titleEl.textContent = 'Events & Contests Manager';
+        subEl.textContent = 'Full CRUD: Create, edit, set status, and delete events.';
+        actionBtn.innerHTML = `<button onclick="openEventModal()" class="px-3.5 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-plus-lg"></i><span>Add Event</span></button>`;
+        loadEvents();
+      } else if (tab === 'careers') {
+        titleEl.textContent = 'Career Openings Manager';
+        subEl.textContent = 'Full CRUD: Post jobs, edit descriptions, toggle status, and delete roles.';
+        actionBtn.innerHTML = `<button onclick="openCareerModal()" class="px-3.5 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-plus-lg"></i><span>Add Job Opening</span></button>`;
+        loadCareers();
+      } else if (tab === 'applications') {
+        titleEl.textContent = 'Job Applications Inbox';
+        subEl.textContent = 'Full CRUD: Review candidate applications, update hiring status, and manage candidates.';
+        loadApplications();
+      } else if (tab === 'offerings') {
+        titleEl.textContent = 'Courses & Services Catalog';
+        subEl.textContent = 'Full CRUD: Manage training courses and software engineering service packages.';
+        actionBtn.innerHTML = `<button onclick="openOfferingModal()" class="px-3.5 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-plus-lg"></i><span>Add Offering</span></button>`;
+        loadOfferings();
+      } else if (tab === 'registrations') {
+        titleEl.textContent = 'Event Registrations Roster';
+        subEl.textContent = 'Full CRUD: View event attendee registrations and remove entries.';
+        loadRegistrations();
+      }
+    }
+
+    function refreshCurrentTab() {
+      const spinner = document.getElementById('refresh-spinner');
+      if (spinner) spinner.classList.add('animate-spin');
+      switchTab(currentTab);
+      setTimeout(() => {
+        if (spinner) spinner.classList.remove('animate-spin');
+        showToast('Data refreshed');
+      }, 500);
+    }
+
+    // 1. ANALYTICS
+    async function loadAnalytics() {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/analytics`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        document.getElementById('stat-apps').textContent = data.metrics.totalApplications;
+        document.getElementById('stat-events').textContent = data.metrics.totalEvents;
+        document.getElementById('stat-jobs').textContent = data.metrics.totalJobs;
+        document.getElementById('stat-views').textContent = data.metrics.totalViews;
+        document.getElementById('stat-leads').textContent = data.metrics.totalLeads || 0;
+
+        document.getElementById('badge-applications-count').textContent = data.metrics.totalApplications;
+        document.getElementById('badge-events-count').textContent = data.metrics.totalEvents;
+        document.getElementById('badge-careers-count').textContent = data.metrics.totalJobs;
+        document.getElementById('badge-leads-count').textContent = data.metrics.totalLeads || 0;
+
+        const popEl = document.getElementById('popular-pages-list');
+        popEl.innerHTML = data.popularPages.map(p => `
+          <div class="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-lg text-xs">
+            <span class="font-mono text-slate-700">${p.page_path}</span>
+            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-mono font-bold rounded">${p.views} views</span>
+          </div>
+        `).join('') || '<p class="text-xs text-slate-400">No page view telemetry recorded yet.</p>';
+
+        const appEl = document.getElementById('recent-apps-list');
+        appEl.innerHTML = data.recentApplications.map(a => `
+          <div class="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-lg text-xs">
+            <div>
+              <span class="block font-bold text-slate-800">${a.applicant_name}</span>
+              <span class="block text-[11px] text-slate-500">${a.job_title}</span>
+            </div>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded ${
+              a.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+            }">${a.status}</span>
+          </div>
+        `).join('') || '<p class="text-xs text-slate-400">No candidate applications submitted yet.</p>';
+      } catch (err) {
+        showToast('Failed to load analytics', 'error');
+      }
+    }
+
+    // SKELETON TABLE ROW RENDERER
+    function renderTableSkeleton(tbodyId, rowsCount = 4) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      tbody.innerHTML = Array(rowsCount).fill(`
+        <tr class="animate-pulse border-b border-slate-100">
+          <td class="p-3"><div class="h-3.5 bg-slate-200 rounded-md w-16"></div></td>
+          <td class="p-3 space-y-1.5">
+            <div class="h-3.5 bg-slate-200 rounded-md w-32"></div>
+            <div class="h-2.5 bg-slate-150 rounded-md w-24"></div>
+          </td>
+          <td class="p-3"><div class="h-3.5 bg-slate-200 rounded-md w-40"></div></td>
+          <td class="p-3"><div class="h-3.5 bg-slate-200 rounded-md w-24"></div></td>
+          <td class="p-3"><div class="h-5 bg-slate-200 rounded-full w-20"></div></td>
+          <td class="p-3 text-right"><div class="h-6 bg-slate-200 rounded-lg w-16 ml-auto"></div></td>
+        </tr>
+      `).join('');
+    }
+
+    // 2. LEADS CRM INBOX
+    async function loadLeads() {
+      renderTableSkeleton('leads-table-body');
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/leads`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        document.getElementById('badge-leads-count').textContent = data.leads.length;
+        const tbody = document.getElementById('leads-table-body');
+        tbody.innerHTML = data.leads.map(l => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 text-slate-500 font-mono">${new Date(l.created_at).toLocaleDateString()}</td>
+            <td class="p-3">
+              <span class="block font-bold text-slate-900">${l.name}</span>
+              <span class="block text-[11px] text-slate-500">${l.email}</span>
+            </td>
+            <td class="p-3">
+              <span class="block font-semibold text-[#123B32]">${l.subject || 'Inquiry'}</span>
+              <span class="block text-[10px] text-slate-400">${l.service_category || 'General'}</span>
+            </td>
+            <td class="p-3 font-mono text-slate-500">${l.phone || '-'}</td>
+            <td class="p-3">
+              <select onchange="updateLeadStatus(${l.id}, this.value)" class="bg-white text-slate-700 border border-slate-200 rounded px-2 py-1 text-[11px] font-semibold">
+                <option value="New Lead" ${l.status === 'New Lead' ? 'selected' : ''}>New Lead</option>
+                <option value="Contacted" ${l.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+                <option value="Proposal Sent" ${l.status === 'Proposal Sent' ? 'selected' : ''}>Proposal Sent</option>
+                <option value="Converted" ${l.status === 'Converted' ? 'selected' : ''}>Converted</option>
+              </select>
+            </td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="openSendEmailModal('${l.email}', '${l.name}', 'RE: ${l.subject || 'Inquiry'}')" title="Send Brevo Email" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-[11px] font-semibold"><i class="bi bi-envelope-at"></i> Email</button>
+              <button onclick="viewLeadDetail(${JSON.stringify(l).replace(/"/g, '&quot;')})" title="View Inquiry" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px]"><i class="bi bi-eye"></i> View</button>
+              <button onclick="confirmDeleteLead(${l.id})" title="Delete Lead" class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No client inquiries received.</td></tr>';
+      } catch (err) {
+        showToast('Error loading leads', 'error');
+      }
+    }
+
+    async function updateLeadStatus(id, status) {
+      try {
+        await fetch(`${API_BASE}/api/admin/leads/${id}/status`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ status })
+        });
+        showToast(`Lead status updated to ${status}`);
+      } catch (err) {
+        showToast('Status update failed', 'error');
+      }
+    }
+
+    function confirmDeleteLead(id) {
+      showConfirmModal('Delete Lead', 'Are you sure you want to remove this lead inquiry?', 'Delete Lead', async () => {
+        try {
+          await fetch(`${API_BASE}/api/admin/leads/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          showToast('Lead deleted');
+          loadLeads();
+        } catch (err) {
+          showToast('Delete failed', 'error');
+        }
+      });
+    }
+
+    function viewLeadDetail(l) {
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900">Client Lead Inquiry Detail</h3>
+        <div class="space-y-3 text-xs text-slate-700">
+          <div><strong class="text-slate-500">Contact Name:</strong> ${l.name}</div>
+          <div><strong class="text-slate-500">Email Address:</strong> ${l.email}</div>
+          <div><strong class="text-slate-500">Phone Number:</strong> ${l.phone || 'N/A'}</div>
+          <div><strong class="text-slate-500">Subject:</strong> ${l.subject || 'General'}</div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="block text-slate-500 font-semibold mb-1">Message Body:</span>
+            <p class="whitespace-pre-line text-slate-800">${l.message}</p>
+          </div>
+        </div>
+        <div class="flex justify-between items-center pt-3">
+          <button onclick="openSendEmailModal('${l.email}', '${l.name}', 'RE: ${l.subject}')" class="px-4 py-2 bg-[#123B32] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5"><i class="bi bi-send"></i> Reply via Brevo Email</button>
+          <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-800 font-semibold rounded-xl text-xs">Close</button>
+        </div>
+      `);
+    }
+
+    // 3. ANNOUNCEMENTS CRUD
+    let announcementsData = [];
+    async function loadAnnouncements() {
+      renderTableSkeleton('announcements-table-body');
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/announcements`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        announcementsData = data.announcements || [];
+        document.getElementById('badge-announcements-count').textContent = announcementsData.length;
+        const tbody = document.getElementById('announcements-table-body');
+        tbody.innerHTML = announcementsData.map(a => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold text-slate-600">${a.priority}</td>
+            <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded font-semibold text-[10px]">${a.badge_type}</span></td>
+            <td class="p-3">
+              <span class="block font-bold text-slate-900">${a.title}</span>
+              <span class="block text-[11px] text-slate-500 truncate max-w-md">${a.content}</span>
+            </td>
+            <td class="p-3 font-mono text-slate-500 text-[11px]">${a.link_url || '-'}</td>
+            <td class="p-3">
+              <button onclick="toggleAnnouncementStatus(${a.id}, ${!a.is_active})" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase cursor-pointer ${a.is_active ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}">
+                ${a.is_active ? 'Active' : 'Inactive'}
+              </button>
+            </td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="openAnnouncementModal(${a.id})" title="Edit Announcement" class="p-1 text-slate-600 hover:text-[#123B32] hover:bg-slate-100 rounded"><i class="bi bi-pencil"></i></button>
+              <button onclick="confirmDeleteAnnouncement(${a.id})" title="Delete Announcement" class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No announcements found.</td></tr>';
+      } catch (err) {
+        showToast('Error loading announcements', 'error');
+      }
+    }
+
+    function openAnnouncementModal(id = null) {
+      const isEdit = !!id;
+      const ann = isEdit ? announcementsData.find(a => a.id === id) : {};
+
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900">${isEdit ? 'Edit Announcement' : 'Add New Announcement'}</h3>
+        <form onsubmit="saveAnnouncement(event, ${id || 'null'})" class="space-y-3.5 text-xs">
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Title</label>
+            <input type="text" id="ann-title" required value="${ann.title || ''}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Content</label>
+            <textarea id="ann-content" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 h-20 focus:outline-none focus:border-[#123B32]">${ann.content || ''}</textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Badge Tag</label>
+              <input type="text" id="ann-badge" value="${ann.badge_type || 'New'}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Priority Order</label>
+              <input type="number" id="ann-priority" value="${ann.priority || 1}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Target Link URL (optional)</label>
+            <input type="text" id="ann-link" value="${ann.link_url || ''}" placeholder="events.html" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+          </div>
+          <div class="flex items-center gap-2 pt-1">
+            <input type="checkbox" id="ann-active" ${ann.is_active !== false ? 'checked' : ''} class="w-4 h-4 rounded text-[#123B32]">
+            <label for="ann-active" class="text-slate-700 font-semibold">Active Banner</label>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-[#123B32] text-white font-semibold rounded-xl shadow-xs">${isEdit ? 'Update Banner' : 'Save Banner'}</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function saveAnnouncement(e, id = null) {
+      e.preventDefault();
+      const body = {
+        title: document.getElementById('ann-title').value,
+        content: document.getElementById('ann-content').value,
+        badge_type: document.getElementById('ann-badge').value,
+        priority: parseInt(document.getElementById('ann-priority').value) || 1,
+        link_url: document.getElementById('ann-link').value,
+        is_active: document.getElementById('ann-active').checked
+      };
+
+      try {
+        const url = id ? `${API_BASE}/api/admin/announcements/${id}` : `${API_BASE}/api/admin/announcements`;
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: getAuthHeaders(),
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('Failed to save announcement');
+        showToast(id ? 'Announcement updated!' : 'Announcement created live!');
+        closeModal();
+        loadAnnouncements();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function quickPublishAnnouncement(e) {
+      e.preventDefault();
+      const title = document.getElementById('quick-ann-title').value;
+      const content = document.getElementById('quick-ann-content').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/announcements`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ title, content, badge_type: 'Urgent', priority: 1, is_active: true })
+        });
+        if (!res.ok) throw new Error('Quick publish failed');
+        showToast('Instant Announcement published!');
+        document.getElementById('quick-ann-title').value = '';
+        document.getElementById('quick-ann-content').value = '';
+        if (currentTab === 'announcements') loadAnnouncements();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function toggleAnnouncementStatus(id, newStatus) {
+      const ann = announcementsData.find(a => a.id === id);
+      if (!ann) return;
+      try {
+        await fetch(`${API_BASE}/api/admin/announcements/${id}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ ...ann, is_active: newStatus })
+        });
+        showToast(`Status updated to ${newStatus ? 'Active' : 'Inactive'}`);
+        loadAnnouncements();
+      } catch (err) {
+        showToast('Update failed', 'error');
+      }
+    }
+
+    function confirmDeleteAnnouncement(id) {
+      showConfirmModal('Delete Announcement', 'Are you sure you want to remove this announcement banner?', 'Delete Banner', async () => {
+        try {
+          await fetch(`${API_BASE}/api/admin/announcements/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          showToast('Announcement deleted');
+          loadAnnouncements();
+        } catch (err) {
+          showToast('Delete failed', 'error');
+        }
+      });
+    }
+
+    // 4. EVENTS CRUD
+    let eventsData = [];
+    async function loadEvents() {
+      renderTableSkeleton('events-table-body');
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/events`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        eventsData = data.events || [];
+        document.getElementById('badge-events-count').textContent = eventsData.length;
+        const tbody = document.getElementById('events-table-body');
+        tbody.innerHTML = eventsData.map(ev => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3"><span class="px-2 py-0.5 bg-sky-50 text-sky-800 font-bold rounded text-[10px]">${ev.category}</span></td>
+            <td class="p-3">
+              <span class="block font-bold text-slate-900">${ev.title}</span>
+              <span class="block text-[11px] text-slate-500 truncate max-w-sm">${ev.description}</span>
+            </td>
+            <td class="p-3 text-slate-600 font-mono text-[11px]">${ev.event_date}</td>
+            <td class="p-3 text-slate-500">${ev.location}</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                ev.status === 'Upcoming' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-500'
+              }">${ev.status}</span>
+            </td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="openEventModal(${ev.id})" title="Edit Event" class="p-1 text-slate-600 hover:text-[#123B32] hover:bg-slate-100 rounded"><i class="bi bi-pencil"></i></button>
+              <button onclick="confirmDeleteEvent(${ev.id})" title="Delete Event" class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No events found.</td></tr>';
+      } catch (err) {
+        showToast('Error loading events', 'error');
+      }
+    }
+
+    function handleAdminFileUpload(event, targetInputId, previewId) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const maxSizeBytes = 10 * 1024 * 1024; // 10 MB limit
+      if (file.size > maxSizeBytes) {
+        showToast('File size exceeds 10 MB limit. Please select a smaller file (Max 10 MB).', 'error');
+        event.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function() {
+        document.getElementById(targetInputId).value = reader.result;
+        const prev = document.getElementById(previewId);
+        if (prev) {
+          prev.src = reader.result;
+          prev.classList.remove('hidden');
+        }
+        showToast(`File attached (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function openEventModal(id = null) {
+      const isEdit = !!id;
+      const ev = isEdit ? eventsData.find(e => e.id === id) : {};
+
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900">${isEdit ? 'Edit Event' : 'Add New Event'}</h3>
+        <form onsubmit="saveEvent(event, ${id || 'null'})" class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Title</label>
+            <input type="text" id="ev-title" required value="${ev.title || ''}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Category</label>
+              <input type="text" id="ev-category" value="${ev.category || 'Hackathon'}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Event Date</label>
+              <input type="text" id="ev-date" value="${ev.event_date || ''}" placeholder="Sept 25, 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Location</label>
+              <input type="text" id="ev-location" value="${ev.location || ''}" placeholder="SST Tech Hub, Salem" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Registration Fee</label>
+              <input type="text" id="ev-fee" value="${ev.registration_fee || 'Free'}" placeholder="₹499 / Team or Free" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Status</label>
+            <select id="ev-status" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+              <option value="Upcoming" ${ev.status === 'Upcoming' ? 'selected' : ''}>Upcoming</option>
+              <option value="Completed" ${ev.status === 'Completed' ? 'selected' : ''}>Completed</option>
+              <option value="Cancelled" ${ev.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Upload Event Cover Image (Max 10 MB)</label>
+            <input type="file" accept="image/*" onchange="handleAdminFileUpload(event, 'ev-img', 'ev-img-prev')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 cursor-pointer">
+            <input type="hidden" id="ev-img" value="${ev.image_url || ''}">
+            <img id="ev-img-prev" src="${ev.image_url || ''}" class="${ev.image_url ? '' : 'hidden'} h-24 w-full object-cover rounded-xl mt-2 border border-slate-200">
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Description</label>
+            <textarea id="ev-desc" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 h-16 focus:outline-none focus:border-[#123B32]">${ev.description || ''}</textarea>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-[#123B32] text-white font-semibold rounded-xl shadow-xs">${isEdit ? 'Update Event' : 'Publish Event'}</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function saveEvent(e, id = null) {
+      e.preventDefault();
+      const body = {
+        title: document.getElementById('ev-title').value,
+        category: document.getElementById('ev-category').value,
+        event_date: document.getElementById('ev-date').value,
+        location: document.getElementById('ev-location').value,
+        registration_fee: document.getElementById('ev-fee').value,
+        image_url: document.getElementById('ev-img').value,
+        description: document.getElementById('ev-desc').value,
+        status: document.getElementById('ev-status').value
+      };
+
+      try {
+        const url = id ? `${API_BASE}/api/admin/events/${id}` : `${API_BASE}/api/admin/events`;
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: getAuthHeaders(),
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('Failed to save event');
+        showToast(id ? 'Event updated!' : 'Event published!');
+        closeModal();
+        loadEvents();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function confirmDeleteEvent(id) {
+      showConfirmModal('Delete Event', 'Are you sure you want to delete this event posting?', 'Delete Event', async () => {
+        try {
+          await fetch(`${API_BASE}/api/admin/events/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          showToast('Event deleted');
+          loadEvents();
+        } catch (err) {
+          showToast('Delete failed', 'error');
+        }
+      });
+    }
+
+    // 5. CAREERS CRUD
+    let careersData = [];
+    async function loadCareers() {
+      renderTableSkeleton('careers-table-body');
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/careers`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        careersData = data.careers || [];
+        document.getElementById('badge-careers-count').textContent = careersData.length;
+        const tbody = document.getElementById('careers-table-body');
+        tbody.innerHTML = careersData.map(j => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-bold text-slate-900">${j.title}</td>
+            <td class="p-3 text-slate-600">${j.department}</td>
+            <td class="p-3 text-slate-500">${j.job_type} • ${j.location}</td>
+            <td class="p-3 font-mono font-semibold text-[#C47D4C]">${j.salary_range}</td>
+            <td class="p-3">
+              <button onclick="toggleCareerStatus(${j.id}, '${j.status === 'Open' ? 'Closed' : 'Open'}')" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase cursor-pointer ${
+                j.status === 'Open' ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+              }">${j.status}</button>
+            </td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="openCareerModal(${j.id})" title="Edit Job Opening" class="p-1 text-slate-600 hover:text-[#123B32] hover:bg-slate-100 rounded"><i class="bi bi-pencil"></i></button>
+              <button onclick="confirmDeleteCareer(${j.id})" title="Delete Job Opening" class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No job openings found.</td></tr>';
+      } catch (err) {
+        showToast('Error loading careers', 'error');
+      }
+    }
+
+    function openCareerModal(id = null) {
+      const isEdit = !!id;
+      const j = isEdit ? careersData.find(c => c.id === id) : {};
+
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900">${isEdit ? 'Edit Job Opening' : 'Add New Job Opening'}</h3>
+        <form onsubmit="saveCareer(event, ${id || 'null'})" class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Job Title</label>
+            <input type="text" id="job-title" required value="${j.title || ''}" placeholder="Full Stack Developer" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Department</label>
+              <input type="text" id="job-dept" value="${j.department || 'Software Engineering'}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Job Type</label>
+              <input type="text" id="job-type" value="${j.job_type || 'Full-time'}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Location</label>
+              <input type="text" id="job-loc" value="${j.location || 'Salem, TN'}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Salary Range</label>
+              <input type="text" id="job-salary" value="${j.salary_range || ''}" placeholder="₹4.5L - ₹7.5L / year" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Job Description</label>
+            <textarea id="job-desc" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 h-16 focus:outline-none focus:border-[#123B32]">${j.description || ''}</textarea>
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Upload Job Cover Image (Max 10 MB)</label>
+            <input type="file" accept="image/*" onchange="handleAdminFileUpload(event, 'job-img', 'job-img-prev')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 cursor-pointer">
+            <input type="hidden" id="job-img" value="${j.image_url || ''}">
+            <img id="job-img-prev" src="${j.image_url || ''}" class="${j.image_url ? '' : 'hidden'} h-24 w-full object-cover rounded-xl mt-2 border border-slate-200">
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Requirements</label>
+            <textarea id="job-req" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 h-16 focus:outline-none focus:border-[#123B32]">${j.requirements || ''}</textarea>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-[#123B32] text-white font-semibold rounded-xl shadow-xs">${isEdit ? 'Update Job' : 'Post Job'}</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function saveCareer(e, id = null) {
+      e.preventDefault();
+      const body = {
+        title: document.getElementById('job-title').value,
+        department: document.getElementById('job-dept').value,
+        job_type: document.getElementById('job-type').value,
+        location: document.getElementById('job-loc').value,
+        salary_range: document.getElementById('job-salary').value,
+        image_url: document.getElementById('job-img').value,
+        description: document.getElementById('job-desc').value,
+        requirements: document.getElementById('job-req').value,
+        status: 'Open'
+      };
+
+      try {
+        const url = id ? `${API_BASE}/api/admin/careers/${id}` : `${API_BASE}/api/admin/careers`;
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: getAuthHeaders(),
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('Failed to save job');
+        showToast(id ? 'Job opening updated!' : 'Job opening posted!');
+        closeModal();
+        loadCareers();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function toggleCareerStatus(id, newStatus) {
+      const c = careersData.find(j => j.id === id);
+      if (!c) return;
+      try {
+        await fetch(`${API_BASE}/api/admin/careers/${id}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ ...c, status: newStatus })
+        });
+        showToast(`Job status updated to ${newStatus}`);
+        loadCareers();
+      } catch (err) {
+        showToast('Update failed', 'error');
+      }
+    }
+
+    function confirmDeleteCareer(id) {
+      showConfirmModal('Delete Job Posting', 'Are you sure you want to remove this job opening?', 'Delete Job', async () => {
+        try {
+          await fetch(`${API_BASE}/api/admin/careers/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          showToast('Job posting deleted');
+          loadCareers();
+        } catch (err) {
+          showToast('Delete failed', 'error');
+        }
+      });
+    }
+
+    // 6. APPLICATIONS INBOX
+    async function loadApplications() {
+      renderTableSkeleton('applications-table-body');
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/applications`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        document.getElementById('badge-applications-count').textContent = data.applications.length;
+        const tbody = document.getElementById('applications-table-body');
+        tbody.innerHTML = data.applications.map(app => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 text-slate-500 font-mono">${new Date(app.submitted_at).toLocaleDateString()}</td>
+            <td class="p-3 font-bold text-slate-900">
+              <span class="block font-bold text-slate-900">${app.applicant_name}</span>
+              <span class="inline-block mt-0.5 px-2 py-0.2 bg-sky-50 text-sky-800 border border-sky-200 font-mono font-bold text-[10px] rounded">🔖 ${app.token_no || 'Pending Token'}</span>
+            </td>
+            <td class="p-3 text-[#123B32] font-semibold">${app.job_title}</td>
+            <td class="p-3 text-slate-600">
+              <span class="block">${app.email}</span>
+              <span class="block text-[10px] text-slate-400 font-mono">${app.phone || '-'}</span>
+            </td>
+            <td class="p-3">
+              <select onchange="updateAppStatus(${app.id}, this.value)" class="bg-white text-slate-700 border border-slate-200 rounded px-2 py-1 text-[11px] font-semibold">
+                <option value="Pending" ${app.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                <option value="Shortlisted" ${app.status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
+                <option value="Interviewed" ${app.status === 'Interviewed' ? 'selected' : ''}>Interviewed</option>
+                <option value="Rejected" ${app.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+              </select>
+            </td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="openSendEmailModal('${app.email}', '${app.applicant_name}', 'Interview Update: ${app.job_title} @ Shazu Soft Technologies')" title="Send Brevo Email" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-[11px] font-semibold"><i class="bi bi-envelope-at"></i> Email</button>
+              <button onclick="viewApplicationDetail(${JSON.stringify(app).replace(/"/g, '&quot;')})" title="View Detail" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px]"><i class="bi bi-eye"></i> View</button>
+              <button onclick="confirmDeleteApplication(${app.id})" title="Delete Application" class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No applications received.</td></tr>';
+      } catch (err) {
+        showToast('Error loading applications', 'error');
+      }
+    }
+
+    async function updateAppStatus(id, status) {
+      try {
+        await fetch(`${API_BASE}/api/admin/applications/${id}/status`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ status })
+        });
+        showToast(`Pipeline status updated to ${status}`);
+      } catch (err) {
+        showToast('Status update failed', 'error');
+      }
+    }
+
+    function confirmDeleteApplication(id) {
+      showConfirmModal('Delete Application', 'Are you sure you want to delete candidate application entry?', 'Delete Entry', async () => {
+        try {
+          await fetch(`${API_BASE}/api/admin/applications/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          showToast('Application deleted');
+          loadApplications();
+        } catch (err) {
+          showToast('Delete failed', 'error');
+        }
+      });
+    }
+
+    function viewApplicationDetail(app) {
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900">Candidate Application Detail</h3>
+        <div class="space-y-3 text-xs text-slate-700">
+          <div><strong class="text-slate-500">Applicant Name:</strong> ${app.applicant_name}</div>
+          <div><strong class="text-slate-500">Email Address:</strong> ${app.email}</div>
+          <div><strong class="text-slate-500">Applied Position:</strong> ${app.job_title}</div>
+          <div><strong class="text-slate-500">Phone Number:</strong> ${app.phone || 'N/A'}</div>
+          <div><strong class="text-slate-500">Resume / Document:</strong> ${
+            app.resume_url ? (
+              app.resume_url.startsWith('data:') ? 
+                `<a href="${app.resume_url}" download="Candidate_Resume_${app.applicant_name.replace(/\s+/g, '_')}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#123B32] text-white font-bold rounded-lg text-xs shadow-xs hover:bg-[#2F5B4E] transition-colors"><i class="bi bi-file-earmark-arrow-down-fill text-sm"></i> Download / View Attached Base64 Document</a>` :
+                `<a href="${app.resume_url}" target="_blank" class="text-[#123B32] font-bold underline">${app.resume_url}</a>`
+            ) : 'Not provided'
+          }</div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="block text-slate-500 font-semibold mb-1">Cover Note / Intro:</span>
+            <p class="whitespace-pre-line text-slate-800">${app.message || 'No additional note provided.'}</p>
+          </div>
+        </div>
+        <div class="flex justify-between items-center pt-3">
+          <button onclick="openSendEmailModal('${app.email}', '${app.applicant_name}', 'Interview Update: ${app.job_title}')" class="px-4 py-2 bg-[#123B32] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5"><i class="bi bi-send"></i> Send Email via Brevo</button>
+          <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-800 font-semibold rounded-xl text-xs">Close</button>
+        </div>
+      `);
+    }
+
+    // 7. COURSES & SERVICES CRUD
+    let offeringsData = [];
+    async function loadOfferings() {
+      renderTableSkeleton('offerings-table-body');
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/courses-services`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        offeringsData = data.offerings || [];
+        const tbody = document.getElementById('offerings-table-body');
+        tbody.innerHTML = offeringsData.map(o => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3"><span class="px-2 py-0.5 bg-indigo-50 text-indigo-800 font-bold rounded text-[10px]">${o.offering_type}</span></td>
+            <td class="p-3">
+              <span class="block font-bold text-slate-900">${o.title}</span>
+              <span class="block text-[11px] text-slate-500 truncate max-w-sm">${o.description}</span>
+            </td>
+            <td class="p-3 font-mono text-emerald-700 font-bold">${o.price_range}</td>
+            <td class="p-3 text-slate-600 font-mono">${o.duration}</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${o.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'}">${o.is_active ? 'Active' : 'Inactive'}</span>
+            </td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="openOfferingModal(${o.id})" title="Edit Offering" class="p-1 text-slate-600 hover:text-[#123B32] hover:bg-slate-100 rounded"><i class="bi bi-pencil"></i></button>
+              <button onclick="confirmDeleteOffering(${o.id})" title="Delete Offering" class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No courses or services found.</td></tr>';
+      } catch (err) {
+        showToast('Error loading courses/services', 'error');
+      }
+    }
+
+    function openOfferingModal(id = null) {
+      const isEdit = !!id;
+      const o = isEdit ? offeringsData.find(item => item.id === id) : {};
+
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900">${isEdit ? 'Edit Course/Service' : 'Add Course/Service Offering'}</h3>
+        <form onsubmit="saveOffering(event, ${id || 'null'})" class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Title</label>
+            <input type="text" id="off-title" required value="${o.title || ''}" placeholder="Full-Stack Web Engineering" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Type</label>
+              <select id="off-type" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+                <option value="Course" ${o.offering_type === 'Course' ? 'selected' : ''}>Course / Training</option>
+                <option value="Service" ${o.offering_type === 'Service' ? 'selected' : ''}>Software Service</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Price Range</label>
+              <input type="text" id="off-price" value="${o.price_range || ''}" placeholder="₹18,000 / student" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Duration</label>
+            <input type="text" id="off-duration" value="${o.duration || ''}" placeholder="12 Weeks" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Description</label>
+            <textarea id="off-desc" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 h-20 focus:outline-none focus:border-[#123B32]">${o.description || ''}</textarea>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-[#123B32] text-white font-semibold rounded-xl shadow-xs">${isEdit ? 'Update Offering' : 'Save Offering'}</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function saveOffering(e, id = null) {
+      e.preventDefault();
+      const body = {
+        title: document.getElementById('off-title').value,
+        offering_type: document.getElementById('off-type').value,
+        price_range: document.getElementById('off-price').value,
+        duration: document.getElementById('off-duration').value,
+        description: document.getElementById('off-desc').value,
+        is_active: true
+      };
+
+      try {
+        const url = id ? `${API_BASE}/api/admin/courses-services/${id}` : `${API_BASE}/api/admin/courses-services`;
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: getAuthHeaders(),
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('Failed to save offering');
+        showToast(id ? 'Offering updated!' : 'Offering published!');
+        closeModal();
+        loadOfferings();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function confirmDeleteOffering(id) {
+      showConfirmModal('Delete Offering', 'Are you sure you want to remove this course or service offering?', 'Delete Offering', async () => {
+        try {
+          await fetch(`${API_BASE}/api/admin/courses-services/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          showToast('Offering deleted');
+          loadOfferings();
+        } catch (err) {
+          showToast('Delete failed', 'error');
+        }
+      });
+    }
+
+    // 8. REGISTRATIONS
+    async function loadRegistrations() {
+      renderTableSkeleton('registrations-table-body');
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/event-registrations`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        document.getElementById('badge-registrations-count').textContent = data.registrations.length;
+        const tbody = document.getElementById('registrations-table-body');
+        tbody.innerHTML = data.registrations.map(r => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 text-slate-500 font-mono">${new Date(r.registered_at).toLocaleDateString()}</td>
+            <td class="p-3">
+              <span class="block font-bold text-slate-900">${r.name}</span>
+              <span class="block text-[11px] text-slate-500">${r.email} • ${r.phone || '-'}</span>
+              <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-[10px] rounded">🎟️ ${r.token_no || 'Pending Token'}</span>
+            </td>
+            <td class="p-3">
+              <span class="block font-semibold text-amber-700">${r.event_title}</span>
+              <span class="inline-block mt-0.5 px-2 py-0.2 bg-emerald-50 text-emerald-800 font-mono font-bold rounded text-[10px]">${r.registration_fee || 'Free'}</span>
+            </td>
+            <td class="p-3 font-mono text-slate-700 font-bold">
+              ${r.transaction_id ? `<span class="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs text-[#123B32]">${r.transaction_id}</span>` : '<span class="text-slate-400 font-normal">N/A (Free)</span>'}
+            </td>
+            <td class="p-3">
+              <select onchange="updateRegistrationPaymentStatus(${r.id}, this.value)" class="bg-white text-slate-800 border border-slate-200 rounded px-2 py-1 text-[11px] font-semibold">
+                <option value="Pending Verification" ${r.payment_status === 'Pending Verification' ? 'selected' : ''}>Pending Verification</option>
+                <option value="Verified" ${r.payment_status === 'Verified' ? 'selected' : ''}>Verified</option>
+                <option value="Rejected" ${r.payment_status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+              </select>
+            </td>
+            <td class="p-3 text-right space-x-1">
+              ${r.payment_status !== 'Verified' ? `<button onclick="updateRegistrationPaymentStatus(${r.id}, 'Verified')" title="Verify Payment & Issue Pass" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded text-[11px]"><i class="bi bi-check-circle"></i> Verify Pass</button>` : ''}
+              <button onclick="confirmDeleteRegistration(${r.id})" title="Delete Registration" class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No event registrations found.</td></tr>';
+      } catch (err) {
+        showToast('Error loading registrations', 'error');
+      }
+    }
+
+    async function updateRegistrationPaymentStatus(id, payment_status) {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/event-registrations/${id}/payment`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ payment_status })
+        });
+        if (!res.ok) throw new Error('Payment status update failed');
+        showToast(payment_status === 'Verified' ? 'Payment Verified! Official Entry Pass emailed.' : `Status updated to ${payment_status}`);
+        loadRegistrations();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function confirmDeleteRegistration(id) {
+      showConfirmModal('Delete Registration', 'Are you sure you want to delete this event attendee registration?', 'Delete Registration', async () => {
+        try {
+          await fetch(`${API_BASE}/api/admin/event-registrations/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          showToast('Registration deleted');
+          loadRegistrations();
+        } catch (err) {
+          showToast('Delete failed', 'error');
+        }
+      });
+    }
+
+    // 9. DIRECT BREVO EMAIL DISPATCH MODAL
+    function openSendEmailModal(toEmail = '', toName = '', defaultSubject = 'Message from Shazu Soft Technologies') {
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900 flex items-center gap-2">
+          <i class="bi bi-send-fill text-[#123B32]"></i>
+          <span>Send Direct Brevo Email</span>
+        </h3>
+        <form onsubmit="sendDirectEmail(event)" class="space-y-3.5 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Recipient Name</label>
+              <input type="text" id="email-to-name" value="${toName}" placeholder="John Doe" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Recipient Email *</label>
+              <input type="email" id="email-to-email" required value="${toEmail}" placeholder="john@example.com" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Subject Line *</label>
+            <input type="text" id="email-subject" required value="${defaultSubject}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Email Message Body *</label>
+            <textarea id="email-body" required placeholder="Type your email message..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 h-28 focus:outline-none focus:border-[#123B32]"></textarea>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-semibold">Cancel</button>
+            <button type="submit" class="px-5 py-2 bg-[#123B32] text-white font-semibold rounded-xl shadow-xs flex items-center gap-1.5"><i class="bi bi-send"></i> Dispatch Email</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function sendDirectEmail(e) {
+      e.preventDefault();
+      const toEmail = document.getElementById('email-to-email').value;
+      const toName = document.getElementById('email-to-name').value;
+      const subject = document.getElementById('email-subject').value;
+      const message = document.getElementById('email-body').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/email/send`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ toEmail, toName, subject, message })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to send email');
+        showToast(`Email sent via Brevo to ${toEmail}`);
+        closeModal();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function exportApplicationsCSV() {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/applications`, { headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!data.applications || data.applications.length === 0) {
+          showToast('No applications to export', 'error');
+          return;
+        }
+
+        let csv = 'ID,Submitted Date,Applicant Name,Email,Phone,Position,Status,Resume URL,Message\n';
+        data.applications.forEach(a => {
+          csv += `"${a.id}","${a.submitted_at}","${a.applicant_name}","${a.email}","${a.phone}","${a.job_title}","${a.status}","${a.resume_url}","${(a.message || '').replace(/"/g, '""')}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `sst_applications_${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        showToast('Applications exported to CSV!');
+      } catch (err) {
+        showToast('Export failed', 'error');
+      }
+    }
+
+    function handleGlobalSearch(query) {
+      const q = query.toLowerCase();
+      const rows = document.querySelectorAll('tbody tr');
+      rows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        if (!q || text.includes(q)) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+
+    function showModal(html) {
+      document.getElementById('modal-container').innerHTML = html;
+      document.getElementById('modal-backdrop').classList.remove('hidden');
+    }
+    function closeModal() {
+      document.getElementById('modal-backdrop').classList.add('hidden');
+    }
+
+    checkAuth();
+  </script>
+</body>
+</html>

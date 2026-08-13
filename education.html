@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Education Services | Shazu Soft Technologies</title>
+  <meta name="description" content="Explore Shazu Soft Technologies' education offerings including Hackathons, Internships, Projects, FDPs and Skills Development.">
+  <link rel="canonical" href="https://shazusofttechnologies.org/education.html">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              white: '#F5F3EC',       // Light Background (Warm Off-White)
+              cardBg: '#FFFFFF',      // Pure White
+              lightGreen: '#E8EFEB',   // Soft Green BG
+              green: '#123B32',       // Primary Dark Green
+              secGreen: '#2F5B4E',    // Secondary Green
+              accent: '#527A68',      // Accent Green
+              copper: '#C47D4C',      // Warm Accent (Muted Copper)
+              darkText: '#26322E',    // Charcoal Green Dark Text
+              secText: '#527A68',     // Secondary Text
+              border: '#D3DDD7',      // Soft Muted Border
+              softGreen: '#E8EFEB',   // Very Light Green
+              hoverGreen: '#2F5B4E'   // Professional Green Hover
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="js/theme.js"></script>
+  <link rel="icon" href="https://shazusofttechnologies.org/sst.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+</head>
+<body class="bg-brand-white text-brand-darkText antialiased">
+  <!-- Page Loading Splash Screen -->
+  <div id="page-preloader">
+    <div class="flex flex-col items-center text-center space-y-4 max-w-xs px-4">
+      <!-- Animated SST Logo Container -->
+      <div class="relative flex items-center justify-center p-4">
+        <!-- Glowing Outer Pulse Ring -->
+        <div class="absolute w-28 h-28 rounded-full bg-[#E8EFEB]0/10 dark:bg-[#123B32]/10 animate-ping pointer-events-none"></div>
+        
+        <!-- Rotating Spinner Border -->
+        <div class="w-28 h-28 rounded-full border-3 border-slate-200 dark:border-slate-800 border-t-[#123B32] border-r-[#123B32] animate-spin absolute"></div>
+        
+        <!-- SST Company Logo -->
+        <img src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-16 w-auto relative z-10 animate-pulse">
+      </div>
+
+      <!-- SST Branding Text -->
+      <div class="space-y-0.5 pt-1">
+        <span class="block font-heading font-black text-lg tracking-tight text-[#0F172A] dark:text-white">SHAZU SOFT</span>
+        <span class="block text-xs font-extrabold tracking-widest text-[#123B32] uppercase">Technologies</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Off-Canvas Backdrop (Root Stacking Context z-index 99988) -->
+  <div id="mobile-backdrop" class="mobile-drawer-backdrop"></div>
+
+        <!-- Mobile Side Navigation Drawer (Root Stacking Context z-index 99999) -->
+  <aside id="mobile-menu" class="mobile-drawer-content font-heading text-[#0F172A]">
+    <div class="flex-1 overflow-y-auto">
+      <!-- Drawer Header -->
+      <div class="p-4 border-b border-[#E2E8F0] flex items-center justify-between bg-white">
+        <a href="index.html" class="flex items-center space-x-2.5">
+          <img src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-10 w-auto">
+          <div>
+            <span class="block font-heading font-black text-sm tracking-tight text-[#0F172A]">SHAZU SOFT</span>
+            <span class="block text-[10px] font-bold tracking-wider text-[#123B32] uppercase">Technologies</span>
+          </div>
+        </a>
+        <button id="mobile-close-btn" class="w-8 h-8 rounded-full bg-[#E8EFEB] hover:bg-[#E8EFEB] text-[#64748B] hover:text-[#123B32] flex items-center justify-center transition-colors cursor-pointer" aria-label="Close Navigation Menu">
+          <i class="bi bi-x-lg text-xs pointer-events-none"></i>
+        </button>
+      </div>
+
+      <!-- Drawer Nav Links -->
+      <nav class="p-3 space-y-1.5">
+        <a href="index.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-estate text-base text-[#123B32]"></i>
+            <span>Home</span>
+          </div>
+        </a>
+
+        <!-- About Us Accordion -->
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="uil uil-info-circle text-base text-[#123B32]"></i>
+              <span>About Us</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
+          </button>
+          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
+            <a href="about.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">About Company</a>
+            <a href="membership.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Membership & Chapters</a>
+          </div>
+        </div>
+
+        <!-- Services Accordion -->
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-[#E8EFEB] border-l-3 border-[#123B32] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="uil uil-setting text-base text-[#123B32]"></i>
+              <span>Services</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow rotate-180"></i>
+          </button>
+          <div class="mobile-accordion-menu pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
+            <a href="services.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">All Services</a>
+            <a href="education.html" class="block py-1 text-xs text-[#123B32] font-bold">Education Services</a>
+            <a href="software.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Software Services</a>
+            <a href="research.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Research Services</a>
+          </div>
+        </div>
+
+        <!-- Events Accordion -->
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="uil uil-calendar-alt text-base text-[#123B32]"></i>
+              <span>Events</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
+          </button>
+          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
+            <a href="events.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Upcoming Events</a>
+            <a href="events.html#hackathons" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Hackathons & Contests</a>
+          </div>
+        </div>
+
+        <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-briefcase-alt text-base text-[#123B32]"></i>
+            <span>Career</span>
+          </div>
+        </a>
+        <a href="contact.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-envelope text-base text-[#123B32]"></i>
+            <span>Contact Us</span>
+          </div>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Drawer Footer CTA -->
+    <div class="p-4 border-t border-[#E2E8F0] bg-[#E8EFEB]">
+      <a href="membership.html" class="flex items-center justify-center gap-2 w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-lg text-xs shadow-xs transition-all">
+        <i class="uil uil-user-plus text-sm"></i> Join Us
+      </a>
+    </div>
+  </aside>
+
+    <!-- Header Section -->
+  <!-- Combined Sticky Top Announcement Bar & Header Section -->
+  <div class="sticky top-0 z-40 w-full">
+    <div id="dynamic-announcement-bar"></div>
+    <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
+      <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <!-- Brand Logo & Name -->
+      <a href="index.html" class="flex items-center space-x-3 group">
+        <img src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
+        <div>
+          <span class="block font-heading font-black text-lg tracking-tight leading-tight text-[#0F172A]">SHAZU SOFT</span>
+          <span class="block text-xs font-bold tracking-wider text-[#123B32] uppercase">Technologies</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links with Dropdown Sub-Menus -->
+      <nav class="hidden lg:flex items-center space-x-1 font-heading">
+        <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
+
+        <!-- About Us Dropdown -->
+        <div class="relative group">
+          <a href="about.html" class="nav-link-pill flex items-center gap-1">
+            <i class="uil uil-info-circle text-[14px]"></i>
+            <span>About Us</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+            <div class="bg-white dark:bg-[#1e293b] border border-[#E2E8F0] dark:border-[#334155] rounded-xl shadow-xl p-2 space-y-1">
+              <a href="about.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
+                <i class="bi bi-building text-[#123B32] dark:text-[#527A68]"></i>
+                <span class="text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68]">About Company</span>
+              </a>
+              <a href="membership.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
+                <i class="bi bi-people text-[#123B32] dark:text-[#527A68]"></i>
+                <span class="text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68]">Membership & Chapters</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services Dropdown -->
+        <div class="relative group">
+          <a href="services.html" class="nav-link-pill active flex items-center gap-1">
+            <i class="uil uil-setting text-[14px]"></i>
+            <span>Services</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[260px]">
+            <div class="bg-white dark:bg-[#1e293b] border border-[#E2E8F0] dark:border-[#334155] rounded-xl shadow-xl p-2 space-y-1">
+              <a href="education.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 text-[#123B32] dark:text-[#527A68] flex items-center justify-center text-base shrink-0">
+                  <i class="uil uil-graduation-cap"></i>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68] leading-none">Education Services</span>
+                  <span class="block text-[10px] text-[#64748B] dark:text-[#cbd5e1] mt-1 font-normal">Internships, Hackathons & Mentoring</span>
+                </div>
+              </a>
+              <a href="software.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 text-[#123B32] dark:text-[#527A68] flex items-center justify-center text-base shrink-0">
+                  <i class="bi bi-code-square"></i>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68] leading-none">Software Services</span>
+                  <span class="block text-[10px] text-[#64748B] dark:text-[#cbd5e1] mt-1 font-normal">Full Stack & Web Application Dev</span>
+                </div>
+              </a>
+              <a href="research.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 text-[#123B32] dark:text-[#527A68] flex items-center justify-center text-base shrink-0">
+                  <i class="bi bi-journal-richtext"></i>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68] leading-none">Research Services</span>
+                  <span class="block text-[10px] text-[#64748B] dark:text-[#cbd5e1] mt-1 font-normal">Conferences, Papers & Patents</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Events Dropdown -->
+        <div class="relative group">
+          <a href="events.html" class="nav-link-pill flex items-center gap-1">
+            <i class="uil uil-calendar-alt text-[14px]"></i>
+            <span>Events</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+            <div class="bg-white dark:bg-[#1e293b] border border-[#E2E8F0] dark:border-[#334155] rounded-xl shadow-xl p-2 space-y-1">
+              <a href="events.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
+                <i class="bi bi-calendar-event text-[#123B32] dark:text-[#527A68]"></i>
+                <span class="text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68]">Upcoming Events</span>
+              </a>
+              <a href="events.html#hackathons" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
+                <i class="bi bi-laptop text-[#123B32] dark:text-[#527A68]"></i>
+                <span class="text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68]">Hackathons & Contests</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+        <a href="contact.html" class="nav-link-pill"><i class="uil uil-envelope text-[14px]"></i>Contact Us</a>
+      </nav>
+
+      <!-- CTA Action Button & Theme Toggle -->
+      <div class="flex items-center gap-3">
+        <!-- Light / Dark Theme Toggle Switcher -->
+        <label class="switch" title="Toggle Theme">
+          <input class="theme-toggle-input" type="checkbox" />
+          <div class="slider round">
+            <div class="sun-moon">
+              <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+
+              <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+            </div>
+            <div class="stars">
+              <svg id="star-1" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-2" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-3" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-4" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+            </div>
+          </div>
+        </label>
+
+        <div class="hidden lg:block">
+          <a href="membership.html" class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold transition-all duration-150 shadow-xs">
+            Join Us
+          </a>
+        </div>
+      </div>
+
+      <!-- Pure Tailwind Animated Hamburger Bars -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 text-[#0F172A] hover:text-[#123B32] focus:outline-none cursor-pointer relative z-40 flex flex-col justify-center items-center w-10 h-10 space-y-1.5" aria-label="Toggle Navigation Menu">
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pt-20">
+    <!-- Education Hero -->
+    <section data-aos="fade-up" class="hero-bg py-12 md:py-16 border-b border-brand-border">
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-7 text-left space-y-4 animate-fade-up">
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-green bg-[#E8EFEB] dark:bg-emerald-950/60 px-3 py-1 rounded-full inline-block">ACADEMIC & EDUCATION DIVISION</span>
+          <h1 class="text-3xl md:text-5xl font-extrabold text-brand-darkText dark:text-[#f8fafc] font-heading">
+            Education Services
+          </h1>
+          <p class="text-brand-secText dark:text-[#cbd5e1] text-base md:text-lg max-w-2xl leading-relaxed">
+            Bridging the curriculum gap through certified training, practical problem-solving contests, and comprehensive faculty development programs.
+          </p>
+        </div>
+        <div class="lg:col-span-5 flex justify-center">
+          <div class="p-3 bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl shadow-xl hover-lift">
+            <img src="images/education.png" alt="Education Services Illustration" class="max-h-72 w-auto object-contain img-interactive img-float">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Grid Layout -->
+    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- Hackathon -->
+          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
+                <i class="bi bi-laptop"></i>
+              </div>
+              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Hackathon</h3>
+              <p class="text-brand-secText text-[11.5px] leading-relaxed">
+                Coordinating intra-college and open hackathon tournaments where participants develop minimal prototypes of software programs to tackle contemporary global needs.
+              </p>
+            </div>
+          </div>
+
+          <!-- Internship -->
+          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
+                <i class="text-[15px] uil uil-briefcase-alt"></i>
+              </div>
+              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Internship</h3>
+              <p class="text-brand-secText text-[11.5px] leading-relaxed">
+                Certified internship arrangements covering web application development, computational algorithms, and quantitative auditing for final-year engineering scholars.
+              </p>
+            </div>
+          </div>
+
+          <!-- Innovative Project -->
+          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
+                <i class="uil uil-lightbulb"></i>
+              </div>
+              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Innovative Project</h3>
+              <p class="text-brand-secText text-[11.5px] leading-relaxed">
+                Specialized project advisory groups matching senior developers with student teams to construct innovative projects using real datasets.
+              </p>
+            </div>
+          </div>
+
+          <!-- Hands-on Training -->
+          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
+                <i class="uil uil-setting-wide-connected"></i>
+              </div>
+              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Hands-on Training</h3>
+              <p class="text-brand-secText text-[11.5px] leading-relaxed">
+                Direct lab configurations and instructional workshops detailing modern scripting environments, layout libraries, and versioning toolsets.
+              </p>
+            </div>
+          </div>
+
+          <!-- FDP / Seminar -->
+          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
+                <i class="uil uil-users-alt"></i>
+              </div>
+              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">FDP / Seminar</h3>
+              <p class="text-brand-secText text-[11.5px] leading-relaxed">
+                Faculty Development Programs (FDP) structured to align college lecturers with contemporary software lifecycle methodologies and research patterns.
+              </p>
+            </div>
+          </div>
+
+          <!-- Skills Development -->
+          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
+                <i class="uil uil-award"></i>
+              </div>
+              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Skills Development</h3>
+              <p class="text-brand-secText text-[11.5px] leading-relaxed">
+                Comprehensive training programs covering behavioral communications, logical reasoning, and industry programming languages to boost job placement rates.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Accreditation Advisory Banner with glassmorphism-blue -->
+    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-brand-lightGreen">
+      <div class="max-w-4xl mx-auto px-6 text-center">
+        <div class="glassmorphism-blue p-6 md:p-12 rounded-2xl border border-brand-green/20 space-y-6">
+          <h3 class="text-2xl font-extrabold font-heading text-brand-darkText">Collaborating with Mahendra Engineering College</h3>
+          <p class="text-brand-secText text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
+            Our MoU agreements deliver continuous industrial exposure workshops, certified technical modules, and project support frameworks directly to academic divisions in Salem & Namakkal region.
+          </p>
+          <div class="pt-2">
+            <a href="contact.html" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-brand-green hover:bg-brand-hoverGreen text-white font-semibold text-xs transition-all shadow-sm">
+              Schedule Campus Seminar
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="bg-[#17211D] text-[#E4EBE7] pt-16 pb-12 border-t border-emerald-950">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
+      <!-- Info Column -->
+      <div class="md:col-span-5 space-y-4">
+        <a href="index.html" class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-lg bg-brand-green text-white flex items-center justify-center font-bold text-lg">
+            S
+          </div>
+          <div>
+            <span class="block font-heading font-extrabold text-sm tracking-tight leading-tight text-white">SHAZU SOFT</span>
+            <span class="block text-[10px] font-semibold tracking-wider text-brand-green">Technologies</span>
+          </div>
+        </a>
+        <p class="text-[#66736D] text-xs leading-relaxed max-w-sm">
+          Shazu Soft Technologies is a technology-driven organization integrating software solutions, education, research, professional development, and industry-academia collaboration.
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="md:col-span-2 space-y-3">
+        <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Quick Links</h4>
+        <ul class="space-y-2 text-xs text-[#66736D]">
+          <li><a href="index.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-estate"></i>Home</a></li>
+          <li><a href="about.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-info-circle"></i>About Us</a></li>
+          <li><a href="services.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-setting"></i>Services</a></li>
+          <li><a href="events.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-calendar-alt"></i>Events</a></li>
+          <li><a href="careers.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-briefcase-alt"></i>Career</a></li>
+          <li><a href="membership.html" class="hover:text-white transition-colors duration-150">Membership</a></li>
+          <li><a href="contact.html" class="hover:text-white transition-colors duration-150">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Services List -->
+      <div class="md:col-span-2 space-y-3">
+        <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Services</h4>
+        <ul class="space-y-2 text-xs text-[#66736D]">
+          <li><a href="education.html" class="hover:text-white transition-colors duration-150">Education Services</a></li>
+          <li><a href="software.html" class="hover:text-white transition-colors duration-150">Software Services</a></li>
+          <li><a href="research.html" class="hover:text-white transition-colors duration-150">Research Services</a></li>
+          <li><a href="education.html" class="hover:text-white transition-colors duration-150">Internships</a></li>
+          <li><a href="education.html" class="hover:text-white transition-colors duration-150">Training Programs</a></li>
+          <li><a href="research.html" class="hover:text-white transition-colors duration-150">Conferences</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact details -->
+      <div class="md:col-span-3 space-y-3 text-[#66736D] text-xs">
+        <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Contact</h4>
+        <p class="leading-relaxed">
+          2nd Agraharam, Chairman Rajarathinam Street,<br>
+          Near Kamala Hospital,<br>
+          Salem, Tamil Nadu – 636001
+        </p>
+        <div class="space-y-1 pt-1">
+          
+          <p><span class="text-white">HR Phone:</span> +91 93616 80077</p>
+          <p><span class="text-white">Email:</span> info@shazusofttechnologies.org</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom footer details -->
+    <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-emerald-950/60 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#66736D]">
+      <p>© 2026 Shazu Soft Technologies. All Rights Reserved.</p>
+      <div class="flex space-x-6">
+        <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+        <a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript JS -->
+    <!-- Floating Action Buttons -->
+  <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/919361680077" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 group relative" aria-label="Chat on WhatsApp">
+      <i class="bi bi-whatsapp text-2xl"></i>
+      <span class="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+        Chat on WhatsApp
+      </span>
+    </a>
+    
+    <!-- AI Chatbot Trigger Button -->
+    <button id="chatbot-toggle-btn" class="w-12 h-12 rounded-full bg-gradient-to-br from-brand-green to-brand-hoverGreen text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 group relative" aria-label="Ask SST AI">
+      <i class="bi bi-robot text-2xl"></i>
+      <span class="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+        Ask SST AI
+      </span>
+    </button>
+  </div>
+
+  <!-- AI Chatbot Box Widget -->
+  <div id="chatbot-widget" class="hidden fixed bottom-20 right-6 w-[350px] md:w-[380px] h-[500px] z-50 bg-white border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 font-heading">
+    <!-- Chat Header -->
+    <div class="bg-slate-900 text-white p-4 flex items-center justify-between border-b border-slate-800">
+      <div class="flex items-center gap-2.5">
+        <img src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-10 w-auto">
+        <div>
+          <h4 class="font-extrabold text-sm leading-none">SST AI Assistant</h4>
+          <span class="text-[10px] text-green-400 font-bold flex items-center gap-1 mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> Online
+          </span>
+        </div>
+      </div>
+      <button id="chatbot-close-btn" class="text-slate-400 hover:text-white text-xl focus:outline-none">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+
+    <!-- Chat Messages Scroll Container -->
+    <div id="chatbot-messages" class="flex-1 min-h-0 p-4 overflow-y-auto bg-slate-50 dark:bg-[#0f172a] space-y-3.5 text-xs text-brand-darkText dark:text-[#f8fafc]">
+      <!-- Bot Intro Message -->
+      <div class="flex items-start gap-2 max-w-[88%]">
+        <div class="w-7 h-7 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 border border-brand-border dark:border-[#334155] flex items-center justify-center flex-shrink-0 text-[#123B32] dark:text-[#527A68]">
+          <i class="bi bi-robot"></i>
+        </div>
+        <div class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] px-3.5 py-2.5 rounded-2xl rounded-tl-none shadow-sm leading-relaxed text-left">
+          Hello! Welcome to Shazu Soft Technologies. I'm your AI assistant. How can I help you today with our software, education, or research services?
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing Indicator (hidden by default) -->
+    <div id="chatbot-typing" class="hidden px-4 py-2 bg-slate-50 text-[11px] text-brand-secText italic flex items-center gap-1.5">
+      <span class="flex gap-0.5">
+        <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce"></span>
+        <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
+        <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
+      </span>
+      SST AI is typing...
+    </div>
+
+    <!-- Chat Input Area -->
+    <form id="chatbot-form" class="p-3 border-t border-brand-border bg-white flex gap-2">
+      <input type="text" id="chatbot-input" placeholder="Type your message..." autocomplete="off" class="flex-1 border border-brand-border px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:border-brand-green text-brand-darkText">
+      <button type="submit" class="w-9 h-9 rounded-xl bg-brand-green hover:bg-brand-hoverGreen text-white flex items-center justify-center shadow-md transition-all duration-150">
+        <i class="bi bi-send"></i>
+      </button>
+    </form>
+  </div>
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/chatbot.js"></script>
+</body>
+</html>
