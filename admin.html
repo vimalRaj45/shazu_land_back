@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS Play CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -74,7 +74,7 @@
     <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 backdrop-blur-xl p-8 rounded-3xl shadow-2xl space-y-6">
       <div class="text-center space-y-2">
         <div class="inline-flex items-center justify-center p-3.5 bg-[#123B32]/60 rounded-2xl border border-[#527A68]/40 mb-2 shadow-inner">
-          <img src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-12 w-auto">
+          <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-12 w-auto">
         </div>
         <h1 class="text-2xl font-extrabold font-heading text-white tracking-tight">SST Admin Control Panel</h1>
         <p class="text-xs text-slate-400">Authenticated access for dynamic content, Brevo & Neon DB</p>
@@ -130,7 +130,7 @@
       <div class="flex items-center gap-3">
         <a href="index.html" class="flex items-center gap-2 group">
           <div class="p-1.5 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
-            <img src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-6 w-auto">
+            <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-6 w-auto">
           </div>
           <span class="font-heading font-extrabold text-sm sm:text-base tracking-tight text-white">SHAZU SOFT</span>
           <span class="px-2 py-0.5 bg-[#C47D4C] text-[9px] sm:text-[10px] font-mono font-bold uppercase rounded text-white tracking-widest hidden sm:inline">CONTROL PANEL</span>
@@ -496,8 +496,8 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="js/hot-toast.js"></script>
+  <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script defer src="js/hot-toast.js"></script>
   
   <script>
     AOS.init({ duration: 400, once: true });
@@ -1081,7 +1081,7 @@
             <label class="block text-slate-600 font-semibold mb-1">Upload Event Cover Image (Max 10 MB)</label>
             <input type="file" accept="image/*" onchange="handleAdminFileUpload(event, 'ev-img', 'ev-img-prev')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 cursor-pointer">
             <input type="hidden" id="ev-img" value="${ev.image_url || ''}">
-            <img id="ev-img-prev" src="${ev.image_url || ''}" class="${ev.image_url ? '' : 'hidden'} h-24 w-full object-cover rounded-xl mt-2 border border-slate-200">
+            <img loading="lazy" decoding="async" id="ev-img-prev" src="${ev.image_url || ''}" class="${ev.image_url ? '' : 'hidden'} h-24 w-full object-cover rounded-xl mt-2 border border-slate-200">
           </div>
           <div>
             <label class="block text-slate-600 font-semibold mb-1">Description</label>
@@ -1209,7 +1209,7 @@
             <label class="block text-slate-600 font-semibold mb-1">Upload Job Cover Image (Max 10 MB)</label>
             <input type="file" accept="image/*" onchange="handleAdminFileUpload(event, 'job-img', 'job-img-prev')" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 cursor-pointer">
             <input type="hidden" id="job-img" value="${j.image_url || ''}">
-            <img id="job-img-prev" src="${j.image_url || ''}" class="${j.image_url ? '' : 'hidden'} h-24 w-full object-cover rounded-xl mt-2 border border-slate-200">
+            <img loading="lazy" decoding="async" id="job-img-prev" src="${j.image_url || ''}" class="${j.image_url ? '' : 'hidden'} h-24 w-full object-cover rounded-xl mt-2 border border-slate-200">
           </div>
           <div>
             <label class="block text-slate-600 font-semibold mb-1">Requirements</label>

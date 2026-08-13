@@ -147,7 +147,7 @@
           <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between overflow-hidden group">
             <!-- Job Cover Image Header -->
             <div class="h-40 w-full relative overflow-hidden bg-slate-100">
-              <img src="${coverImg}" alt="${job.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+              <img src="${coverImg}" alt="${job.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
               <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
                 <span class="px-3 py-1 bg-[#123B32]/90 backdrop-blur-md text-white font-bold text-[10px] rounded-full uppercase tracking-wider">${job.department}</span>
@@ -260,7 +260,7 @@
         <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
           <!-- Event Cover Image Banner -->
           <div class="h-44 w-full relative overflow-hidden bg-slate-100">
-            <img src="${eventImg}" alt="${ev.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
             
             <!-- Category & Status Overlay Badges -->
