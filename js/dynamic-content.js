@@ -47,11 +47,11 @@
       container.innerHTML = `
         <div class="bg-[#123B32] text-white border-b border-[#527A68]/40 py-1 px-4 overflow-hidden shadow-xs relative z-30 flex items-center gap-3">
           <!-- Left Fixed Announcements Trigger Button -->
-          <button onclick="openAllAnnouncementsModal()" class="shrink-0 bg-[#C47D4C] hover:bg-[#a66439] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 cursor-pointer z-10 transition-colors">
+          <a href="announcements.html" class="shrink-0 bg-[#C47D4C] hover:bg-[#a66439] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 cursor-pointer z-10 transition-colors">
             <i class="bi bi-megaphone-fill text-[10px]"></i>
             <span class="hidden sm:inline">Announcements</span>
             <span class="bg-white/20 px-1.5 py-0.2 rounded-full text-[9px] font-mono">${data.announcements.length}</span>
-          </button>
+          </a>
 
           <!-- Continuous Scrolling Ticker -->
           <div class="flex-1 overflow-hidden">
@@ -67,44 +67,95 @@
     }
   }
 
-  // Global All Announcements Modal
-  window.openAllAnnouncementsModal = function () {
-    const list = window.allAnnouncementsList || [];
-    const listHtml = list.length > 0 ? list.map(a => `
-      <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-2 text-left">
-        <div class="flex items-center justify-between gap-2">
-          <span class="px-2.5 py-0.5 rounded-full bg-[#123B32] text-white text-[10px] font-extrabold uppercase tracking-wider">${a.badge_type || 'Announcement'}</span>
-          <span class="text-[10px] font-mono text-slate-400">Priority ${a.priority || 1}</span>
-        </div>
-        <h4 class="text-sm font-bold text-slate-900 dark:text-white font-heading">${a.title}</h4>
-        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${a.content}</p>
-        ${a.link_url ? `<a href="${a.link_url}" class="inline-flex items-center gap-1 text-xs font-bold text-[#123B32] dark:text-emerald-400 hover:underline pt-1"><span>Official Announcement Link</span> <i class="bi bi-box-arrow-up-right"></i></a>` : ''}
-      </div>
-    `).join('') : '<p class="text-xs text-slate-400 text-center py-6">No active announcements right now.</p>';
+  // 2b. Dedicated Announcements Inside Page Loader
+  async function loadAnnouncementsPage() {
+    const container = document.getElementById('dynamic-all-announcements-container');
+    if (!container) return;
 
-    const modalHtml = `
-      <div id="all-announcements-modal-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-3xl p-6 shadow-2xl space-y-5 text-left">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
-            <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/80 text-[#C47D4C] flex items-center justify-center text-lg">
-                <i class="bi bi-megaphone-fill"></i>
-              </div>
-              <div>
-                <h3 class="text-base font-bold font-heading text-slate-900 dark:text-white">All Active Announcements</h3>
-                <p class="text-xs text-slate-500">Shazu Soft Technologies Official Noticeboard</p>
-              </div>
-            </div>
-            <button onclick="document.getElementById('all-announcements-modal-backdrop').remove()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-sm cursor-pointer"><i class="bi bi-x-lg"></i></button>
-          </div>
-          <div class="space-y-3">
-            ${listHtml}
-          </div>
-          <button onclick="document.getElementById('all-announcements-modal-backdrop').remove()" class="w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-semibold text-xs rounded-xl shadow-md cursor-pointer">Close Noticeboard</button>
+    try {
+      const res = await fetch(`${API_BASE}/api/public/announcements`);
+      const data = await res.json();
+      window.allAnnouncementsPageList = data.announcements || [];
+      renderAnnouncementsPageList(window.allAnnouncementsPageList);
+    } catch (err) {
+      console.warn('Could not load announcements page list:', err);
+      container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-xs">Could not load announcements at this moment.</div>`;
+    }
+  }
+
+  function renderAnnouncementsPageList(list) {
+    const container = document.getElementById('dynamic-all-announcements-container');
+    if (!container) return;
+
+    if (!list || list.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full py-16 text-center text-slate-400 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+          <i class="bi bi-inbox text-3xl mb-2 block"></i>
+          <p class="text-xs font-semibold">No announcements found in this category.</p>
         </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+      `;
+      return;
+    }
+
+    container.innerHTML = list.map(a => `
+      <article data-aos="fade-up" class="bg-white dark:bg-slate-900 border border-[#D3DDD7] dark:border-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 group">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <span class="px-3 py-0.5 rounded-full bg-[#123B32] text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
+              ${a.badge_type || 'Notice'}
+            </span>
+            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+              ${a.created_at ? new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Official'}
+            </span>
+          </div>
+
+          ${a.image_url ? `
+            <div class="w-full h-44 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 my-2">
+              <img loading="lazy" decoding="async" src="${a.image_url}" alt="${a.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            </div>
+          ` : ''}
+
+          <h3 class="text-base font-extrabold text-[#0F172A] dark:text-white font-heading leading-snug">
+            ${a.title}
+          </h3>
+
+          <p class="text-xs text-[#334E43] dark:text-slate-300 leading-relaxed">
+            ${a.content}
+          </p>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <span class="text-[11px] font-mono text-slate-400">#Notice-${a.id || 1}</span>
+          ${a.link_url ? `
+            <a href="${a.link_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#123B32] dark:text-emerald-400 hover:text-[#C47D4C] transition-colors">
+              <span>View Details</span>
+              <i class="bi bi-box-arrow-up-right text-[11px]"></i>
+            </a>
+          ` : `
+            <a href="contact.html" class="inline-flex items-center gap-1 text-xs font-bold text-[#123B32] dark:text-emerald-400 hover:underline">
+              <span>Inquire</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          `}
+        </div>
+      </article>
+    `).join('');
+  }
+
+  window.filterAnnouncements = function (badgeType, btnElement) {
+    const list = window.allAnnouncementsPageList || [];
+    const buttons = document.querySelectorAll('#announcement-filter-buttons button');
+    buttons.forEach(b => b.classList.remove('active'));
+    if (btnElement) {
+      btnElement.classList.add('active');
+    }
+
+    if (badgeType === 'all') {
+      renderAnnouncementsPageList(list);
+    } else {
+      const filtered = list.filter(a => (a.badge_type || '').toUpperCase() === badgeType.toUpperCase());
+      renderAnnouncementsPageList(filtered);
+    }
   };
 
   // 3. Load Dynamic Careers Listing
@@ -586,6 +637,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     trackPageView();
     loadAnnouncements();
+    loadAnnouncementsPage();
     loadCareers();
     loadEvents();
 
@@ -609,12 +661,8 @@
     const filterPills = document.querySelectorAll('.event-filter-pill');
     filterPills.forEach(pill => {
       pill.addEventListener('click', (e) => {
-        filterPills.forEach(p => {
-          p.classList.remove('bg-[#123B32]', 'text-white', 'shadow-md');
-          p.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
-        });
-        pill.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
-        pill.classList.add('bg-[#123B32]', 'text-white', 'shadow-md');
+        filterPills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
 
         const filter = pill.getAttribute('data-filter') || 'all';
         if (!window.allEventsData) return;

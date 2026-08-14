@@ -14,6 +14,15 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.25;
 }
 
+/* Text Justification for Paragraphs & Descriptions */
+p:not(.text-center):not(.text-center *):not(.text-right):not(.text-right *):not(#chatbot-widget *):not(.pill-badge *):not(.hero-pill-badge *):not(header *):not(.animate-marquee-track *),
+article p:not(.text-center):not(.text-center *),
+.card p:not(.text-center):not(.text-center *),
+.prose p:not(.text-center):not(.text-center *) {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
 /* Container Left/Right Spacing Enhancements */
 .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
   padding-left: 2rem !important;
@@ -47,7 +56,241 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Navigation Link Styling - Minimalist Light Blue & White Theme */
+/* Header & Navigation Link Styling */
+header {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+html.dark header {
+  background-color: rgba(15, 23, 42, 0.98) !important;
+  border-bottom: 1px solid #1E293B !important;
+}
+
+/* Header Brand Title & Subtitle Legibility & Responsive Exact Width Alignment */
+.brand-text-container {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  width: fit-content !important;
+  align-items: stretch !important;
+}
+
+.brand-title-text,
+header a span.brand-title-text,
+header a span.font-black {
+  color: #0F172A !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.01em !important;
+  white-space: nowrap !important;
+  display: block !important;
+  line-height: 1.15 !important;
+}
+
+.brand-sub-text,
+header a span.brand-sub-text {
+  color: #123B32 !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 8.5px !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  margin-top: 1px !important;
+}
+
+.brand-sub-text span {
+  display: inline-block !important;
+  color: inherit !important;
+}
+
+html.dark .brand-title-text,
+html.dark header a span.brand-title-text,
+html.dark header a span.font-black {
+  color: #FFFFFF !important;
+}
+
+html.dark .brand-sub-text,
+html.dark header a span.brand-sub-text {
+  color: #34D399 !important;
+}
+
+/* Footer and Mobile Drawer Alignment */
+footer .brand-sub-text {
+  color: #34D399 !important;
+  font-size: 8.5px !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+aside#mobile-menu .brand-title-text {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+  display: block !important;
+}
+
+aside#mobile-menu .brand-sub-text {
+  color: #123B32 !important;
+  font-size: 8.5px !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+/* ==========================================================================
+   Mobile Side Navigation Drawer Contrast & Bold Typography
+   ========================================================================== */
+aside#mobile-menu {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+}
+
+/* Mobile Drawer Navigation Links */
+aside#mobile-menu nav a,
+aside#mobile-menu nav button.mobile-accordion-toggle {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  letter-spacing: 0.05em !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+aside#mobile-menu nav a span,
+aside#mobile-menu nav button.mobile-accordion-toggle span {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+aside#mobile-menu nav a i,
+aside#mobile-menu nav button.mobile-accordion-toggle i {
+  color: #123B32 !important;
+  font-size: 16px !important;
+}
+
+aside#mobile-menu nav button.mobile-accordion-toggle i.accordion-arrow,
+aside#mobile-menu nav button.mobile-accordion-toggle i.bi-chevron-down {
+  color: #64748B !important;
+  font-size: 11px !important;
+}
+
+/* Inactive Mobile Drawer Navigation Links */
+aside#mobile-menu nav a:not(.active),
+aside#mobile-menu nav button.mobile-accordion-toggle:not(.active) {
+  background-color: transparent !important;
+  border-left: 3.5px solid transparent !important;
+  color: #0F172A !important;
+}
+
+aside#mobile-menu nav a:not(.active) span,
+aside#mobile-menu nav button.mobile-accordion-toggle:not(.active) span {
+  color: #0F172A !important;
+}
+
+/* Active Link in Mobile Drawer (ONLY .active) */
+aside#mobile-menu nav a.active,
+aside#mobile-menu nav button.mobile-accordion-toggle.active {
+  background-color: #E8EFEB !important;
+  color: #123B32 !important;
+  border-left: 3.5px solid #123B32 !important;
+}
+
+aside#mobile-menu nav a.active span,
+aside#mobile-menu nav a.active i,
+aside#mobile-menu nav button.mobile-accordion-toggle.active span,
+aside#mobile-menu nav button.mobile-accordion-toggle.active i {
+  color: #123B32 !important;
+}
+
+/* Hover State (Non-Active) */
+aside#mobile-menu nav a:not(.active):hover,
+aside#mobile-menu nav button.mobile-accordion-toggle:not(.active):hover {
+  background-color: #F1F5F3 !important;
+  color: #123B32 !important;
+}
+
+aside#mobile-menu nav a:not(.active):hover span,
+aside#mobile-menu nav button.mobile-accordion-toggle:not(.active):hover span {
+  color: #123B32 !important;
+}
+
+/* Submenu links inside Accordions */
+aside#mobile-menu .mobile-accordion-menu a {
+  color: #334E43 !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  letter-spacing: normal !important;
+}
+
+aside#mobile-menu .mobile-accordion-menu a:hover {
+  color: #123B32 !important;
+  padding-left: 4px !important;
+}
+
+/* Dark Mode Mobile Drawer */
+html.dark aside#mobile-menu {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+html.dark aside#mobile-menu .brand-title-text {
+  color: #FFFFFF !important;
+}
+
+html.dark aside#mobile-menu .brand-sub-text {
+  color: #34D399 !important;
+}
+
+html.dark aside#mobile-menu nav a:not(.active),
+html.dark aside#mobile-menu nav button.mobile-accordion-toggle:not(.active) {
+  background-color: transparent !important;
+  border-left: 3.5px solid transparent !important;
+  color: #F8FAFC !important;
+}
+
+html.dark aside#mobile-menu nav a:not(.active) span,
+html.dark aside#mobile-menu nav button.mobile-accordion-toggle:not(.active) span {
+  color: #F8FAFC !important;
+}
+
+html.dark aside#mobile-menu nav a.active,
+html.dark aside#mobile-menu nav button.mobile-accordion-toggle.active {
+  background-color: rgba(6, 78, 59, 0.4) !important;
+  color: #6EE7B7 !important;
+  border-left: 3.5px solid #10B981 !important;
+}
+
+html.dark aside#mobile-menu nav a.active span,
+html.dark aside#mobile-menu nav a.active i,
+html.dark aside#mobile-menu nav button.mobile-accordion-toggle.active span,
+html.dark aside#mobile-menu nav button.mobile-accordion-toggle.active i {
+  color: #6EE7B7 !important;
+}
+
+html.dark aside#mobile-menu nav a:not(.active):hover,
+html.dark aside#mobile-menu nav button.mobile-accordion-toggle:not(.active):hover {
+  background-color: #1E293B !important;
+  color: #6EE7B7 !important;
+}
+
+html.dark aside#mobile-menu nav a:not(.active):hover span,
+html.dark aside#mobile-menu nav button.mobile-accordion-toggle:not(.active):hover span {
+  color: #6EE7B7 !important;
+}
+
+html.dark aside#mobile-menu .mobile-accordion-menu a {
+  color: #CBD5E1 !important;
+}
+
+html.dark aside#mobile-menu .mobile-accordion-menu a:hover {
+  color: #6EE7B7 !important;
+}
+
 .nav-link-pill {
   font-family: 'Outfit', sans-serif !important;
   font-size: 16px !important;
@@ -62,12 +305,15 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap !important;
   border-radius: 8px !important;
   border: none !important;
+  position: relative !important;
 }
 
 .nav-link-pill.active {
   color: #123B32 !important; /* Primary Dark Green */
   font-weight: 700 !important;
-  background-color: #E8EFEB !important; /* Soft Green BG */
+  background-color: transparent !important; /* No background color, only underline */
+  border-bottom: 2.5px solid #123B32 !important;
+  border-radius: 0 !important;
 }
 
 .nav-link-pill:not(.active) {
@@ -78,6 +324,169 @@ h1, h2, h3, h4, h5, h6 {
 .nav-link-pill:not(.active):hover {
   color: #123B32 !important;
   background-color: #E8EFEB !important; /* Soft Green BG */
+}
+
+/* Professional Navbar Dropdown Menus */
+.nav-dropdown-menu {
+  background-color: #FFFFFF !important;
+  border: 1px solid #D3DDD7 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
+}
+
+.nav-dropdown-item {
+  border-radius: 4px !important;
+  transition: all 0.15s ease-in-out !important;
+  color: #0F172A !important;
+}
+
+.nav-dropdown-item span:first-child,
+.nav-dropdown-item .dropdown-title {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+.nav-dropdown-item span:last-child,
+.nav-dropdown-item .dropdown-desc {
+  color: #334E43 !important;
+  font-weight: 500 !important;
+}
+
+.nav-dropdown-item:hover {
+  background-color: #E8EFEB !important;
+}
+
+.nav-dropdown-item:hover span:first-child,
+.nav-dropdown-item:hover .dropdown-title {
+  color: #123B32 !important;
+}
+
+/* Hero Pill Badge */
+.hero-pill-badge {
+  background-color: #FFFFFF !important;
+  border: 1px solid #D3DDD7 !important;
+  color: #123B32 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.hero-pill-badge span,
+.hero-pill-badge i {
+  color: #123B32 !important;
+}
+
+.hero-pill-badge span.dot-separator {
+  color: #527A68 !important;
+}
+
+/* Event Search & Filter Bar */
+#event-search {
+  background-color: #F1F5F3 !important;
+  color: #0F172A !important;
+  border: 1px solid #D3DDD7 !important;
+}
+
+#event-search::placeholder {
+  color: #64748B !important;
+}
+
+html.dark #event-search {
+  background-color: #0F172A !important;
+  color: #FFFFFF !important;
+  border-color: #334155 !important;
+}
+
+html.dark #event-search::placeholder {
+  color: #94A3B8 !important;
+}
+
+.event-filter-pill {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1.5px solid #D3DDD7 !important;
+  font-weight: 700 !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.event-filter-pill:hover {
+  background-color: #E8EFEB !important;
+  color: #123B32 !important;
+  border-color: #123B32 !important;
+}
+
+.event-filter-pill.active {
+  background-color: #123B32 !important;
+  color: #FFFFFF !important;
+  border-color: #123B32 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(18, 59, 50, 0.25) !important;
+}
+
+html.dark .event-filter-pill {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
+  border-color: #334155 !important;
+}
+
+html.dark .event-filter-pill:hover {
+  background-color: #334155 !important;
+  color: #6EE7B7 !important;
+  border-color: #6EE7B7 !important;
+}
+
+html.dark .event-filter-pill.active {
+  background-color: #10B981 !important;
+  color: #022C22 !important;
+  border-color: #10B981 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Dark Mode Dropdown Styles */
+html.dark .nav-dropdown-menu {
+  background-color: #0F172A !important;
+  border-color: #334155 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .nav-dropdown-item {
+  color: #F8FAFC !important;
+}
+
+html.dark .nav-dropdown-item span:first-child,
+html.dark .nav-dropdown-item .dropdown-title {
+  color: #F8FAFC !important;
+  font-weight: 700 !important;
+}
+
+html.dark .nav-dropdown-item span:last-child,
+html.dark .nav-dropdown-item .dropdown-desc {
+  color: #94A3B8 !important;
+  font-weight: 400 !important;
+}
+
+html.dark .nav-dropdown-item:hover {
+  background-color: #1E293B !important;
+}
+
+html.dark .nav-dropdown-item:hover span:first-child,
+html.dark .nav-dropdown-item:hover .dropdown-title {
+  color: #6EE7B7 !important;
+}
+
+html.dark .hero-pill-badge {
+  background-color: rgba(6, 78, 59, 0.4) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #6EE7B7 !important;
+  box-shadow: none !important;
+}
+
+html.dark .hero-pill-badge span,
+html.dark .hero-pill-badge i {
+  color: #6EE7B7 !important;
+}
+
+html.dark .hero-pill-badge span.dot-separator {
+  color: #34D399 !important;
 }
 
 /* Mobile Off-Canvas Side Drawer (Minimalist White & Light Blue) */
@@ -290,23 +699,121 @@ input:focus, textarea:focus, select:focus, button:focus-visible, a:focus-visible
   opacity: 1;
 }
 
-/* Page Preloader Splash Screen */
-#page-preloader {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 999999 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background-color: #F5F3EC !important;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+/* ==========================================================================
+   Comprehensive Light Mode Foundations (High Contrast & Legibility)
+   ========================================================================== */
+html:not(.dark) {
+  color-scheme: light;
+  background-color: #FFFFFF;
+  color: #0F172A;
 }
 
-#page-preloader.fade-out {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+html:not(.dark) body {
+  background-color: #FFFFFF;
+  color: #0F172A;
+}
+
+/* Global Headings in Light Mode */
+html:not(.dark) main h1,
+html:not(.dark) main h2,
+html:not(.dark) main h3,
+html:not(.dark) main h4,
+html:not(.dark) main h5,
+html:not(.dark) main h6,
+html:not(.dark) header h1,
+html:not(.dark) header h2,
+html:not(.dark) header h3,
+html:not(.dark) header h4 {
+  color: #0F172A;
+}
+
+/* Global Paragraphs & Text Elements in Light Mode */
+html:not(.dark) main p,
+html:not(.dark) main li,
+html:not(.dark) header p {
+  color: #26322E;
+}
+
+/* High Contrast Brand Text Utilities in Light Mode */
+html:not(.dark) main .text-brand-darkText,
+html:not(.dark) main [class*="text-[#0F172A]"],
+html:not(.dark) main [class*="text-[#17211D]"] {
+  color: #0F172A !important;
+}
+
+html:not(.dark) main .text-brand-secText,
+html:not(.dark) main [class*="text-brand-secText"],
+html:not(.dark) main [class*="text-[#334E43]"],
+html:not(.dark) main [class*="text-[#527A68]"] {
+  color: #334E43 !important;
+}
+
+html:not(.dark) main [class*="text-[#475569]"],
+html:not(.dark) main [class*="text-[#64748B]"],
+html:not(.dark) main [class*="text-[#66736D]"] {
+  color: #334155 !important;
+}
+
+/* Brand Accent & Links in Light Mode */
+html:not(.dark) main .text-brand-green,
+html:not(.dark) main [class*="text-[#123B32]"] {
+  color: #123B32 !important;
+}
+
+html:not(.dark) main a.text-brand-green:hover,
+html:not(.dark) main a[class*="text-[#123B32]"]:hover {
+  color: #0D2B24 !important;
+}
+
+/* Card & Surface Defaults in Light Mode */
+html:not(.dark) .bg-white,
+html:not(.dark) div[class*="bg-white"] {
+  background-color: #FFFFFF;
+}
+
+html:not(.dark) .border-brand-border,
+html:not(.dark) [class*="border-[#D3DDD7]"],
+html:not(.dark) [class*="border-[#E2E8F0]"] {
+  border-color: #E2E8F0;
+}
+
+/* ==========================================================================
+   Global Footer High Contrast System (Both Light and Dark Modes)
+   ========================================================================== */
+footer {
+  background-color: #0F172A !important;
+  border-top: 1px solid #1E293B !important;
+  color: #CBD5E1 !important;
+}
+
+footer h4,
+footer h3,
+footer .font-heading {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+footer p {
+  color: #CBD5E1 !important;
+}
+
+footer ul li a {
+  color: #94A3B8 !important;
+  transition: color 0.15s ease-in-out !important;
+}
+
+footer ul li a:hover,
+footer .hover\:text-white:hover {
+  color: #FFFFFF !important;
+}
+
+footer .footer-subtitle,
+footer span.text-emerald-400 {
+  color: #34D399 !important;
+}
+
+footer .border-t {
+  border-top-color: #1E293B !important;
 }
 
 /* ==========================================================================
@@ -401,17 +908,10 @@ html.dark a[class*="text-[#123B32]"]:hover {
   color: #FDBA74 !important; /* Bright warm accent on hover */
 }
 
-/* Header Brand Logo & Text in Dark Mode */
-html.dark header a span,
-html.dark header a div span,
-html.dark header .brand-title {
-  color: #FFFFFF !important;
-}
-
-html.dark header a span.text-slate-500,
-html.dark header a span.text-slate-400,
-html.dark header a span.text-brand-secText {
-  color: #A7F3D0 !important; /* Bright mint green subtitle */
+/* Footer Brand Subtitle Legibility */
+footer a span.text-brand-green,
+footer span.text-brand-green {
+  color: #34D399 !important;
 }
 
 /* Background Surface Inversions */
@@ -475,10 +975,12 @@ html.dark .nav-link-pill:not(.active):hover {
 }
 
 html.dark .nav-link-pill.active {
-  color: #123B32 !important;
-  background-color: #E8EFEB !important;
+  color: #6EE7B7 !important;
+  background-color: transparent !important;
   font-weight: 700 !important;
-  box-shadow: 0 4px 12px rgba(232, 239, 235, 0.25) !important;
+  border-bottom: 2.5px solid #6EE7B7 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 /* Hamburger Bars in Dark Mode */
@@ -495,12 +997,6 @@ html.dark .mobile-drawer-content {
 
 html.dark .mobile-drawer-content div {
   border-color: #1e293b !important;
-}
-
-/* Preloader in Dark Mode */
-html.dark #page-preloader {
-  background-color: #0b0f19 !important;
-  color: #f8fafc !important;
 }
 
 /* AI Chatbot Widget in Dark Mode */
@@ -592,13 +1088,17 @@ html.dark #theme-toggle-btn:hover {
 }
 
 /* ==========================================================================
-   Chatbot Widget & Scrollbar Fixes
+   Chatbot Widget & Floating Trigger Styling (High Contrast in Light & Dark)
    ========================================================================== */
 #chatbot-widget {
+  background-color: #FFFFFF !important;
+  border: 1px solid #D3DDD7 !important;
+  color: #0F172A !important;
   max-height: calc(100vh - 110px) !important;
   display: flex !important;
   flex-direction: column !important;
-  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.4) !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35) !important;
+  z-index: 9999 !important;
 }
 
 #chatbot-widget.hidden {
@@ -612,51 +1112,176 @@ html.dark #theme-toggle-btn:hover {
   overflow-y: auto !important;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
 }
 
-/* Custom Scrollbar for Chatbot Messages */
-#chatbot-messages::-webkit-scrollbar {
-  width: 6px;
+/* Chatbot Message Bubbles in Light Mode */
+#chatbot-messages .bg-white,
+#chatbot-messages div[class*="bg-white"] {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #E2E8F0 !important;
 }
 
-#chatbot-messages::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 4px;
+#chatbot-messages p,
+#chatbot-messages span,
+#chatbot-messages div {
+  color: #0F172A;
 }
 
-#chatbot-messages::-webkit-scrollbar-thumb {
-  background: rgba(18, 59, 50, 0.4);
-  border-radius: 4px;
+/* User Message Bubble */
+#chatbot-messages .bg-\[\#123B32\],
+#chatbot-messages div[class*="bg-[#123B32]"] {
+  background-color: #123B32 !important;
+  color: #FFFFFF !important;
 }
 
-#chatbot-messages::-webkit-scrollbar-thumb:hover {
-  background: rgba(18, 59, 50, 0.7);
+#chatbot-messages .bg-\[\#123B32\] *,
+#chatbot-messages div[class*="bg-[#123B32]"] * {
+  color: #FFFFFF !important;
 }
 
-/* Dark mode chat styles */
+#chatbot-form {
+  background-color: #FFFFFF !important;
+  border-top: 1px solid #E2E8F0 !important;
+}
+
+#chatbot-input {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #D3DDD7 !important;
+}
+
+#chatbot-input::placeholder {
+  color: #64748B !important;
+}
+
+#chatbot-form button[type="submit"] {
+  background-color: #123B32 !important;
+  color: #FFFFFF !important;
+}
+
+#chatbot-form button[type="submit"] i {
+  color: #FFFFFF !important;
+}
+
+#chatbot-form button[type="submit"]:hover {
+  background-color: #1A4B40 !important;
+}
+
+/* Floating AI Chatbot Button & WhatsApp Trigger */
+#chatbot-toggle-btn {
+  background-color: #123B32 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 25px -5px rgba(18, 59, 50, 0.4) !important;
+  cursor: pointer !important;
+}
+
+#chatbot-toggle-btn i {
+  color: #FFFFFF !important;
+}
+
+#chatbot-toggle-btn:hover {
+  background-color: #1A4B40 !important;
+}
+
+/* Announcement Filter Buttons */
+.announcement-filter-btn {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1.5px solid #D3DDD7 !important;
+  font-weight: 700 !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.announcement-filter-btn:hover {
+  background-color: #E8EFEB !important;
+  color: #123B32 !important;
+  border-color: #123B32 !important;
+}
+
+.announcement-filter-btn.active {
+  background-color: #123B32 !important;
+  color: #FFFFFF !important;
+  border-color: #123B32 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(18, 59, 50, 0.25) !important;
+}
+
+/* Dark mode chat & announcement styles */
 html.dark #chatbot-widget {
-  background-color: #0f172a !important;
+  background-color: #0F172A !important;
   border-color: #334155 !important;
-  color: #f8fafc !important;
+  color: #F8FAFC !important;
 }
 
 html.dark #chatbot-messages {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
+  background-color: #0B0F19 !important;
+  color: #F8FAFC !important;
 }
 
-html.dark #chatbot-messages .bg-white {
-  background-color: #1e293b !important;
+html.dark #chatbot-messages .bg-white,
+html.dark #chatbot-messages div[class*="bg-white"],
+html.dark #chatbot-messages div[class*="bg-[#1e293b]"] {
+  background-color: #1E293B !important;
   border-color: #334155 !important;
-  color: #f8fafc !important;
+  color: #F8FAFC !important;
 }
 
-html.dark #chatbot-messages::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+html.dark #chatbot-messages p,
+html.dark #chatbot-messages span,
+html.dark #chatbot-messages div {
+  color: #F8FAFC;
 }
 
-html.dark #chatbot-messages::-webkit-scrollbar-thumb {
-  background: rgba(96, 165, 250, 0.5);
+html.dark #chatbot-form {
+  background-color: #0F172A !important;
+  border-top-color: #334155 !important;
+}
+
+html.dark #chatbot-input {
+  background-color: #0B0F19 !important;
+  color: #FFFFFF !important;
+  border-color: #334155 !important;
+}
+
+html.dark #chatbot-form button[type="submit"] {
+  background-color: #10B981 !important;
+  color: #022C22 !important;
+}
+
+html.dark #chatbot-form button[type="submit"] i {
+  color: #022C22 !important;
+}
+
+html.dark #chatbot-toggle-btn {
+  background-color: #10B981 !important;
+  color: #022C22 !important;
+}
+
+html.dark #chatbot-toggle-btn i {
+  color: #022C22 !important;
+}
+
+html.dark .announcement-filter-btn {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
+  border-color: #334155 !important;
+}
+
+html.dark .announcement-filter-btn:hover {
+  background-color: #334155 !important;
+  color: #6EE7B7 !important;
+  border-color: #6EE7B7 !important;
+}
+
+html.dark .announcement-filter-btn.active {
+  background-color: #10B981 !important;
+  color: #022C22 !important;
+  border-color: #10B981 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
 }
 
 /* ==========================================================================

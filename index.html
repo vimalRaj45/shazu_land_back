@@ -35,7 +35,7 @@
               accent: '#527A68',      // Accent Green
               copper: '#C47D4C',      // Warm Accent (Muted Copper)
               darkText: '#26322E',    // Charcoal Green Dark Text
-              secText: '#527A68',     // Secondary Text
+              secText: '#334E43',     // High-Contrast Forest Slate Secondary Text
               border: '#D3DDD7',      // Soft Muted Border
               softGreen: '#E8EFEB',   // Very Light Green
               hoverGreen: '#2F5B4E'   // Professional Green Hover
@@ -54,28 +54,6 @@
   <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
 </head>
 <body class="bg-brand-white text-brand-darkText antialiased">
-  <!-- Page Loading Splash Screen -->
-  <div id="page-preloader">
-    <div class="flex flex-col items-center text-center space-y-4 max-w-xs px-4">
-      <!-- Animated SST Logo Container -->
-      <div class="relative flex items-center justify-center p-4">
-        <!-- Glowing Outer Pulse Ring -->
-        <div class="absolute w-28 h-28 rounded-full bg-[#E8EFEB]0/10 dark:bg-[#123B32]/10 animate-ping pointer-events-none"></div>
-        
-        <!-- Rotating Spinner Border -->
-        <div class="w-28 h-28 rounded-full border-3 border-slate-200 dark:border-slate-800 border-t-[#123B32] border-r-[#123B32] animate-spin absolute"></div>
-        
-        <!-- SST Company Logo -->
-        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-16 w-auto relative z-10 animate-pulse">
-      </div>
-
-      <!-- SST Branding Text -->
-      <div class="space-y-0.5 pt-1">
-        <span class="block font-heading font-black text-lg tracking-tight text-[#0F172A] dark:text-white">SHAZU SOFT</span>
-        <span class="block text-xs font-extrabold tracking-widest text-[#123B32] uppercase">Technologies</span>
-      </div>
-    </div>
-  </div>
 
   <!-- Mobile Off-Canvas Backdrop (Root Stacking Context z-index 99988) -->
   <div id="mobile-backdrop" class="mobile-drawer-backdrop"></div>
@@ -84,12 +62,12 @@
   <aside id="mobile-menu" class="mobile-drawer-content font-heading text-[#0F172A]">
     <div class="flex-1 overflow-y-auto">
       <!-- Drawer Header -->
-      <div class="p-4 border-b border-[#E2E8F0] flex items-center justify-between bg-white">
+      <div class="p-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
         <a href="index.html" class="flex items-center space-x-2.5">
           <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-10 w-auto">
-          <div>
-            <span class="block font-heading font-black text-sm tracking-tight text-[#0F172A]">SHAZU SOFT</span>
-            <span class="block text-[10px] font-bold tracking-wider text-[#123B32] uppercase">Technologies</span>
+          <div class="brand-text-container">
+            <span class="brand-title-text text-sm">SHAZU SOFT</span>
+            <span class="brand-sub-text"><span>T</span><span>E</span><span>C</span><span>H</span><span>N</span><span>O</span><span>L</span><span>O</span><span>G</span><span>I</span><span>E</span><span>S</span></span>
           </div>
         </a>
         <button id="mobile-close-btn" class="w-8 h-8 rounded-full bg-[#E8EFEB] hover:bg-[#E8EFEB] text-[#64748B] hover:text-[#123B32] flex items-center justify-center transition-colors cursor-pointer" aria-label="Close Navigation Menu">
@@ -183,33 +161,32 @@
     <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <!-- Brand Logo & Name -->
-        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
-        <div>
-          <span class="block font-heading font-black text-lg tracking-tight leading-tight text-[#0F172A]">SHAZU SOFT</span>
-          <span class="block text-xs font-bold tracking-wider text-[#123B32] uppercase">Technologies</span>
-        </div>
-      </a>
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
+          <div class="brand-text-container">
+            <span class="brand-title-text text-lg">SHAZU SOFT</span>
+            <span class="brand-sub-text"><span>T</span><span>E</span><span>C</span><span>H</span><span>N</span><span>O</span><span>L</span><span>O</span><span>G</span><span>I</span><span>E</span><span>S</span></span>
+          </div>
+        </a>
 
       <!-- Navigation Links with Dropdown Sub-Menus -->
-      <nav class="hidden lg:flex items-center space-x-1 font-heading">
+      <nav class="hidden lg:flex items-center space-x-1 font-heading text-[#26322E] dark:text-[#E2E8F0]">
         <a href="index.html" class="nav-link-pill active"><i class="uil uil-estate text-[14px]"></i>Home</a>
 
         <!-- About Us Dropdown -->
         <div class="relative group">
-          <a href="about.html" class="nav-link-pill flex items-center gap-1">
+          <a href="about.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-info-circle text-[14px]"></i>
             <span>About Us</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
           </a>
           <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
-            <div class="bg-white dark:bg-[#1e293b] border border-[#E2E8F0] dark:border-[#334155] rounded-xl shadow-xl p-2 space-y-1">
-              <a href="about.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
-                <i class="bi bi-building text-[#123B32] dark:text-[#527A68]"></i>
-                <span class="text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68]">About Company</span>
+            <div class="nav-dropdown-menu p-1.5 space-y-0.5">
+              <a href="about.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">About Company</span>
               </a>
-              <a href="membership.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
-                <i class="bi bi-people text-[#123B32] dark:text-[#527A68]"></i>
-                <span class="text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68]">Membership & Chapters</span>
+              <a href="membership.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Membership & Chapters</span>
               </a>
             </div>
           </div>
@@ -217,39 +194,24 @@
 
         <!-- Services Dropdown -->
         <div class="relative group">
-          <a href="services.html" class="nav-link-pill flex items-center gap-1">
+          <a href="services.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-setting text-[14px]"></i>
             <span>Services</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
           </a>
           <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[260px]">
-            <div class="bg-white dark:bg-[#1e293b] border border-[#E2E8F0] dark:border-[#334155] rounded-xl shadow-xl p-2 space-y-1">
-              <a href="education.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
-                <div class="w-8 h-8 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 text-[#123B32] dark:text-[#527A68] flex items-center justify-center text-base shrink-0">
-                  <i class="uil uil-graduation-cap"></i>
-                </div>
-                <div>
-                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68] leading-none">Education Services</span>
-                  <span class="block text-[10px] text-[#64748B] dark:text-[#cbd5e1] mt-1 font-normal">Internships, Hackathons & Mentoring</span>
-                </div>
+            <div class="nav-dropdown-menu p-1.5 space-y-1">
+              <a href="education.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Education Services</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Internships, Hackathons & Mentoring</span>
               </a>
-              <a href="software.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
-                <div class="w-8 h-8 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 text-[#123B32] dark:text-[#527A68] flex items-center justify-center text-base shrink-0">
-                  <i class="bi bi-code-square"></i>
-                </div>
-                <div>
-                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68] leading-none">Software Services</span>
-                  <span class="block text-[10px] text-[#64748B] dark:text-[#cbd5e1] mt-1 font-normal">Full Stack & Web Application Dev</span>
-                </div>
+              <a href="software.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Software Services</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Full Stack & Web Application Dev</span>
               </a>
-              <a href="research.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
-                <div class="w-8 h-8 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 text-[#123B32] dark:text-[#527A68] flex items-center justify-center text-base shrink-0">
-                  <i class="bi bi-journal-richtext"></i>
-                </div>
-                <div>
-                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68] leading-none">Research Services</span>
-                  <span class="block text-[10px] text-[#64748B] dark:text-[#cbd5e1] mt-1 font-normal">Conferences, Papers & Patents</span>
-                </div>
+              <a href="research.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Research Services</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Conferences, Papers & Patents</span>
               </a>
             </div>
           </div>
@@ -257,27 +219,25 @@
 
         <!-- Events Dropdown -->
         <div class="relative group">
-          <a href="events.html" class="nav-link-pill flex items-center gap-1">
+          <a href="events.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-calendar-alt text-[14px]"></i>
             <span>Events</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
           </a>
           <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
-            <div class="bg-white dark:bg-[#1e293b] border border-[#E2E8F0] dark:border-[#334155] rounded-xl shadow-xl p-2 space-y-1">
-              <a href="events.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
-                <i class="bi bi-calendar-event text-[#123B32] dark:text-[#527A68]"></i>
-                <span class="text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68]">Upcoming Events</span>
+            <div class="nav-dropdown-menu p-1.5 space-y-0.5">
+              <a href="events.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Upcoming Events</span>
               </a>
-              <a href="events.html#hackathons" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#E8EFEB] dark:hover:bg-[#334155] group/sub transition-colors">
-                <i class="bi bi-laptop text-[#123B32] dark:text-[#527A68]"></i>
-                <span class="text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] group-hover/sub:text-[#123B32] dark:group-hover/sub:text-[#527A68]">Hackathons & Contests</span>
+              <a href="events.html#hackathons" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Hackathons & Contests</span>
               </a>
             </div>
           </div>
         </div>
 
-        <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
-        <a href="contact.html" class="nav-link-pill"><i class="uil uil-envelope text-[14px]"></i>Contact Us</a>
+        <a href="careers.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+        <a href="contact.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-envelope text-[14px]"></i>Contact Us</a>
       </nav>
 
       <!-- CTA Action Button & Theme Toggle -->
@@ -354,6 +314,7 @@
         <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
         <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
         <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+      </button>
     </div>
   </header>
 </div>
@@ -377,9 +338,13 @@
       <div class="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <!-- Hero Text content -->
         <div class="lg:col-span-7 space-y-6" data-aos="fade-right">
-          <div class="pill-badge bg-white dark:bg-slate-800 border border-[#D3DDD7] dark:border-[#2F5B4E] text-brand-green text-xs font-bold tracking-wide uppercase px-3.5 py-1.5 shadow-xs rounded-full inline-flex items-center gap-1.5">
-            <i class="bi bi-stars"></i>
-            <span>INNOVATION</span><span>•</span><span>RESEARCH</span><span>•</span><span>TECHNOLOGY</span>
+          <div class="hero-pill-badge text-xs font-black tracking-wider uppercase px-4 py-1.5 rounded-full inline-flex items-center gap-2">
+            <i class="bi bi-stars text-sm"></i>
+            <span class="font-extrabold tracking-wider">INNOVATION</span>
+            <span class="font-black dot-separator">•</span>
+            <span class="font-extrabold tracking-wider">RESEARCH</span>
+            <span class="font-black dot-separator">•</span>
+            <span class="font-extrabold tracking-wider">TECHNOLOGY</span>
           </div>
           <h1 class="text-3xl md:text-4xl lg:text-[42px] font-black text-brand-darkText dark:text-white tracking-tight leading-snug font-heading my-2">
             Bridging Ideas with <br>
@@ -389,10 +354,10 @@
             Shazu Soft Technologies empowers students, researchers, educational institutions, professionals, and businesses through technology, education, research, and professional development.
           </p>
           <div class="flex flex-wrap items-center gap-4 pt-2">
-            <a href="services.html" class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-gradient-to-br from-brand-green to-brand-hoverGreen text-white font-extrabold text-xs transition-all duration-200 shadow-lg shadow-[#123B32]/30 hover:-translate-y-0.5 hover:shadow-[#123B32]/40">
+            <a href="services.html" class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-[#123B32] hover:bg-[#1A4B40] text-white dark:bg-emerald-500 dark:hover:bg-emerald-400 dark:text-[#022C22] font-extrabold text-xs transition-all duration-200 shadow-lg shadow-[#123B32]/30 dark:shadow-emerald-950/40 hover:-translate-y-0.5">
               Explore Our Services
             </a>
-            <a href="events.html" class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white dark:bg-slate-800 border border-brand-border dark:border-slate-700 text-brand-darkText dark:text-white hover:border-slate-400 font-bold text-xs transition-all duration-200 hover:-translate-y-0.5 shadow-xs">
+            <a href="events.html" class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white dark:bg-slate-800 border border-[#D3DDD7] dark:border-slate-700 text-[#0F172A] dark:text-white hover:border-slate-400 dark:hover:border-slate-500 font-bold text-xs transition-all duration-200 hover:-translate-y-0.5 shadow-xs">
               Explore Events
             </a>
           </div>
@@ -410,13 +375,6 @@
         <!-- Hero visual / image area with Glassmorphism slider -->
         <div class="lg:col-span-5 relative flex justify-center" data-aos="zoom-in" data-aos-delay="150">
           <div class="relative w-full max-w-md bg-white border border-brand-border rounded-[18px] shadow-xl overflow-hidden">
-            <!-- Browser mockup bar -->
-            <div class="bg-slate-50 border-b border-brand-border px-4 py-2.5 flex items-center gap-1.5">
-              <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-              <div class="text-[10px] text-brand-secText font-bold mx-auto uppercase tracking-widest font-heading">SST Dynamic Console</div>
-            </div>
             <div class="relative aspect-square p-2">
             
             <!-- Slides Container -->
@@ -480,7 +438,7 @@
     <!-- Milestone Announcement Section -->
     <section class="py-12 md:py-10 md:py-12 bg-white border-y border-brand-border overflow-hidden">
       <div class="max-w-7xl mx-auto px-6">
-        <div class="sec-eyebrow inline-flex items-center gap-1 px-3 py-1.5 bg-brand-lightGreen border border-brand-border/60 text-brand-green font-bold text-[11px] tracking-wide uppercase rounded-full mb-3 shadow-sm bg-white">
+        <div class="sec-eyebrow inline-flex items-center gap-1 px-3 py-1.5 bg-brand-lightGreen border border-brand-border/60 text-brand-green font-bold text-[11px] tracking-wide uppercase rounded-full mb-3 shadow-sm">
           NEW BEGINNING
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
@@ -528,7 +486,7 @@
       <div class="max-w-7xl mx-auto px-6">
         <div class="flex justify-between items-end mb-12">
           <div>
-            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight font-heading">Latest Updates</h2>
+            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight font-heading text-brand-darkText">Latest Updates</h2>
             <div class="w-12 h-1 bg-brand-green mt-2 rounded"></div>
           </div>
         </div>
@@ -876,21 +834,21 @@
     </section>
 
     <!-- Final CTA Section with Glassmorphism green -->
-    <section class="py-12 md:py-10 md:py-12 bg-brand-lightGreen overflow-hidden">
+    <section class="py-12 md:py-10 md:py-12 bg-brand-lightGreen dark:bg-[#0b0f19] overflow-hidden">
       <div class="max-w-4xl mx-auto px-6 text-center">
         <!-- Accent green overlay card -->
-        <div data-aos="zoom-in" class="glassmorphism-blue rounded-2xl p-6 md:p-12 shadow-sm border border-brand-green/20 space-y-6">
-          <h2 class="text-3xl font-extrabold tracking-tight font-heading text-brand-darkText leading-tight">
+        <div data-aos="zoom-in" class="bg-white/90 dark:bg-slate-900/90 rounded-2xl p-6 md:p-12 shadow-sm border border-[#D3DDD7] dark:border-slate-800 space-y-6">
+          <h2 class="text-3xl font-extrabold tracking-tight font-heading text-brand-darkText dark:text-white leading-tight">
             Are You Planning an Academic Accreditation or Event?
           </h2>
-          <p class="text-brand-secText text-base max-w-2xl mx-auto">
+          <p class="text-brand-secText dark:text-slate-300 text-base max-w-2xl mx-auto">
             Get comprehensive guidance for institutional audits, organizing conferences, publishing proceedings, or establishing student chapters with Shazu Soft Technologies.
           </p>
           <div class="flex flex-wrap justify-center gap-4 pt-2">
-            <a href="contact.html" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-brand-green hover:bg-brand-hoverGreen text-white font-semibold transition-all duration-200 shadow-sm shadow-brand-green/10">
+            <a href="contact.html" class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-[#123B32] hover:bg-[#1A4B40] text-white dark:bg-emerald-500 dark:hover:bg-emerald-400 dark:text-[#022C22] font-extrabold text-xs transition-all duration-200 shadow-lg shadow-[#123B32]/25 dark:shadow-emerald-950/40 hover:-translate-y-0.5">
               Request Consultation
             </a>
-            <a href="membership.html" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white border border-brand-border text-brand-green hover:bg-brand-softGreen font-semibold transition-all duration-200">
+            <a href="membership.html" class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white dark:bg-slate-800 border border-[#D3DDD7] dark:border-slate-700 text-[#123B32] dark:text-white hover:bg-[#E8EFEB] dark:hover:bg-slate-700 font-extrabold text-xs transition-all duration-200 hover:-translate-y-0.5 shadow-xs">
               Join Us
             </a>
           </div>
@@ -900,20 +858,18 @@
   </main>
 
   <!-- Footer Section -->
-  <footer class="bg-[#17211D] text-[#E4EBE7] pt-16 pb-12 border-t border-emerald-950">
+  <footer class="bg-[#0F172A] text-slate-300 pt-16 pb-12 border-t border-slate-800">
     <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
       <!-- Info Column -->
       <div class="md:col-span-5 space-y-4">
-        <a href="index.html" class="flex items-center space-x-3">
-          <div class="w-9 h-9 rounded-lg bg-brand-green text-white flex items-center justify-center font-bold text-lg">
-            S
-          </div>
-          <div>
-            <span class="block font-heading font-extrabold text-sm tracking-tight leading-tight text-white">SHAZU SOFT</span>
-            <span class="block text-[10px] font-semibold tracking-wider text-brand-green">Technologies</span>
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-11 w-auto">
+          <div class="brand-text-container">
+            <span class="brand-title-text text-base text-white">SHAZU SOFT</span>
+            <span class="brand-sub-text"><span>T</span><span>E</span><span>C</span><span>H</span><span>N</span><span>O</span><span>L</span><span>O</span><span>G</span><span>I</span><span>E</span><span>S</span></span>
           </div>
         </a>
-        <p class="text-[#66736D] text-xs leading-relaxed max-w-sm">
+        <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
           Shazu Soft Technologies is a technology-driven organization integrating software solutions, education, research, professional development, and industry-academia collaboration.
         </p>
       </div>
@@ -921,7 +877,7 @@
       <!-- Quick Links -->
       <div class="md:col-span-2 space-y-3">
         <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Quick Links</h4>
-        <ul class="space-y-2 text-xs text-[#66736D]">
+        <ul class="space-y-2 text-xs text-slate-400">
           <li><a href="index.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-estate"></i>Home</a></li>
           <li><a href="about.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-info-circle"></i>About Us</a></li>
           <li><a href="services.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-setting"></i>Services</a></li>
@@ -935,7 +891,7 @@
       <!-- Services List -->
       <div class="md:col-span-2 space-y-3">
         <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Services</h4>
-        <ul class="space-y-2 text-xs text-[#66736D]">
+        <ul class="space-y-2 text-xs text-slate-400">
           <li><a href="education.html" class="hover:text-white transition-colors duration-150">Education Services</a></li>
           <li><a href="software.html" class="hover:text-white transition-colors duration-150">Software Services</a></li>
           <li><a href="research.html" class="hover:text-white transition-colors duration-150">Research Services</a></li>
@@ -946,7 +902,7 @@
       </div>
 
       <!-- Contact details -->
-      <div class="md:col-span-3 space-y-3 text-[#66736D] text-xs">
+      <div class="md:col-span-3 space-y-3 text-slate-400 text-xs">
         <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Contact</h4>
         <p class="leading-relaxed">
           2nd Agraharam, Chairman Rajarathinam Street,<br>
@@ -954,14 +910,14 @@
           Salem, Tamil Nadu – 636001
         </p>
         <div class="space-y-1 pt-1">
-          <p><span class="text-white">HR Phone:</span> +91 93616 80077</p>
-          <p><span class="text-white">Email:</span> info@shazusofttechnologies.org</p>
+          <p><span class="text-white font-bold">HR Phone:</span> +91 93616 80077</p>
+          <p><span class="text-white font-bold">Email:</span> info@shazusofttechnologies.org</p>
         </div>
       </div>
     </div>
 
     <!-- Bottom footer details -->
-    <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-emerald-950/60 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#66736D]">
+    <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
       <p>© 2026 Shazu Soft Technologies. All Rights Reserved.</p>
       <div class="flex space-x-6">
         <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>

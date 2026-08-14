@@ -26,9 +26,9 @@
               secGreen: '#2F5B4E',     // Secondary Green
               accent: '#527A68',       // Accent Green
               copper: '#C47D4C',       // Warm Copper Accent
-              darkText: '#1E292B',     // Charcoal Text
-              secText: '#527A68',      // Muted Secondary Text
-              border: '#E2E8F0'        // Soft Slate Border
+              darkText: '#26322E',     // Charcoal Dark Text
+              secText: '#334E43',      // High-Contrast Forest Slate Secondary Text
+              border: '#D3DDD7',       // Light Border
             }
           },
           fontFamily: {
@@ -496,11 +496,17 @@
     </div>
   </div>
 
-  <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script defer src="js/hot-toast.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="js/hot-toast.js"></script>
   
   <script>
-    AOS.init({ duration: 400, once: true });
+    if (typeof AOS !== 'undefined') {
+      AOS.init({ duration: 400, once: true });
+    } else {
+      window.addEventListener('DOMContentLoaded', () => {
+        if (typeof AOS !== 'undefined') AOS.init({ duration: 400, once: true });
+      });
+    }
 
     const API_BASE = '';
     let jwtToken = localStorage.getItem('sst_admin_token') || '';

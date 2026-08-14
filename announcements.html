@@ -6,13 +6,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://unicons.iconscout.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="preconnect" href="https://images.unsplash.com">
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Careers | Shazu Soft Technologies</title>
-  <meta name="description" content="Explore career opportunities at Shazu Soft Technologies. We are hiring Process Associates, Web Developers, Designers and Analysts in Salem.">
-  <link rel="canonical" href="https://shazusofttechnologies.org/careers.html">
+  <title>Announcements & Official Notices | Shazu Soft Technologies</title>
+  <meta name="description" content="Official circulars, academic notices, event announcements, and partnership milestones from Shazu Soft Technologies.">
+  <link rel="canonical" href="https://shazusofttechnologies.org/announcements.html">
   
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/custom.css">
@@ -27,18 +26,18 @@
         extend: {
           colors: {
             brand: {
-              white: '#F5F3EC',       // Light Background (Warm Off-White)
-              cardBg: '#FFFFFF',      // Pure White
-              lightGreen: '#E8EFEB',   // Soft Green BG
-              green: '#123B32',       // Primary Dark Green
-              secGreen: '#2F5B4E',    // Secondary Green
-              accent: '#527A68',      // Accent Green
-              copper: '#C47D4C',      // Warm Accent (Muted Copper)
-              darkText: '#26322E',    // Charcoal Green Dark Text
-              secText: '#334E43',     // High-Contrast Forest Slate Secondary Text
-              border: '#D3DDD7',      // Soft Muted Border
-              softGreen: '#E8EFEB',   // Very Light Green
-              hoverGreen: '#2F5B4E'   // Professional Green Hover
+              white: '#F5F3EC',
+              cardBg: '#FFFFFF',
+              lightGreen: '#E8EFEB',
+              green: '#123B32',
+              secGreen: '#2F5B4E',
+              accent: '#527A68',
+              copper: '#C47D4C',
+              darkText: '#26322E',
+              secText: '#334E43',
+              border: '#D3DDD7',
+              softGreen: '#E8EFEB',
+              hoverGreen: '#2F5B4E'
             }
           },
           fontFamily: {
@@ -55,10 +54,10 @@
 </head>
 <body class="bg-brand-white text-brand-darkText antialiased">
   
-  <!-- Mobile Off-Canvas Backdrop (Root Stacking Context z-index 99988) -->
+  <!-- Mobile Off-Canvas Backdrop -->
   <div id="mobile-backdrop" class="mobile-drawer-backdrop"></div>
 
-        <!-- Mobile Side Navigation Drawer (Root Stacking Context z-index 99999) -->
+  <!-- Mobile Side Navigation Drawer -->
   <aside id="mobile-menu" class="mobile-drawer-content font-heading text-[#0F172A]">
     <div class="flex-1 overflow-y-auto">
       <!-- Drawer Header -->
@@ -131,12 +130,11 @@
           </div>
         </div>
 
-        <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-[#E8EFEB] border-l-3 border-[#123B32] transition-all">
+        <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <div class="flex items-center gap-3">
             <i class="uil uil-briefcase-alt text-base text-[#123B32]"></i>
             <span>Career</span>
           </div>
-          <span class="w-1.5 h-1.5 rounded-full bg-[#123B32]"></span>
         </a>
         <a href="contact.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <div class="flex items-center gap-3">
@@ -155,25 +153,24 @@
     </div>
   </aside>
 
-    <!-- Header Section -->
-  <!-- Combined Sticky Top Announcement Bar & Header Section -->
+  <!-- Header Section -->
   <div class="sticky top-0 z-40 w-full">
     <div id="dynamic-announcement-bar"></div>
     <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
       <!-- Brand Logo & Name -->
       <a href="index.html" class="flex items-center space-x-3 group">
-        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
+        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-11 w-auto">
         <div>
-          <span class="block font-heading font-black text-lg tracking-tight leading-tight text-[#0F172A]">SHAZU SOFT</span>
-          <span class="block text-xs font-bold tracking-wider text-[#123B32] uppercase">Technologies</span>
+          <span class="block font-heading font-black text-base tracking-tight leading-tight brand-title-text">SHAZU SOFT</span>
+          <span class="block text-[11px] font-bold tracking-wider brand-sub-text uppercase">Technologies</span>
         </div>
       </a>
 
-      <!-- Navigation Links with Dropdown Sub-Menus -->
-      <nav class="hidden lg:flex items-center space-x-1 font-heading">
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden lg:flex items-center space-x-1">
         <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
-
+        
         <!-- About Us Dropdown -->
         <div class="relative group">
           <a href="about.html" class="nav-link-pill flex items-center gap-1">
@@ -181,13 +178,15 @@
             <span>About Us</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
           </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[240px]">
             <div class="nav-dropdown-menu p-1.5 space-y-0.5">
               <a href="about.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">About Company</span>
+                <span class="block text-xs font-bold">About Company</span>
+                <span class="block text-[11px] mt-0.5">Our Story & Leadership</span>
               </a>
               <a href="membership.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Membership & Chapters</span>
+                <span class="block text-xs font-bold">Membership & Chapters</span>
+                <span class="block text-[11px] mt-0.5">Student & Professional Wings</span>
               </a>
             </div>
           </div>
@@ -203,16 +202,16 @@
           <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[260px]">
             <div class="nav-dropdown-menu p-1.5 space-y-1">
               <a href="education.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Education Services</span>
-                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Internships, Hackathons & Mentoring</span>
+                <span class="block text-xs font-bold">Education Services</span>
+                <span class="block text-[11px] mt-0.5 font-normal">Internships, Hackathons & Mentoring</span>
               </a>
               <a href="software.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Software Services</span>
-                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Full Stack & Web Application Dev</span>
+                <span class="block text-xs font-bold">Software Services</span>
+                <span class="block text-[11px] mt-0.5 font-normal">Full Stack & Web Application Dev</span>
               </a>
               <a href="research.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Research Services</span>
-                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Conferences, Papers & Patents</span>
+                <span class="block text-xs font-bold">Research Services</span>
+                <span class="block text-[11px] mt-0.5 font-normal">Conferences, Papers & Patents</span>
               </a>
             </div>
           </div>
@@ -228,16 +227,16 @@
           <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
             <div class="nav-dropdown-menu p-1.5 space-y-0.5">
               <a href="events.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Upcoming Events</span>
+                <span class="block text-xs font-bold">Upcoming Events</span>
               </a>
               <a href="events.html#hackathons" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Hackathons & Contests</span>
+                <span class="block text-xs font-bold">Hackathons & Contests</span>
               </a>
             </div>
           </div>
         </div>
 
-        <a href="careers.html" class="nav-link-pill active"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+        <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
         <a href="contact.html" class="nav-link-pill"><i class="uil uil-envelope text-[14px]"></i>Contact Us</a>
       </nav>
 
@@ -320,81 +319,93 @@
   </header>
 </div>
 
-  <!-- Main Content -->
   <main>
-    <!-- Careers Hero -->
-    <section data-aos="fade-up" class="hero-bg py-12 md:py-16 border-b border-brand-border">
-      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <div class="lg:col-span-7 text-left space-y-4 animate-fade-up">
-          <span class="text-xs font-bold uppercase tracking-wider text-brand-green bg-[#E8EFEB] dark:bg-emerald-950/60 px-3 py-1 rounded-full inline-block">WE'RE HIRING</span>
-          <h1 class="text-3xl md:text-5xl font-extrabold text-brand-darkText dark:text-[#f8fafc] font-heading">
-            Join Our Team
-          </h1>
-          <p class="text-brand-secText dark:text-[#cbd5e1] text-base md:text-lg max-w-2xl leading-relaxed">
-            At Shazu Soft Technologies, we believe our people are our greatest strength. We are committed to building a collaborative, innovative, and growth-oriented workplace where every employee can thrive.
-          </p>
+    <!-- Hero Header -->
+    <section class="hero-bg py-16 md:py-20 relative overflow-hidden border-b border-brand-border">
+      <div class="dot-grid"></div>
+      <div class="ambient-blob-1"></div>
+      <div class="ambient-blob-2"></div>
+
+      <div class="max-w-7xl mx-auto px-6 relative z-10 text-center">
+        <div class="hero-pill-badge text-xs font-black tracking-wider uppercase px-4 py-1.5 rounded-full inline-flex items-center gap-2 mb-4" data-aos="fade-down">
+          <i class="bi bi-megaphone-fill text-sm"></i>
+          <span>OFFICIAL CIRCULARS & NOTICES</span>
         </div>
-        <div class="lg:col-span-5 flex justify-center">
-          <div class="p-3 bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl shadow-xl hover-lift">
-            <img loading="lazy" decoding="async" src="images/business_growth.png" alt="Careers Illustration" class="max-h-72 w-auto object-contain img-interactive img-float">
-          </div>
-        </div>
+
+        <h1 class="text-3xl md:text-5xl font-black text-brand-darkText tracking-tight font-heading mb-4" data-aos="fade-up">
+          Announcements & Bulletins
+        </h1>
+
+        <p class="text-brand-secText text-base md:text-lg max-w-2xl mx-auto leading-relaxed" data-aos="fade-up" data-aos-delay="100">
+          Stay informed with active institutional circulars, academic notifications, MoU milestones, and official press releases from Shazu Soft Technologies.
+        </p>
       </div>
     </section>
 
-    <!-- Jobs Grid Section -->
-    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-white">
+    <!-- Announcements Content Section -->
+    <section class="py-12 md:py-16 bg-white overflow-hidden">
       <div class="max-w-7xl mx-auto px-6">
-        <div class="mb-12">
-          <h2 class="text-2xl font-extrabold tracking-tight font-heading text-brand-darkText">Available Roles</h2>
-          <div class="w-12 h-1 bg-brand-green mt-2 rounded"></div>
+        
+        <!-- Filter Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-8 border-b border-slate-200 dark:border-slate-800 mb-8" data-aos="fade-up">
+          <div class="flex flex-wrap items-center gap-2" id="announcement-filter-buttons">
+            <button onclick="filterAnnouncements('all', this)" class="announcement-filter-btn active px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer">
+              All Announcements
+            </button>
+            <button onclick="filterAnnouncements('IMPORTANT', this)" class="announcement-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer">
+              Important
+            </button>
+            <button onclick="filterAnnouncements('ACADEMIC', this)" class="announcement-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer">
+              Academic
+            </button>
+            <button onclick="filterAnnouncements('MILESTONE', this)" class="announcement-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer">
+              Milestones
+            </button>
+          </div>
+
+          <div class="text-xs text-brand-secText font-semibold flex items-center gap-1.5">
+            <i class="bi bi-clock-history"></i>
+            <span>Real-time Noticeboard</span>
+          </div>
         </div>
 
-        <div id="dynamic-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Dynamic jobs populated by js/dynamic-content.js -->
+        <!-- Dynamic All Announcements Grid -->
+        <div id="dynamic-all-announcements-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Populated dynamically via JS -->
+          <div class="col-span-full py-16 text-center text-slate-400">
+            <div class="w-8 h-8 border-3 border-[#123B32] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p class="text-xs font-semibold">Loading official announcements...</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Consultation CTA -->
+    <section class="py-12 md:py-16 bg-brand-lightGreen dark:bg-[#0b0f19] border-t border-brand-border">
+      <div class="max-w-4xl mx-auto px-6 text-center">
+        <div data-aos="zoom-in" class="bg-white/90 dark:bg-slate-900/90 rounded-2xl p-8 md:p-12 shadow-sm border border-[#D3DDD7] dark:border-slate-800 space-y-6">
+          <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight font-heading text-brand-darkText dark:text-white leading-tight">
+            Need Direct Support or Institutional Inquiries?
+          </h2>
+          <p class="text-brand-secText dark:text-slate-300 text-sm md:text-base max-w-2xl mx-auto">
+            Connect with our administrative office for official authorizations, partnerships, press releases, or academic coordination.
+          </p>
+          <div class="flex flex-wrap justify-center gap-4 pt-2">
+            <a href="contact.html" class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-[#123B32] hover:bg-[#1A4B40] text-white dark:bg-emerald-500 dark:hover:bg-emerald-400 dark:text-[#022C22] font-extrabold text-xs transition-all duration-200 shadow-lg shadow-[#123B32]/25 dark:shadow-emerald-950/40 hover:-translate-y-0.5">
+              Contact Administration
+            </a>
+            <a href="index.html" class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white dark:bg-slate-800 border border-[#D3DDD7] dark:border-slate-700 text-[#123B32] dark:text-white hover:bg-[#E8EFEB] dark:hover:bg-slate-700 font-extrabold text-xs transition-all duration-200 hover:-translate-y-0.5 shadow-xs">
+              Back to Home
+            </a>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Job Application Modal -->
-  <div id="apply-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-5 relative border border-brand-border glassmorphism animate-fade-in">
-      <button onclick="closeApplyModal()" class="absolute top-4 right-4 text-brand-secText hover:text-brand-green text-xl"><i class="bi bi-x-lg"></i></button>
-      <h3 class="font-heading font-extrabold text-xl text-brand-darkText mb-1">Apply for <span id="modal-role" class="text-brand-green">Role</span></h3>
-      <p class="text-xs text-brand-secText mb-6">Shazu Soft Technologies — Salem Headquarters</p>
-      
-      <form id="mock-job-form" class="space-y-4">
-        <div class="space-y-1">
-          <label for="app-name" class="block text-xs font-bold text-brand-darkText">Full Name *</label>
-          <input type="text" id="app-name" required class="w-full border border-brand-border bg-brand-lightGreen/50 p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="space-y-1">
-            <label for="app-email" class="block text-xs font-bold text-brand-darkText">Email *</label>
-            <input type="email" id="app-email" required class="w-full border border-brand-border bg-brand-lightGreen/50 p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-          </div>
-          <div class="space-y-1">
-            <label for="app-phone" class="block text-xs font-bold text-brand-darkText">Phone *</label>
-            <input type="tel" id="app-phone" required class="w-full border border-brand-border bg-brand-lightGreen/50 p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-          </div>
-        </div>
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-brand-darkText">Resume (Mock Upload) *</label>
-          <div class="border-2 border-dashed border-brand-border hover:border-brand-green/50 rounded-lg p-5 text-center cursor-pointer bg-brand-lightGreen/30">
-            <i class="uil uil-cloud-computing text-2xl text-brand-green mb-2 block"></i>
-            <span class="text-xs text-brand-secText font-semibold">Click to select PDF or Doc file</span>
-          </div>
-        </div>
-        <button type="submit" class="w-full py-3 bg-brand-green hover:bg-brand-hoverGreen text-white text-sm font-bold rounded-lg transition-all mt-4">
-          Submit Application
-        </button>
-      </form>
-    </div>
-  </div>
-
   <!-- Footer Section -->
-  <footer class="bg-[#17211D] text-[#E4EBE7] pt-16 pb-12 border-t border-emerald-950">
+  <footer class="bg-[#0F172A] text-slate-300 pt-16 pb-12 border-t border-slate-800">
     <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
       <!-- Info Column -->
       <div class="md:col-span-5 space-y-4">
@@ -405,7 +416,7 @@
             <span class="block text-[10px] font-bold tracking-wider text-emerald-400 uppercase">Technologies</span>
           </div>
         </a>
-        <p class="text-[#66736D] text-xs leading-relaxed max-w-sm">
+        <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
           Shazu Soft Technologies is a technology-driven organization integrating software solutions, education, research, professional development, and industry-academia collaboration.
         </p>
       </div>
@@ -413,7 +424,7 @@
       <!-- Quick Links -->
       <div class="md:col-span-2 space-y-3">
         <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Quick Links</h4>
-        <ul class="space-y-2 text-xs text-[#66736D]">
+        <ul class="space-y-2 text-xs text-slate-400">
           <li><a href="index.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-estate"></i>Home</a></li>
           <li><a href="about.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-info-circle"></i>About Us</a></li>
           <li><a href="services.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-setting"></i>Services</a></li>
@@ -427,7 +438,7 @@
       <!-- Services List -->
       <div class="md:col-span-2 space-y-3">
         <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Services</h4>
-        <ul class="space-y-2 text-xs text-[#66736D]">
+        <ul class="space-y-2 text-xs text-slate-400">
           <li><a href="education.html" class="hover:text-white transition-colors duration-150">Education Services</a></li>
           <li><a href="software.html" class="hover:text-white transition-colors duration-150">Software Services</a></li>
           <li><a href="research.html" class="hover:text-white transition-colors duration-150">Research Services</a></li>
@@ -438,7 +449,7 @@
       </div>
 
       <!-- Contact details -->
-      <div class="md:col-span-3 space-y-3 text-[#66736D] text-xs">
+      <div class="md:col-span-3 space-y-3 text-slate-400 text-xs">
         <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Contact</h4>
         <p class="leading-relaxed">
           2nd Agraharam, Chairman Rajarathinam Street,<br>
@@ -446,15 +457,14 @@
           Salem, Tamil Nadu – 636001
         </p>
         <div class="space-y-1 pt-1">
-          
-          <p><span class="text-white">HR Phone:</span> +91 93616 80077</p>
-          <p><span class="text-white">Email:</span> info@shazusofttechnologies.org</p>
+          <p><span class="text-white font-bold">HR Phone:</span> +91 93616 80077</p>
+          <p><span class="text-white font-bold">Email:</span> info@shazusofttechnologies.org</p>
         </div>
       </div>
     </div>
 
     <!-- Bottom footer details -->
-    <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-emerald-950/60 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#66736D]">
+    <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
       <p>© 2026 Shazu Soft Technologies. All Rights Reserved.</p>
       <div class="flex space-x-6">
         <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
@@ -463,8 +473,7 @@
     </div>
   </footer>
 
-  <!-- Main JavaScript JS -->
-    <!-- Floating Action Buttons -->
+  <!-- Floating Action Buttons -->
   <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
     <!-- WhatsApp Button -->
     <a href="https://wa.me/919361680077" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 group relative" aria-label="Chat on WhatsApp">
@@ -475,7 +484,7 @@
     </a>
     
     <!-- AI Chatbot Trigger Button -->
-    <button id="chatbot-toggle-btn" class="w-12 h-12 rounded-full bg-gradient-to-br from-brand-green to-brand-hoverGreen text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 group relative" aria-label="Ask SST AI">
+    <button id="chatbot-toggle-btn" class="w-12 h-12 rounded-full bg-[#123B32] text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 group relative cursor-pointer" aria-label="Ask SST AI">
       <i class="bi bi-robot text-2xl"></i>
       <span class="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
         Ask SST AI
@@ -484,7 +493,7 @@
   </div>
 
   <!-- AI Chatbot Box Widget -->
-  <div id="chatbot-widget" class="hidden fixed bottom-20 right-6 w-[350px] md:w-[380px] h-[500px] z-50 bg-white border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 font-heading">
+  <div id="chatbot-widget" class="hidden fixed bottom-20 right-6 w-[350px] md:w-[380px] h-[500px] z-50 bg-white border border-[#D3DDD7] rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 font-heading">
     <!-- Chat Header -->
     <div class="bg-slate-900 text-white p-4 flex items-center justify-between border-b border-slate-800">
       <div class="flex items-center gap-2.5">
@@ -496,7 +505,7 @@
           </span>
         </div>
       </div>
-      <button id="chatbot-close-btn" class="text-slate-400 hover:text-white text-xl focus:outline-none">
+      <button id="chatbot-close-btn" class="text-slate-400 hover:text-white text-xl focus:outline-none cursor-pointer">
         <i class="bi bi-x"></i>
       </button>
     </div>
@@ -514,7 +523,7 @@
       </div>
     </div>
 
-    <!-- Typing Indicator (hidden by default) -->
+    <!-- Typing Indicator -->
     <div id="chatbot-typing" class="hidden px-4 py-2 bg-slate-50 text-[11px] text-brand-secText italic flex items-center gap-1.5">
       <span class="flex gap-0.5">
         <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce"></span>
@@ -527,57 +536,16 @@
     <!-- Chat Input Area -->
     <form id="chatbot-form" class="p-3 border-t border-brand-border bg-white flex gap-2">
       <input type="text" id="chatbot-input" placeholder="Type your message..." autocomplete="off" class="flex-1 border border-brand-border px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:border-brand-green text-brand-darkText">
-      <button type="submit" class="w-9 h-9 rounded-xl bg-brand-green hover:bg-brand-hoverGreen text-white flex items-center justify-center shadow-md transition-all duration-150">
-        <i class="bi bi-send"></i>
+      <button type="submit" class="w-9 h-9 rounded-xl bg-[#123B32] hover:bg-[#1A4B40] text-white flex items-center justify-center shadow-md transition-all duration-150 cursor-pointer">
+        <i class="bi bi-send text-white"></i>
       </button>
     </form>
   </div>
 
-<script defer src="https://unpkg.com/aos@next/dist/aos.js"></script>
-  <script defer src="js/main.js"></script>
-  <script defer src="js/chatbot.js"></script>
-  
-  <!-- Careers Dynamic Modal Handler -->
-  <script>
-    const modal = document.getElementById('apply-modal');
-    const roleSpan = document.getElementById('modal-role');
-
-    function openApplyModal(roleName) {
-      if (modal && roleSpan) {
-        roleSpan.textContent = roleName;
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-      }
-    }
-
-    function closeApplyModal() {
-      if (modal) {
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-      }
-    }
-
-    // Modal submit listener
-    const mockForm = document.getElementById('mock-job-form');
-    if (mockForm) {
-      mockForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('app-name').value.trim();
-        const role = roleSpan.textContent;
-        
-        closeApplyModal();
-        mockForm.reset();
-
-        // Trigger dynamic success popup helper from main.js
-        if (typeof window.showSuccessModal === 'function') {
-          window.showSuccessModal('Application Received!', `Thank you, ${name}. Your application for the position of "${role}" has been successfully logged.`);
-        } else {
-          alert(`Application Submitted! Thank you ${name} for applying for the ${role} position.`);
-        }
-      });
-    }
-  </script>
-  <script defer src="js/hot-toast.js"></script>
-  <script defer src="js/dynamic-content.js"></script>
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script src="js/dynamic-content.js"></script>
 </body>
 </html>

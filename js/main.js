@@ -1,17 +1,3 @@
-// Global Page Preloader Controller
-const hidePreloader = () => {
-  const preloader = document.getElementById('page-preloader');
-  if (preloader && !preloader.classList.contains('fade-out')) {
-    preloader.classList.add('fade-out');
-    setTimeout(() => {
-      if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
-    }, 550);
-  }
-};
-
-window.addEventListener('load', hidePreloader);
-setTimeout(hidePreloader, 1800);
-
 // Global Mobile Drawer Controller (With Console Diagnostic Logging)
 window.toggleMobileDrawer = function(e) {
   console.log('🍔 [HAMBURGER CLICK DETECTED!]', e);
@@ -430,4 +416,36 @@ document.addEventListener('DOMContentLoaded', () => {
       el.style.transition = 'none';
     });
   }
+
+  // 10. Auto-Format Brand Logo Subtitle Exact Width Across All Devices
+  document.querySelectorAll('header a, footer a, aside#mobile-menu a').forEach(brandLink => {
+    const divs = brandLink.querySelectorAll(':scope > div');
+    divs.forEach(container => {
+      const spans = container.querySelectorAll(':scope > span');
+      if (spans.length >= 2) {
+        container.classList.add('brand-text-container');
+        const titleSpan = spans[0];
+        const subSpan = spans[1];
+        titleSpan.classList.add('brand-title-text');
+        subSpan.classList.add('brand-sub-text');
+        if (subSpan.textContent.trim().toUpperCase() === 'TECHNOLOGIES' && !subSpan.querySelector('span')) {
+          subSpan.innerHTML = 'TECHNOLOGIES'.split('').map(c => `<span>${c}</span>`).join('');
+        }
+      }
+    });
+  });
+
+  // 11. Sync ONLY current active page in Mobile Drawer
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('aside#mobile-menu nav a').forEach(link => {
+    const href = link.getAttribute('href') || '';
+    const isCurrent = href === currentPath || (currentPath === '' && href === 'index.html');
+    if (isCurrent) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+      const dot = link.querySelector('.w-1\\.5.h-1\\.5, .rounded-full.bg-\\[\\#123B32\\]');
+      if (dot && dot.parentElement === link) dot.remove();
+    }
+  });
 });
