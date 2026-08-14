@@ -402,32 +402,32 @@
     const title = decodeURIComponent(encodedTitle);
     const modalHtml = `
       <div id="public-modal-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4 text-slate-800 dark:text-slate-100">
-          <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+        <div class="bg-white dark:bg-slate-900 border border-[#D3DDD7] dark:border-slate-800 w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl space-y-4 text-[#0F172A] dark:text-slate-100 max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div>
-              <h3 class="text-lg font-bold font-heading">Apply for ${title}</h3>
-              <p class="text-xs text-slate-500">Shazu Soft Technologies Hiring Portal</p>
+              <h3 class="text-lg sm:text-xl font-black font-heading text-[#0F172A] dark:text-white leading-tight">Apply for ${title}</h3>
+              <p class="text-xs text-[#527A68] dark:text-emerald-400 font-semibold mt-0.5">Shazu Soft Technologies Hiring Portal</p>
             </div>
-            <button onclick="closePublicModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg"><i class="bi bi-x-lg"></i></button>
+            <button onclick="closePublicModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer"><i class="bi bi-x-lg text-sm pointer-events-none"></i></button>
           </div>
-          <form onsubmit="submitJobApplication(event, '${jobId}', '${encodedTitle}')" class="space-y-3 text-xs">
+          <form onsubmit="submitJobApplication(event, '${jobId}', '${encodedTitle}')" class="space-y-3.5 text-xs">
             <div>
-              <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Full Name *</label>
-              <input type="text" id="pub-app-name" required placeholder="John Doe" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Full Name *</label>
+              <input type="text" id="pub-app-name" required placeholder="John Doe" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
             </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Email Address *</label>
-                <input type="email" id="pub-app-email" required placeholder="john@example.com" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Email Address *</label>
+                <input type="email" id="pub-app-email" required placeholder="john@example.com" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
               </div>
               <div>
-                <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Phone Number</label>
-                <input type="tel" id="pub-app-phone" placeholder="+91 98765 43210" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Phone Number</label>
+                <input type="tel" id="pub-app-phone" placeholder="+91 98765 43210" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
               </div>
             </div>
             <div>
-              <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Upload Resume / Portfolio Document (Max 10 MB)</label>
-              <input type="file" id="pub-app-resume-file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handlePublicResumeUpload(event)" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Upload Resume / Portfolio Document (Max 10 MB)</label>
+              <input type="file" id="pub-app-resume-file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handlePublicResumeUpload(event)" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-slate-300 cursor-pointer">
               <input type="hidden" id="pub-app-resume" value="">
               <div id="pub-resume-preview" class="hidden pt-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                 <i class="bi bi-file-earmark-check-fill text-sm"></i>
@@ -435,12 +435,14 @@
               </div>
             </div>
             <div>
-              <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Cover Note / Brief Intro</label>
-              <textarea id="pub-app-msg" placeholder="Tell us why you are a great fit for SST..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white h-20 focus:outline-none focus:border-[#123B32]"></textarea>
+              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Cover Note / Brief Intro</label>
+              <textarea id="pub-app-msg" placeholder="Tell us why you are a great fit for SST..." class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 h-24 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all"></textarea>
             </div>
-            <div class="flex justify-end gap-3 pt-2">
-              <button type="button" onclick="closePublicModal()" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-semibold">Cancel</button>
-              <button type="submit" class="px-5 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-semibold rounded-xl transition-all shadow-md">Submit Application</button>
+            <div class="flex justify-end items-center gap-3 pt-2">
+              <button type="button" onclick="closePublicModal()" class="px-5 py-2.5 bg-[#F1F5F3] hover:bg-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0F172A] dark:text-slate-300 rounded-xl font-bold text-xs transition-all cursor-pointer">Cancel</button>
+              <button type="submit" class="px-6 py-2.5 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-md text-xs inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                <span>Submit Application</span>
+              </button>
             </div>
           </form>
         </div>
@@ -456,27 +458,27 @@
 
     const modalHtml = `
       <div id="public-modal-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4 text-slate-800 dark:text-slate-100 max-h-[90vh] overflow-y-auto">
-          <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+        <div class="bg-white dark:bg-slate-900 border border-[#D3DDD7] dark:border-slate-800 w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl space-y-4 text-[#0F172A] dark:text-slate-100 max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div>
-              <h3 class="text-lg font-bold font-heading">Register for ${title}</h3>
-              <p class="text-xs text-slate-500">SST Event & Contest Registration</p>
+              <h3 class="text-lg sm:text-xl font-black font-heading text-[#0F172A] dark:text-white leading-tight">Register for ${title}</h3>
+              <p class="text-xs text-[#527A68] dark:text-emerald-400 font-semibold mt-0.5">SST Event & Contest Registration</p>
             </div>
-            <button onclick="closePublicModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg"><i class="bi bi-x-lg"></i></button>
+            <button onclick="closePublicModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer"><i class="bi bi-x-lg text-sm pointer-events-none"></i></button>
           </div>
 
           ${isPaid ? `
-            <div class="bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 p-4 rounded-xl space-y-3">
+            <div class="bg-[#E8EFEB] dark:bg-emerald-950/50 border border-[#D3DDD7] dark:border-emerald-800 p-4 rounded-2xl space-y-3">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">Registration Fee Required</span>
-                <span class="px-2.5 py-1 bg-emerald-700 text-white font-mono font-bold text-xs rounded-lg">${fee}</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-[#123B32] dark:text-emerald-300">Registration Fee Required</span>
+                <span class="px-3 py-1 bg-[#123B32] text-white font-mono font-bold text-xs rounded-lg">${fee}</span>
               </div>
-              <div class="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded-lg border border-emerald-100 dark:border-emerald-900/50">
+              <div class="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-emerald-900/50">
                 <div class="bg-white p-1.5 rounded-lg shadow-xs border border-slate-200">
                   <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=upi://pay?pa=shazusofttechnologies@upi%26pn=ShazuSoftTechnologies%26am=499%26cu=INR" alt="UPI QR Code" class="w-24 h-24">
                 </div>
                 <div class="space-y-1 text-center sm:text-left text-xs">
-                  <span class="block font-bold text-slate-900 dark:text-white">Pay via any UPI App (GPay / PhonePe / Paytm)</span>
+                  <span class="block font-bold text-[#0F172A] dark:text-white">Pay via any UPI App (GPay / PhonePe / Paytm)</span>
                   <span class="block font-mono font-bold text-[#123B32] dark:text-emerald-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">UPI ID: shazusofttechnologies@upi</span>
                   <span class="block text-[11px] text-slate-500">Scan QR or use UPI ID, complete payment, and enter your 12-digit UTR / Ref No below.</span>
                 </div>
@@ -484,37 +486,39 @@
             </div>
           ` : ''}
 
-          <form onsubmit="submitEventRegistration(event, '${eventId}', '${encodedTitle}', '${encodedFee}')" class="space-y-3 text-xs">
+          <form onsubmit="submitEventRegistration(event, '${eventId}', '${encodedTitle}', '${encodedFee}')" class="space-y-3.5 text-xs">
             <div>
-              <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Full Name *</label>
-              <input type="text" id="pub-reg-name" required placeholder="Jane Doe" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Full Name *</label>
+              <input type="text" id="pub-reg-name" required placeholder="Jane Doe" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
             </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Email Address *</label>
-                <input type="email" id="pub-reg-email" required placeholder="jane@example.com" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Email Address *</label>
+                <input type="email" id="pub-reg-email" required placeholder="jane@example.com" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
               </div>
               <div>
-                <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Phone Number *</label>
-                <input type="tel" id="pub-reg-phone" required placeholder="+91 98765 43210" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Phone Number *</label>
+                <input type="tel" id="pub-reg-phone" required placeholder="+91 98765 43210" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
               </div>
             </div>
             <div>
-              <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">College / Organization</label>
-              <input type="text" id="pub-reg-org" placeholder="Anna University / SST Tech" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">College / Organization</label>
+              <input type="text" id="pub-reg-org" placeholder="Anna University / SST Tech" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
             </div>
 
             ${isPaid ? `
               <div>
-                <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">UPI Transaction / UTR No *</label>
-                <input type="text" id="pub-reg-utr" required placeholder="e.g. 423589102456" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-amber-300 dark:border-amber-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] font-mono">
-                <span class="text-[10px] text-slate-500">Find 12-digit UTR in GPay / PhonePe payment receipt.</span>
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">UPI Transaction / UTR No *</label>
+                <input type="text" id="pub-reg-utr" required placeholder="e.g. 423589102456" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] font-mono">
+                <span class="text-[10px] text-slate-500 mt-1 block">Find 12-digit UTR in GPay / PhonePe payment receipt.</span>
               </div>
             ` : ''}
 
-            <div class="flex justify-end gap-3 pt-2">
-              <button type="button" onclick="closePublicModal()" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-semibold">Cancel</button>
-              <button type="submit" class="px-5 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-semibold rounded-xl transition-all shadow-md">Complete Registration</button>
+            <div class="flex justify-end items-center gap-3 pt-2">
+              <button type="button" onclick="closePublicModal()" class="px-5 py-2.5 bg-[#F1F5F3] hover:bg-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0F172A] dark:text-slate-300 rounded-xl font-bold text-xs transition-all cursor-pointer">Cancel</button>
+              <button type="submit" class="px-6 py-2.5 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-md text-xs inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                <span>Complete Registration</span>
+              </button>
             </div>
           </form>
         </div>
@@ -531,6 +535,14 @@
   window.submitJobApplication = async function (e, jobId, encodedTitle) {
     e.preventDefault();
     const title = decodeURIComponent(encodedTitle);
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white inline-block mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Submitting...</span>`;
+    }
+
     const body = {
       job_id: jobId,
       job_title: title,
@@ -552,6 +564,10 @@
       closePublicModal();
       showPublicModalNotice('Application Submitted!', 'Your job application has been successfully submitted to Shazu Soft Technologies! Our hiring team will review it shortly.');
     } catch (err) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
       showPublicModalNotice('Submission Error', err.message, true);
     }
   };
@@ -561,6 +577,13 @@
     const title = decodeURIComponent(encodedTitle);
     const fee = decodeURIComponent(encodedFee);
     const utrEl = document.getElementById('pub-reg-utr');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerHTML : 'Complete Registration';
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white inline-block mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Registering...</span>`;
+    }
 
     const body = {
       event_id: eventId,
@@ -585,6 +608,10 @@
       closePublicModal();
       showPublicModalNotice('Registration Confirmed!', 'You have successfully registered for the event! A confirmation pass has been sent to your email.');
     } catch (err) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
       showPublicModalNotice('Registration Error', err.message, true);
     }
   };

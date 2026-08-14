@@ -291,6 +291,63 @@ html.dark aside#mobile-menu .mobile-accordion-menu a:hover {
   color: #6EE7B7 !important;
 }
 
+/* ==========================================================================
+   Public Application & Event Registration Modal Forms
+   ========================================================================== */
+#public-modal-backdrop input:not([type="file"]),
+#public-modal-backdrop textarea {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+  border: 1px solid #D3DDD7 !important;
+}
+
+#public-modal-backdrop input::placeholder,
+#public-modal-backdrop textarea::placeholder {
+  color: #64748B !important;
+}
+
+#public-modal-backdrop input:focus,
+#public-modal-backdrop textarea:focus {
+  border-color: #123B32 !important;
+  background-color: #FFFFFF !important;
+}
+
+#public-modal-backdrop label {
+  color: #1E292B !important;
+  font-weight: 700 !important;
+}
+
+#public-modal-backdrop h3 {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+html.dark #public-modal-backdrop input:not([type="file"]),
+html.dark #public-modal-backdrop textarea {
+  background-color: #0B0F19 !important;
+  color: #FFFFFF !important;
+  border-color: #334155 !important;
+}
+
+html.dark #public-modal-backdrop input::placeholder,
+html.dark #public-modal-backdrop textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+html.dark #public-modal-backdrop input:focus,
+html.dark #public-modal-backdrop textarea:focus {
+  border-color: #10B981 !important;
+  background-color: #0F172A !important;
+}
+
+html.dark #public-modal-backdrop label {
+  color: #E2E8F0 !important;
+}
+
+html.dark #public-modal-backdrop h3 {
+  color: #FFFFFF !important;
+}
+
 .nav-link-pill {
   font-family: 'Outfit', sans-serif !important;
   font-size: 16px !important;
