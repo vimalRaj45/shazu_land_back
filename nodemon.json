@@ -1,0 +1,13 @@
+{
+  "watch": [
+    "backend",
+    "frontend"
+  ],
+  "ext": "js,json,html,css",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "exec": "node backend/server.js",
+  "delay": 300
+}

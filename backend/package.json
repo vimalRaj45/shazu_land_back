@@ -1,14 +1,12 @@
 {
-  "name": "shazu-soft-web",
+  "name": "shazu-soft-backend",
   "version": "1.0.0",
-  "description": "Shazu Soft Technologies - Full Stack Web Platform",
-  "main": "backend/server.js",
+  "description": "Dynamic Content Management System & Fastify Backend for Shazu Soft Technologies",
+  "main": "server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "nodemon backend/server.js",
-    "dev": "nodemon backend/server.js",
-    "serve": "node backend/server.js",
-    "start:backend": "nodemon backend/server.js"
+    "start": "node server.js",
+    "dev": "npx nodemon server.js"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",

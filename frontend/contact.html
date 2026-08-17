@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Performance Preconnect CDNs -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unicons.iconscout.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://images.unsplash.com">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Shazu Soft Technologies</title>
+  <meta name="description" content="Get in touch with Shazu Soft Technologies in Salem. Reach out for projects, partnerships, internships, or academic conferences.">
+  <link rel="canonical" href="https://shazusofttechnologies.org/contact.html">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              white: '#F5F3EC',       // Light Background (Warm Off-White)
+              cardBg: '#FFFFFF',      // Pure White
+              lightGreen: '#E8EFEB',   // Soft Green BG
+              green: '#123B32',       // Primary Dark Green
+              secGreen: '#2F5B4E',    // Secondary Green
+              accent: '#527A68',      // Accent Green
+              copper: '#C47D4C',      // Warm Accent (Muted Copper)
+              darkText: '#26322E',    // Charcoal Green Dark Text
+              secText: '#334E43',     // High-Contrast Forest Slate Secondary Text
+              border: '#D3DDD7',      // Soft Muted Border
+              softGreen: '#E8EFEB',   // Very Light Green
+              hoverGreen: '#2F5B4E'   // Professional Green Hover
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="js/theme.js"></script>
+  <script src="js/config.js"></script>
+  <link rel="icon" href="https://shazusofttechnologies.org/sst.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+</head>
+<body class="bg-brand-white text-brand-darkText antialiased">
+  
+  
+  <!-- Mobile Off-Canvas Backdrop (Root Stacking Context z-index 99988) -->
+  <div id="mobile-backdrop" class="mobile-drawer-backdrop"></div>
+
+        <!-- Mobile Side Navigation Drawer (Root Stacking Context z-index 99999) -->
+  <aside id="mobile-menu" class="mobile-drawer-content font-heading text-[#0F172A]">
+    <div class="flex-1 overflow-y-auto">
+      <!-- Drawer Header -->
+      <div class="p-4 border-b border-[#E2E8F0] flex items-center justify-between bg-white">
+        <a href="index.html" class="flex items-center space-x-2.5">
+          <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-10 w-auto">
+          <div>
+            <span class="block font-heading font-black text-sm tracking-tight text-[#0F172A]">SHAZU SOFT</span>
+            <span class="block text-[10px] font-bold tracking-wider text-[#123B32] uppercase">Technologies</span>
+          </div>
+        </a>
+        <button id="mobile-close-btn" class="w-8 h-8 rounded-full bg-[#E8EFEB] hover:bg-[#E8EFEB] text-[#64748B] hover:text-[#123B32] flex items-center justify-center transition-colors cursor-pointer" aria-label="Close Navigation Menu">
+          <i class="bi bi-x-lg text-xs pointer-events-none"></i>
+        </button>
+      </div>
+
+      <!-- Drawer Nav Links -->
+      <nav class="p-3 space-y-1.5">
+        <a href="index.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-estate text-base text-[#123B32]"></i>
+            <span>Home</span>
+          </div>
+        </a>
+
+        <!-- About Us Accordion -->
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="uil uil-info-circle text-base text-[#123B32]"></i>
+              <span>About Us</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
+          </button>
+          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
+            <a href="about.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">About Company</a>
+            <a href="membership.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Membership & Chapters</a>
+          </div>
+        </div>
+
+        <!-- Services Accordion -->
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="uil uil-setting text-base text-[#123B32]"></i>
+              <span>Services</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
+          </button>
+          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
+            <a href="education.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Education Services</a>
+            <a href="software.html" target="_blank" rel="noopener noreferrer" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Software Services</a>
+            <a href="research.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Research Services</a>
+          </div>
+        </div>
+
+        <!-- Events Accordion -->
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="uil uil-calendar-alt text-base text-[#123B32]"></i>
+              <span>Events</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
+          </button>
+          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
+            <a href="events.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Upcoming Events</a>
+            <a href="events.html#hackathons" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Hackathons & Contests</a>
+          </div>
+        </div>
+
+        <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-briefcase-alt text-base text-[#123B32]"></i>
+            <span>Career</span>
+          </div>
+        </a>
+        <a href="contact.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-[#E8EFEB] border-l-3 border-[#123B32] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-envelope text-base text-[#123B32]"></i>
+            <span>Contact Us</span>
+          </div>
+          <span class="w-1.5 h-1.5 rounded-full bg-[#123B32]"></span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Drawer Footer CTA -->
+    <div class="p-4 border-t border-[#E2E8F0] bg-[#E8EFEB]">
+      <a href="membership.html" class="flex items-center justify-center gap-2 w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-lg text-xs shadow-xs transition-all">
+        <i class="uil uil-user-plus text-sm"></i> Join Us
+      </a>
+    </div>
+  </aside>
+
+    <!-- Header Section -->
+  <!-- Combined Sticky Top Announcement Bar & Header Section -->
+  <div class="sticky top-0 z-40 w-full">
+    <div id="dynamic-announcement-bar"></div>
+    <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
+      <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <!-- Brand Logo & Name -->
+      <a href="index.html" class="flex items-center space-x-3 group">
+        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
+        <div>
+          <span class="block font-heading font-black text-lg tracking-tight leading-tight text-[#0F172A]">SHAZU SOFT</span>
+          <span class="block text-xs font-bold tracking-wider text-[#123B32] uppercase">Technologies</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links with Dropdown Sub-Menus -->
+      <nav class="hidden lg:flex items-center space-x-1 font-heading">
+        <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
+
+        <!-- About Us Dropdown -->
+        <div class="relative group">
+          <a href="about.html" class="nav-link-pill flex items-center gap-1">
+            <i class="uil uil-info-circle text-[14px]"></i>
+            <span>About Us</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+            <div class="nav-dropdown-menu p-1.5 space-y-0.5">
+              <a href="about.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">About Company</span>
+              </a>
+              <a href="membership.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Membership & Chapters</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services Dropdown -->
+        <div class="relative group">
+          <a href="services.html" class="nav-link-pill flex items-center gap-1">
+            <i class="uil uil-setting text-[14px]"></i>
+            <span>Services</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[260px]">
+            <div class="nav-dropdown-menu p-1.5 space-y-1">
+              <a href="education.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Education Services</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Internships, Hackathons & Mentoring</span>
+              </a>
+              <a href="software.html" target="_blank" rel="noopener noreferrer" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Software Services</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Full Stack & Web Application Dev</span>
+              </a>
+              <a href="research.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Research Services</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Conferences, Papers & Patents</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Events Dropdown -->
+        <div class="relative group">
+          <a href="events.html" class="nav-link-pill flex items-center gap-1">
+            <i class="uil uil-calendar-alt text-[14px]"></i>
+            <span>Events</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+            <div class="nav-dropdown-menu p-1.5 space-y-0.5">
+              <a href="events.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Upcoming Events</span>
+              </a>
+              <a href="events.html#hackathons" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Hackathons & Contests</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+        <a href="contact.html" class="nav-link-pill active"><i class="uil uil-envelope text-[14px]"></i>Contact Us</a>
+      </nav>
+
+      <!-- CTA Action Button & Theme Toggle -->
+      <div class="flex items-center gap-3">
+        <!-- Light / Dark Theme Toggle Switcher -->
+        <label class="switch" title="Toggle Theme">
+          <input class="theme-toggle-input" type="checkbox" />
+          <div class="slider round">
+            <div class="sun-moon">
+              <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+
+              <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+            </div>
+            <div class="stars">
+              <svg id="star-1" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-2" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-3" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-4" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+            </div>
+          </div>
+        </label>
+
+        <div class="hidden lg:block">
+          <a href="membership.html" class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold transition-all duration-150 shadow-xs">
+            Join Us
+          </a>
+        </div>
+      </div>
+
+      <!-- Pure Tailwind Animated Hamburger Bars -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 text-[#0F172A] hover:text-[#123B32] focus:outline-none cursor-pointer relative z-40 flex flex-col justify-center items-center w-10 h-10 space-y-1.5" aria-label="Toggle Navigation Menu">
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+      </button>
+    </div>
+  </header>
+</div>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Contact Hero -->
+    <section data-aos="fade-up" class="bg-brand-lightGreen py-10 md:py-12 md:py-24 border-b border-brand-border">
+      <div class="max-w-7xl mx-auto px-6 text-center space-y-4 animate-fade-up">
+        <span class="text-xs font-bold uppercase tracking-wider text-brand-green">GET IN TOUCH</span>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-brand-darkText font-heading">
+          Let's Connect
+        </h1>
+        <p class="text-brand-secText text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
+          Have a project, partnership, academic accreditation query, or conference idea? Speak with our team.
+        </p>
+      </div>
+    </section>
+
+    <!-- Grid Details & Form -->
+    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12">
+        
+        <!-- Info Column -->
+        <div class="lg:col-span-5 space-y-8">
+          <div class="space-y-4">
+            <h2 class="text-2xl font-extrabold font-heading text-brand-darkText">Contact Details</h2>
+            <p class="text-brand-secText text-xs leading-relaxed max-w-sm">
+              Shazu Soft Technologies operates corporate and advisory structures from Salem, supporting institutional networks throughout Namakkal and Tamil Nadu.
+            </p>
+          </div>
+
+          <div class="space-y-6">
+            <!-- Office Address -->
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-lg bg-brand-softGreen text-brand-green flex items-center justify-center text-lg shadow-sm border border-brand-green/10">
+                <i class="uil uil-map-marker"></i>
+              </div>
+              <div class="space-y-1">
+                <h4 class="font-heading font-bold text-xs text-brand-darkText uppercase tracking-wider">Office Address</h4>
+                <p class="text-brand-secText text-[11.5px] leading-relaxed">
+                  2nd Agraharam, Chairman Rajarathinam Street,<br>
+                  Near Kamala Hospital,<br>
+                  Salem, Tamil Nadu – 636001
+                </p>
+              </div>
+            </div>
+
+            <!-- Phone numbers -->
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-lg bg-brand-softGreen text-brand-green flex items-center justify-center text-lg shadow-sm border border-brand-green/10">
+                <i class="uil uil-phone"></i>
+              </div>
+              <div class="space-y-1">
+                <h4 class="font-heading font-bold text-xs text-brand-darkText uppercase tracking-wider">Call Centers</h4>
+                <p class="text-brand-secText text-xs">
+                  HR Hotline: +91 93616 80077
+                </p>
+              </div>
+            </div>
+
+            <!-- HR Contacts -->
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-lg bg-brand-softGreen text-brand-green flex items-center justify-center text-lg shadow-sm border border-brand-green/10">
+                <i class="uil uil-users-alt"></i>
+              </div>
+              <div class="space-y-1">
+                <h4 class="font-heading font-bold text-xs text-brand-darkText uppercase tracking-wider">HR Division</h4>
+                <p class="text-brand-secText text-xs">
+                  Direct recruiter line: +91 93616 80077
+                </p>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-lg bg-brand-softGreen text-brand-green flex items-center justify-center text-lg shadow-sm border border-brand-green/10">
+                <i class="text-[15px] uil uil-envelope"></i>
+              </div>
+              <div class="space-y-1">
+                <h4 class="font-heading font-bold text-xs text-brand-darkText uppercase tracking-wider">Electronic Mail</h4>
+                <p class="text-brand-secText text-xs font-semibold">
+                  info@shazusofttechnologies.org
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Column -->
+        <div class="lg:col-span-7">
+          <div class="border border-brand-border rounded-xl p-6 bg-brand-lightGreen/10 shadow-sm space-y-6">
+            <h3 class="font-heading font-extrabold text-xl text-brand-darkText">Send a Message</h3>
+            
+            <form id="contact-form" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label for="contact-name" class="block text-xs font-bold text-brand-darkText">Your Name *</label>
+                  <input type="text" id="contact-name" required placeholder="Enter full name" class="w-full border border-brand-border bg-white p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                  <label for="contact-email" class="block text-xs font-bold text-brand-darkText">Email Address *</label>
+                  <input type="email" id="contact-email" required placeholder="name@email.com" class="w-full border border-brand-border bg-white p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label for="contact-phone" class="block text-xs font-bold text-brand-darkText">Phone Number</label>
+                  <input type="tel" id="contact-phone" placeholder="Enter contact number" class="w-full border border-brand-border bg-white p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                  <label for="contact-subject" class="block text-xs font-bold text-brand-darkText">Subject *</label>
+                  <input type="text" id="contact-subject" required placeholder="Project / Audit / Conference" class="w-full border border-brand-border bg-white p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <label for="contact-message" class="block text-xs font-bold text-brand-darkText">Message Content *</label>
+                <textarea id="contact-message" rows="5" required placeholder="Detail your requirements..." class="w-full border border-brand-border bg-white p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none resize-none"></textarea>
+              </div>
+
+              <button type="submit" class="w-full py-3.5 bg-brand-green hover:bg-brand-hoverGreen text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm">
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="bg-[#17211D] text-[#E4EBE7] pt-16 pb-12 border-t border-emerald-950">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
+      <!-- Info Column -->
+      <div class="md:col-span-5 space-y-4">
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-11 w-auto">
+          <div>
+            <span class="block font-heading font-extrabold text-base tracking-tight leading-tight text-white">SHAZU SOFT</span>
+            <span class="block text-[10px] font-bold tracking-wider text-emerald-400 uppercase">Technologies</span>
+          </div>
+        </a>
+        <p class="text-[#66736D] text-xs leading-relaxed max-w-sm">
+          Shazu Soft Technologies is a technology-driven organization integrating software solutions, education, research, professional development, and industry-academia collaboration.
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="md:col-span-2 space-y-3">
+        <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Quick Links</h4>
+        <ul class="space-y-2 text-xs text-[#66736D]">
+          <li><a href="index.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-estate"></i>Home</a></li>
+          <li><a href="about.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-info-circle"></i>About Us</a></li>
+          <li><a href="services.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-setting"></i>Services</a></li>
+          <li><a href="events.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-calendar-alt"></i>Events</a></li>
+          <li><a href="careers.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-briefcase-alt"></i>Career</a></li>
+          <li><a href="membership.html" class="hover:text-white transition-colors duration-150">Membership</a></li>
+          <li><a href="contact.html" class="hover:text-white transition-colors duration-150">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Services List -->
+      <div class="md:col-span-2 space-y-3">
+        <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Services</h4>
+        <ul class="space-y-2 text-xs text-[#66736D]">
+          <li><a href="education.html" class="hover:text-white transition-colors duration-150">Education Services</a></li>
+          <li><a href="software.html" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors duration-150">Software Services</a></li>
+          <li><a href="research.html" class="hover:text-white transition-colors duration-150">Research Services</a></li>
+          <li><a href="education.html" class="hover:text-white transition-colors duration-150">Internships</a></li>
+          <li><a href="education.html" class="hover:text-white transition-colors duration-150">Training Programs</a></li>
+          <li><a href="research.html" class="hover:text-white transition-colors duration-150">Conferences</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact details -->
+      <div class="md:col-span-3 space-y-3 text-[#66736D] text-xs">
+        <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Contact</h4>
+        <p class="leading-relaxed">
+          2nd Agraharam, Chairman Rajarathinam Street,<br>
+          Near Kamala Hospital,<br>
+          Salem, Tamil Nadu – 636001
+        </p>
+        <div class="space-y-1 pt-1">
+          <p><span class="text-white">HR Phone:</span> +91 93616 80077</p>
+          <p><span class="text-white">Email:</span> info@shazusofttechnologies.org</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom footer details -->
+    <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-emerald-950/60 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#66736D]">
+      <p>© 2026 Shazu Soft Technologies. All Rights Reserved.</p>
+      <div class="flex space-x-6">
+        <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+        <a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript JS -->
+    <!-- Floating Action Buttons -->
+  <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/919361680077" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 group relative" aria-label="Chat on WhatsApp">
+      <i class="bi bi-whatsapp text-2xl"></i>
+      <span class="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+        Chat on WhatsApp
+      </span>
+    </a>
+    
+    <!-- AI Chatbot Trigger Button -->
+    <button id="chatbot-toggle-btn" class="w-12 h-12 rounded-full bg-gradient-to-br from-brand-green to-brand-hoverGreen text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 group relative" aria-label="Ask SST AI">
+      <i class="bi bi-robot text-2xl"></i>
+      <span class="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+        Ask SST AI
+      </span>
+    </button>
+  </div>
+
+  <!-- AI Chatbot Box Widget -->
+  <div id="chatbot-widget" class="hidden fixed bottom-20 right-6 w-[350px] md:w-[380px] h-[500px] z-50 bg-white border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 font-heading">
+    <!-- Chat Header -->
+    <div class="bg-slate-900 text-white p-4 flex items-center justify-between border-b border-slate-800">
+      <div class="flex items-center gap-2.5">
+        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-10 w-auto">
+        <div>
+          <h4 class="font-extrabold text-sm leading-none">SST AI Assistant</h4>
+          <span class="text-[10px] text-green-400 font-bold flex items-center gap-1 mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> Online
+          </span>
+        </div>
+      </div>
+      <button id="chatbot-close-btn" class="text-slate-400 hover:text-white text-xl focus:outline-none">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+
+    <!-- Chat Messages Scroll Container -->
+    <div id="chatbot-messages" class="flex-1 min-h-0 p-4 overflow-y-auto bg-slate-50 dark:bg-[#0f172a] space-y-3.5 text-xs text-brand-darkText dark:text-[#f8fafc]">
+      <!-- Bot Intro Message -->
+      <div class="flex items-start gap-2 max-w-[88%]">
+        <div class="w-7 h-7 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 border border-brand-border dark:border-[#334155] flex items-center justify-center flex-shrink-0 text-[#123B32] dark:text-[#527A68]">
+          <i class="bi bi-robot"></i>
+        </div>
+        <div class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] px-3.5 py-2.5 rounded-2xl rounded-tl-none shadow-sm leading-relaxed text-left">
+          Hello! Welcome to Shazu Soft Technologies. I'm your AI assistant. How can I help you today with our software, education, or research services?
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing Indicator (hidden by default) -->
+    <div id="chatbot-typing" class="hidden px-4 py-2 bg-slate-50 text-[11px] text-brand-secText italic flex items-center gap-1.5">
+      <span class="flex gap-0.5">
+        <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce"></span>
+        <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
+        <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
+      </span>
+      SST AI is typing...
+    </div>
+
+    <!-- Chat Input Area -->
+    <form id="chatbot-form" class="p-3 border-t border-brand-border bg-white flex gap-2">
+      <input type="text" id="chatbot-input" placeholder="Type your message..." autocomplete="off" class="flex-1 border border-brand-border px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:border-brand-green text-brand-darkText">
+      <button type="submit" class="w-9 h-9 rounded-xl bg-brand-green hover:bg-brand-hoverGreen text-white flex items-center justify-center shadow-md transition-all duration-150">
+        <i class="bi bi-send"></i>
+      </button>
+    </form>
+  </div>
+
+<script defer src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script defer src="js/main.js"></script>
+  <script defer src="js/chatbot.js"></script>
+  <script defer src="js/hot-toast.js"></script>
+  <script defer src="js/dynamic-content.js"></script>
+</body>
+</html>

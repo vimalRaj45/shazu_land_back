@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Shazu Soft | Custom Software Engineering & Product Development</title>
+  <meta name="description" content="Custom software engineering for ambitious companies. We build high-converting web applications, scalable cloud platforms, mobile apps, and enterprise APIs with agile weekly delivery.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- AOS (Animate On Scroll) CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+  <link rel="icon" href="https://shazusofttechnologies.org/sst.svg" type="image/svg+xml">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              green: '#123B32',
+              hoverGreen: '#0D2B24',
+              emerald: '#10B981',
+              accent: '#34D399',
+              dark: '#090D16',
+              darkCard: '#111827',
+              darkBorder: '#1F2937'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Smooth Typography & Theme Defaults */
+    html {
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+    }
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+      overflow-x: hidden;
+    }
+    html.dark body {
+      background-color: #090D16;
+      color: #F8FAFC;
+    }
+
+    /* Tech Glow & Hover Micro-Interactions */
+    .tech-glow {
+      box-shadow: 0 10px 40px -10px rgba(16, 185, 129, 0.2);
+    }
+    .hover-lift {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+    }
+    .hover-lift:hover {
+      transform: translateY(-4px);
+    }
+
+    /* Custom Switch Toggle */
+    .theme-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+    }
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .theme-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #E2E8F0;
+      transition: .3s;
+      border-radius: 34px;
+      border: 1px solid #CBD5E1;
+    }
+    html.dark .theme-slider {
+      background-color: #1E293B;
+      border-color: #334155;
+    }
+    .theme-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #123B32;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    html.dark .theme-slider:before {
+      transform: translateX(22px);
+      background-color: #10B981;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-emerald-500 selection:text-white transition-colors duration-200">
+
+  <!-- Mobile Navigation Backdrop -->
+  <div id="sw-mobile-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden transition-opacity duration-300"></div>
+
+  <!-- Dedicated Software Mobile Menu Drawer -->
+  <aside id="sw-mobile-drawer" class="fixed top-0 right-0 h-full w-72 max-w-[85vw] bg-white dark:bg-[#0F172A] z-50 shadow-2xl border-l border-slate-200 dark:border-slate-800 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6">
+    <div class="space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div class="flex items-center gap-2.5">
+          <img src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-9 w-auto">
+          <div>
+            <span class="block font-black font-heading text-sm text-slate-900 dark:text-white">SHAZU SOFT</span>
+            <span class="block text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Software Labs</span>
+          </div>
+        </div>
+        <button id="sw-mobile-close" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer" aria-label="Close menu">
+          <i class="bi bi-x-lg text-xs"></i>
+        </button>
+      </div>
+
+      <nav class="space-y-2 font-heading font-semibold text-xs text-slate-700 dark:text-slate-300">
+        <a href="#services" class="sw-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-slate-800/80 hover:text-emerald-600 transition-colors">
+          <i class="bi bi-grid-fill text-emerald-500"></i> What We Build
+        </a>
+        <a href="#tech-stack" class="sw-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-slate-800/80 hover:text-emerald-600 transition-colors">
+          <i class="bi bi-code-slash text-emerald-500"></i> Tech Stack
+        </a>
+        <a href="#process" class="sw-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-slate-800/80 hover:text-emerald-600 transition-colors">
+          <i class="bi bi-arrow-repeat text-emerald-500"></i> How We Ship
+        </a>
+        <a href="#estimator" class="sw-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-slate-800/80 hover:text-emerald-600 transition-colors">
+          <i class="bi bi-calculator text-emerald-500"></i> Timeline Estimator
+        </a>
+        <a href="#solutions" class="sw-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-slate-800/80 hover:text-emerald-600 transition-colors">
+          <i class="bi bi-laptop text-emerald-500"></i> Case Studies
+        </a>
+        <a href="#faq" class="sw-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-slate-800/80 hover:text-emerald-600 transition-colors">
+          <i class="bi bi-question-circle text-emerald-500"></i> FAQs
+        </a>
+        <a href="#contact" class="sw-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-slate-800/80 hover:text-emerald-600 transition-colors">
+          <i class="bi bi-chat-dots text-emerald-500"></i> Get Technical Proposal
+        </a>
+      </nav>
+    </div>
+
+    <div class="space-y-3 pt-6 border-t border-slate-200 dark:border-slate-800">
+      <!-- Mobile Theme Toggle -->
+      <button id="sw-mobile-theme-toggle" class="w-full py-2.5 px-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-between transition-colors cursor-pointer">
+        <span class="flex items-center gap-2">
+          <i id="sw-mobile-theme-icon" class="bi bi-moon-stars-fill text-indigo-400 text-xs"></i>
+          <span id="sw-mobile-theme-label">Theme: Dark Mode</span>
+        </span>
+        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Switch</span>
+      </button>
+
+      <a href="#contact" class="sw-nav-link w-full py-3 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+        <i class="bi bi-send text-xs"></i> Start Your Project
+      </a>
+      <a href="index.html" class="w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1.5">
+        <i class="bi bi-arrow-left"></i> Return to Main Website
+      </a>
+    </div>
+  </aside>
+
+  <!-- Background Ambient Glows -->
+  <div class="fixed top-0 left-1/4 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+  <div class="fixed top-1/3 right-10 w-80 h-80 bg-teal-500/10 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+  <!-- Dedicated Software Header -->
+  <header class="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#090D16]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-2">
+      
+      <!-- Brand Logo & Standalone Badge -->
+      <a href="software.html" class="flex items-center gap-2 sm:gap-3 group shrink-0 min-w-0">
+        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Logo" class="h-10 sm:h-12 w-auto shrink-0 transition-transform group-hover:scale-105">
+        <div class="flex flex-col justify-center min-w-0">
+          <div class="flex items-center gap-1.5 sm:gap-2 flex-nowrap">
+            <span class="font-heading font-black text-base sm:text-lg tracking-tight leading-none text-[#0F172A] dark:text-white whitespace-nowrap">SHAZU SOFT</span>
+            <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[9px] font-extrabold uppercase tracking-wider rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shrink-0 whitespace-nowrap">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              LABS
+            </span>
+          </div>
+          <span class="text-[10px] sm:text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 leading-tight hidden xs:block truncate">Custom Engineering &amp; Solutions</span>
+        </div>
+      </a>
+
+      <!-- Desktop Software Nav Menu with Clean Horizontal Alignment -->
+      <nav class="hidden lg:flex items-center space-x-0.5 xl:space-x-1 font-heading text-xs xl:text-sm font-semibold text-slate-700 dark:text-slate-200 flex-nowrap shrink-0">
+        <a href="#services" class="inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-2 rounded-lg hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800/60 transition-all whitespace-nowrap">
+          <i class="bi bi-grid text-emerald-500 text-xs shrink-0"></i>
+          <span>Services</span>
+        </a>
+        <a href="#tech-stack" class="inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-2 rounded-lg hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800/60 transition-all whitespace-nowrap">
+          <i class="bi bi-code-slash text-emerald-500 text-xs shrink-0"></i>
+          <span>Tech Stack</span>
+        </a>
+        <a href="#process" class="inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-2 rounded-lg hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800/60 transition-all whitespace-nowrap">
+          <i class="bi bi-arrow-repeat text-emerald-500 text-xs shrink-0"></i>
+          <span>Process</span>
+        </a>
+        <a href="#estimator" class="inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-2 rounded-lg hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800/60 transition-all whitespace-nowrap">
+          <i class="bi bi-calculator text-emerald-500 text-xs shrink-0"></i>
+          <span>Estimator</span>
+        </a>
+        <a href="#solutions" class="inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-2 rounded-lg hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800/60 transition-all whitespace-nowrap">
+          <i class="bi bi-laptop text-emerald-500 text-xs shrink-0"></i>
+          <span>Solutions</span>
+        </a>
+        <a href="#faq" class="inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-2 rounded-lg hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800/60 transition-all whitespace-nowrap">
+          <i class="bi bi-question-circle text-emerald-500 text-xs shrink-0"></i>
+          <span>FAQs</span>
+        </a>
+      </nav>
+
+      <!-- Action Area: Return to Main Hub + Explicit Theme Button + Start CTA -->
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <!-- Return to Main Website Link -->
+        <a href="index.html" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 text-xs font-semibold transition-all" title="Return to Shazu Soft Main Portal">
+          <i class="bi bi-arrow-left text-xs"></i> Main Site
+        </a>
+
+        <!-- Explicit Dark / Light Mode Button -->
+        <button id="sw-theme-toggle" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/90 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-emerald-500 text-xs font-semibold transition-all cursor-pointer shadow-2xs shrink-0" title="Toggle Dark / Light Theme" aria-label="Toggle Dark / Light Theme">
+          <i id="sw-theme-icon" class="bi bi-moon-stars-fill text-indigo-400 text-xs"></i>
+          <span id="sw-theme-text" class="text-[11px] font-bold">Dark</span>
+        </button>
+
+        <!-- CTA Start Project -->
+        <a href="#contact" class="hidden md:inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold text-xs shadow-md transition-all">
+          <i class="bi bi-code-slash text-sm"></i> Start Project
+        </a>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="sw-mobile-open" class="lg:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" aria-label="Open navigation menu">
+          <i class="bi bi-list text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Standalone Hero Section -->
+    <section class="relative py-16 lg:py-24 overflow-hidden border-b border-slate-200 dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        
+        <!-- Left Hero Copy -->
+        <div class="lg:col-span-7 space-y-6 text-left" data-aos="fade-right">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-extrabold tracking-wide">
+            <i class="bi bi-check-circle-fill text-emerald-500"></i> Full-Cycle Product Engineering
+          </div>
+
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black font-heading tracking-tight leading-tight text-slate-900 dark:text-white">
+            We Build Custom Software That Eliminates Bottlenecks &amp; <span class="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">Accelerates Revenue</span>
+          </h1>
+
+          <p class="text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+            Struggling with slow development cycles, outdated legacy platforms, or applications that fail under heavy traffic? We design, engineer, and deploy reliable digital products with transparent weekly milestones and zero technical debt.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <a href="#contact" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/20 hover:scale-[1.02] transition-all">
+              <i class="bi bi-send-fill"></i> Get a Free Technical Proposal
+            </a>
+            <a href="#estimator" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white hover:border-emerald-500 font-bold text-xs sm:text-sm transition-all hover-lift">
+              <i class="bi bi-calculator"></i> Estimate Timeline &amp; Scope
+            </a>
+          </div>
+
+          <!-- Highlight Core Commitments Ribbon -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-200 dark:border-slate-800" data-aos="fade-up" data-aos-delay="150">
+            <div class="p-3.5 bg-white dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-slate-800 text-center shadow-xs" data-aos="zoom-in" data-aos-delay="200">
+              <div class="text-lg font-black text-emerald-600 dark:text-emerald-400 font-heading">100%</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Custom Code Architecture</div>
+            </div>
+            <div class="p-3.5 bg-white dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-slate-800 text-center shadow-xs" data-aos="zoom-in" data-aos-delay="250">
+              <div class="text-lg font-black text-emerald-600 dark:text-emerald-400 font-heading">Weekly</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Live Sprint Demos</div>
+            </div>
+            <div class="p-3.5 bg-white dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-slate-800 text-center shadow-xs" data-aos="zoom-in" data-aos-delay="300">
+              <div class="text-lg font-black text-emerald-600 dark:text-emerald-400 font-heading">100%</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Full Code &amp; IP Ownership</div>
+            </div>
+            <div class="p-3.5 bg-white dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-slate-800 text-center shadow-xs" data-aos="zoom-in" data-aos-delay="350">
+              <div class="text-lg font-black text-emerald-600 dark:text-emerald-400 font-heading">Direct</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Engineer Collaboration</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Visual: Clean, High-Contrast Coding Laptop Image Card -->
+        <div class="lg:col-span-5" data-aos="fade-left" data-aos-delay="200">
+          <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 group bg-slate-950">
+            <!-- Full-Bleed High-Res Image -->
+            <img src="images/software_hero.jpg" alt="Software Engineering & Full Stack Development" class="w-full h-[320px] sm:h-[400px] md:h-[430px] object-cover transition-transform duration-700 group-hover:scale-105 block">
+            
+            <!-- Soft Bottom Gradient Vignette -->
+            <div class="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-transparent pointer-events-none"></div>
+
+            <!-- Top Left Status Floating Chip -->
+            <div class="absolute top-3.5 left-3.5 bg-slate-900/90 border border-white/20 text-white text-[11px] font-mono px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>FullStackEngine.ready()</span>
+            </div>
+
+            <!-- Top Right Technology Badge -->
+            <div class="absolute top-3.5 right-3.5 bg-slate-900/90 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg">
+              React • Next • Cloud
+            </div>
+
+            <!-- Bottom Caption Strip -->
+            <div class="absolute bottom-3.5 inset-x-3.5 p-3.5 rounded-xl bg-slate-900/90 border border-white/15 text-white shadow-xl flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-wider block">PRODUCTION CODEBASE</span>
+                <h4 class="font-heading font-black text-xs sm:text-sm text-white truncate">Full-Stack &amp; Cloud Architecture</h4>
+                <p class="text-[10px] text-slate-300 truncate hidden xs:block">Clean, scalable engineering built for modern enterprises.</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-black text-xs shrink-0 shadow-xs">v2.6</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Core Software Services Matrix -->
+    <section id="services" class="py-20 bg-white dark:bg-[#090D16] border-b border-slate-200 dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-6 space-y-12">
+        <div class="text-center max-w-3xl mx-auto space-y-3" data-aos="fade-up">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-3.5 py-1 rounded-full inline-block border border-emerald-200 dark:border-emerald-800">
+            ENGINEERING CAPABILITIES
+          </span>
+          <h2 class="text-3xl sm:text-4xl font-black font-heading text-slate-900 dark:text-white">
+            Software Solutions Built to Drive Tangible Business Outcomes
+          </h2>
+          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+            We don’t just write code — we design architecture that automates operations, delights users, and expands effortlessly with your customer base.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- 1. Full Stack Web Applications -->
+          <div class="p-7 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl hover-lift shadow-xs flex flex-col justify-between group" data-aos="fade-up" data-aos-delay="100">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <i class="bi bi-code-slash"></i>
+              </div>
+              <h3 class="text-lg font-bold font-heading text-slate-900 dark:text-white">Full-Stack Web Applications</h3>
+              <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                High-performance web apps and administrative hubs tailored to your workflows, keeping operations smooth as your user base expands.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <i class="bi bi-check2"></i> React, Next.js, Node.js, PostgreSQL
+            </div>
+          </div>
+
+          <!-- 2. UI / UX Product Design -->
+          <div class="p-7 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl hover-lift shadow-xs flex flex-col justify-between group" data-aos="fade-up" data-aos-delay="150">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <i class="bi bi-palette"></i>
+              </div>
+              <h3 class="text-lg font-bold font-heading text-slate-900 dark:text-white">UI &amp; UX Product Design</h3>
+              <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                Intuitive interfaces and interactive Figma prototypes structured around real customer habits to increase sign-ups and reduce churn.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <i class="bi bi-check2"></i> Figma, Design Systems, User Research
+            </div>
+          </div>
+
+          <!-- 3. Mobile & Cross-Platform Apps -->
+          <div class="p-7 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl hover-lift shadow-xs flex flex-col justify-between group" data-aos="fade-up" data-aos-delay="200">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <i class="bi bi-phone"></i>
+              </div>
+              <h3 class="text-lg font-bold font-heading text-slate-900 dark:text-white">Mobile &amp; Cross-Platform Apps</h3>
+              <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                Fluid iOS and Android experiences built from a unified codebase, allowing you to reach both app stores twice as quickly.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <i class="bi bi-check2"></i> Flutter, React Native, iOS &amp; Android
+            </div>
+          </div>
+
+          <!-- 4. Cloud Infrastructure & DevOps -->
+          <div class="p-7 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl hover-lift shadow-xs flex flex-col justify-between group" data-aos="fade-up" data-aos-delay="250">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <i class="bi bi-cloud-arrow-up"></i>
+              </div>
+              <h3 class="text-lg font-bold font-heading text-slate-900 dark:text-white">Cloud DevOps &amp; CI/CD</h3>
+              <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                Automated release pipelines and resilient server setups that eliminate downtime and scale compute resources on demand.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <i class="bi bi-check2"></i> AWS, Docker, GitHub Actions, Nginx
+            </div>
+          </div>
+
+          <!-- 5. Data Analytics & Dashboards -->
+          <div class="p-7 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl hover-lift shadow-xs flex flex-col justify-between group" data-aos="fade-up" data-aos-delay="300">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <i class="bi bi-bar-chart-line"></i>
+              </div>
+              <h3 class="text-lg font-bold font-heading text-slate-900 dark:text-white">Analytics &amp; Executive Dashboards</h3>
+              <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                Real-time visual reports and KPI tracking consoles that give leadership clear insights into operational performance.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <i class="bi bi-check2"></i> Real-time KPIs, Automated Reports, BI
+            </div>
+          </div>
+
+          <!-- 6. APIs & Microservices Integration -->
+          <div class="p-7 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl hover-lift shadow-xs flex flex-col justify-between group" data-aos="fade-up" data-aos-delay="350">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <i class="bi bi-plug"></i>
+              </div>
+              <h3 class="text-lg font-bold font-heading text-slate-900 dark:text-white">API Engineering &amp; Integrations</h3>
+              <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                Secure webhook bridges and microservices that connect your core database seamlessly with payment gateways, CRMs, and third-party tools.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <i class="bi bi-check2"></i> REST, GraphQL, Webhooks, Stripe
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Technology Stack Section -->
+    <section id="tech-stack" class="py-20 bg-slate-50 dark:bg-[#0D131F] border-b border-slate-200 dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-6 space-y-10">
+        <div class="text-center max-w-2xl mx-auto space-y-3" data-aos="fade-up">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-3.5 py-1 rounded-full inline-block border border-emerald-200 dark:border-emerald-800">
+            MODERN TECHNOLOGY STACK
+          </span>
+          <h2 class="text-3xl font-black font-heading text-slate-900 dark:text-white">
+            Tested Frameworks That Scale Gracefully
+          </h2>
+          <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+            We pick industry-standard technologies known for longevity, security, and developer maintainability.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Frontend -->
+          <div class="p-6 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs space-y-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400 font-extrabold text-sm font-heading">
+              <i class="bi bi-window-sidebar text-lg"></i>
+              <span>Frontend Tier</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">React.js</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Next.js</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">TypeScript</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Tailwind CSS</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Vue.js</span>
+            </div>
+          </div>
+
+          <!-- Backend -->
+          <div class="p-6 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs space-y-4" data-aos="fade-up" data-aos-delay="150">
+            <div class="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400 font-extrabold text-sm font-heading">
+              <i class="bi bi-hdd-stack text-lg"></i>
+              <span>Backend &amp; APIs</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Node.js</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Fastify / Express</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Python FastAPI</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Django</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">GraphQL / REST</span>
+            </div>
+          </div>
+
+          <!-- Databases -->
+          <div class="p-6 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs space-y-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400 font-extrabold text-sm font-heading">
+              <i class="bi bi-database-check text-lg"></i>
+              <span>Databases</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">PostgreSQL</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">MySQL</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">MongoDB</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Redis</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Supabase</span>
+            </div>
+          </div>
+
+          <!-- DevOps & Cloud -->
+          <div class="p-6 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs space-y-4" data-aos="fade-up" data-aos-delay="250">
+            <div class="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400 font-extrabold text-sm font-heading">
+              <i class="bi bi-cloud-check text-lg"></i>
+              <span>Cloud &amp; DevOps</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">AWS Cloud</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Docker</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">GitHub CI/CD</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Nginx</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">Figma</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Case Studies & Solution Architectures -->
+    <section id="solutions" class="py-20 bg-white dark:bg-[#090D16] border-b border-slate-200 dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-6 space-y-12">
+        <div class="text-center max-w-3xl mx-auto space-y-3" data-aos="fade-up">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-3.5 py-1 rounded-full inline-block border border-emerald-200 dark:border-emerald-800">
+            SOLUTION BLUEPRINTS
+          </span>
+          <h2 class="text-3xl sm:text-4xl font-black font-heading text-slate-900 dark:text-white">
+            Architectures Designed for Real-World Demands
+          </h2>
+          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+            Explore the foundational system frameworks and product architectures we engineer.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Showcase 1 -->
+          <div class="p-6 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-3xl space-y-4 hover-lift shadow-xs" data-aos="fade-up" data-aos-delay="100">
+            <div class="h-40 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-800 flex items-center justify-center p-6 text-white text-center shadow-inner">
+              <div>
+                <i class="bi bi-speedometer2 text-4xl mb-2 block"></i>
+                <span class="font-bold text-sm font-heading">Multi-Tenant SaaS Portal</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Enterprise SaaS</span>
+              <h4 class="font-bold text-base text-slate-900 dark:text-white">Automated Subscription &amp; Audit Platform</h4>
+              <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                Streamlined client onboarding with self-service billing, permission tiers, and instant revenue reporting.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-1.5 pt-2">
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300">Next.js</span>
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300">Fastify</span>
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300">PostgreSQL</span>
+            </div>
+          </div>
+
+          <!-- Showcase 2 -->
+          <div class="p-6 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-3xl space-y-4 hover-lift shadow-xs" data-aos="fade-up" data-aos-delay="200">
+            <div class="h-40 rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-800 flex items-center justify-center p-6 text-white text-center shadow-inner">
+              <div>
+                <i class="bi bi-phone text-4xl mb-2 block"></i>
+                <span class="font-bold text-sm font-heading">Offline-First Mobile App</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <span class="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider">Mobile Logistics</span>
+              <h4 class="font-bold text-base text-slate-900 dark:text-white">Field Operations &amp; Dispatch Tracker</h4>
+              <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                Equipped ground staff with offline data entry, GPS route tracking, and automatic sync once connectivity is restored.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-1.5 pt-2">
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300">Flutter</span>
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300">Node.js</span>
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300">Redis</span>
+            </div>
+          </div>
+
+          <!-- Showcase 3 -->
+          <div class="p-6 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-3xl space-y-4 hover-lift shadow-xs" data-aos="fade-up" data-aos-delay="300">
+            <div class="h-40 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-900 flex items-center justify-center p-6 text-white text-center shadow-inner">
+              <div>
+                <i class="bi bi-cart-check text-4xl mb-2 block"></i>
+                <span class="font-bold text-sm font-heading">Custom Commerce Engine</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <span class="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Digital Commerce</span>
+              <h4 class="font-bold text-base text-slate-900 dark:text-white">Direct-to-Consumer Order &amp; Stock Hub</h4>
+              <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                Replaced brittle storefront plugins with custom inventory locks, rapid checkouts, and automated fulfillment alerts.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-1.5 pt-2">
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300">React</span>
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300">Python</span>
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300">AWS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Scope & Delivery Timeline Section -->
+    <section id="estimator" class="py-20 bg-slate-50 dark:bg-[#0D131F] border-b border-slate-200 dark:border-slate-800">
+      <div class="max-w-4xl mx-auto px-6 space-y-10" data-aos="fade-up">
+        <div class="text-center max-w-2xl mx-auto space-y-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-3.5 py-1 rounded-full inline-block border border-emerald-200 dark:border-emerald-800">
+            TRANSPARENT PLANNING
+          </span>
+          <h2 class="text-3xl font-black font-heading text-slate-900 dark:text-white">
+            Estimate Your Delivery Timeline
+          </h2>
+          <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+            Select your project requirements below to view an estimated milestone roadmap.
+          </p>
+        </div>
+
+        <div class="p-6 sm:p-8 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-lg space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <!-- Project Type Selection -->
+            <div>
+              <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">1. Solution Type</label>
+              <select id="estimator-type" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white font-medium focus:outline-none focus:border-emerald-500">
+                <option value="web-app">Custom Web Application</option>
+                <option value="mobile-app">Cross-Platform Mobile App (iOS &amp; Android)</option>
+                <option value="ui-ux">Product UI/UX &amp; Interactive Prototype</option>
+                <option value="cloud-devops">Cloud Infrastructure &amp; Automation</option>
+                <option value="api-backend">API Microservices &amp; Integrations</option>
+                <option value="custom-saas">End-to-End SaaS Platform</option>
+              </select>
+            </div>
+
+            <!-- Project Scale Selection -->
+            <div>
+              <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">2. Scope &amp; Maturity Level</label>
+              <select id="estimator-scale" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white font-medium focus:outline-none focus:border-emerald-500">
+                <option value="starter">MVP / Initial Prototype (1 - 3 Sprints)</option>
+                <option value="growth" selected>Full Production Product (4 - 8 Sprints)</option>
+                <option value="enterprise">Enterprise Migration / Scaled Ecosystem</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dynamic Output Card -->
+          <div class="p-5 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="space-y-1 text-center sm:text-left">
+              <span class="text-[11px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-bold">Estimated Delivery Milestone</span>
+              <div id="estimator-timeline" class="text-xl font-black text-slate-900 dark:text-white font-heading">3 to 6 Weeks (Agile Sprints)</div>
+              <p id="estimator-desc" class="text-xs text-slate-500 dark:text-slate-400">Includes scoping, interactive UI prototyping, sprint coding, testing, and deployment.</p>
+            </div>
+            <a href="#contact" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs whitespace-nowrap shadow-md transition-all">
+              Discuss This Timeline <i class="bi bi-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5-Step Agile Engineering Process -->
+    <section id="process" class="py-20 bg-white dark:bg-[#090D16] border-b border-slate-200 dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-6 space-y-12">
+        <div class="text-center max-w-2xl mx-auto space-y-3" data-aos="fade-up">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-3.5 py-1 rounded-full inline-block border border-emerald-200 dark:border-emerald-800">
+            HOW WE SHIP
+          </span>
+          <h2 class="text-3xl font-black font-heading text-slate-900 dark:text-white">
+            A Clean, Predictable Delivery Roadmap
+          </h2>
+          <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+            No guesswork or surprises. You review working software demonstrations every single sprint.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <!-- Step 1 -->
+          <div class="p-6 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs space-y-3 hover-lift" data-aos="fade-up" data-aos-delay="100">
+            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center font-heading">
+              01
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white font-heading">Discovery &amp; Scoping</h4>
+            <p class="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+              We define business goals, user personas, database schemas, and establish clear sprint milestones.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="p-6 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs space-y-3 hover-lift" data-aos="fade-up" data-aos-delay="150">
+            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center font-heading">
+              02
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white font-heading">UI/UX Prototyping</h4>
+            <p class="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+              Clickable Figma prototypes let you test the user journey and validate features before writing code.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="p-6 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs space-y-3 hover-lift" data-aos="fade-up" data-aos-delay="200">
+            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center font-heading">
+              03
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white font-heading">Agile Sprints</h4>
+            <p class="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+              Bi-weekly builds with staging environments so you can test features and offer feedback in real time.
+            </p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="p-6 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs space-y-3 hover-lift" data-aos="fade-up" data-aos-delay="250">
+            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center font-heading">
+              04
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white font-heading">QA &amp; Security Testing</h4>
+            <p class="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+              Automated tests, vulnerability audits, and cross-browser checks ensure complete platform stability.
+            </p>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="p-6 bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs space-y-3 hover-lift" data-aos="fade-up" data-aos-delay="300">
+            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center font-heading">
+              05
+            </div>
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white font-heading">Launch &amp; SLA Support</h4>
+            <p class="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+              Smooth production deployment, full source handover, and dedicated maintenance agreements.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-slate-50 dark:bg-[#0D131F] border-b border-slate-200 dark:border-slate-800">
+      <div class="max-w-4xl mx-auto px-6 space-y-10" data-aos="fade-up">
+        <div class="text-center space-y-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-3.5 py-1 rounded-full inline-block border border-emerald-200 dark:border-emerald-800">
+            CLEAR ANSWERS
+          </span>
+          <h2 class="text-3xl font-black font-heading text-slate-900 dark:text-white">
+            Frequently Asked Questions
+          </h2>
+          <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+            Straightforward answers about agreements, code ownership, and how we collaborate.
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="p-5 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl space-y-2 shadow-xs" data-aos="fade-up" data-aos-delay="100">
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="bi bi-shield-check text-emerald-500 text-sm"></i> Do we own all source code and intellectual property?
+            </h4>
+            <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed pl-6">
+              Yes, 100%. Upon final delivery and settlement, you receive complete ownership of all repositories, architecture diagrams, Figma design tokens, and deploy keys. We never lock you into proprietary vendor frameworks.
+            </p>
+          </div>
+
+          <div class="p-5 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl space-y-2 shadow-xs" data-aos="fade-up" data-aos-delay="150">
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="bi bi-file-earmark-lock text-emerald-500 text-sm"></i> Will you sign an NDA before we share our project brief?
+            </h4>
+            <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed pl-6">
+              Without hesitation. We routinely execute mutual Non-Disclosure Agreements prior to preliminary scoping calls to ensure your business models, trade secrets, and logic remain strictly confidential.
+            </p>
+          </div>
+
+          <div class="p-5 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl space-y-2 shadow-xs" data-aos="fade-up" data-aos-delay="200">
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="bi bi-eye text-emerald-500 text-sm"></i> How do we monitor progress throughout development?
+            </h4>
+            <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed pl-6">
+              We work in transparent 2-week agile sprints. You receive private staging preview links, regular video walkthroughs, and direct communication with the project lead via Slack or WhatsApp.
+            </p>
+          </div>
+
+          <div class="p-5 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl space-y-2 shadow-xs" data-aos="fade-up" data-aos-delay="250">
+            <h4 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="bi bi-tools text-emerald-500 text-sm"></i> What happens after launch? Do you provide ongoing maintenance?
+            </h4>
+            <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed pl-6">
+              We provide 30 days of warranty support post-launch, alongside ongoing SLA maintenance retainers for cloud infrastructure monitoring, security updates, and new feature development.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dedicated Project Request & Consultation Section -->
+    <section id="contact" class="py-20 bg-white dark:bg-[#090D16]">
+      <div class="max-w-4xl mx-auto px-6 space-y-8" data-aos="fade-up">
+        <div class="text-center space-y-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-3.5 py-1 rounded-full inline-block border border-emerald-200 dark:border-emerald-800">
+            READY TO BUILD?
+          </span>
+          <h2 class="text-3xl font-black font-heading text-slate-900 dark:text-white">
+            Request a Technical Consultation &amp; Scope Breakdown
+          </h2>
+          <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed max-w-lg mx-auto">
+            Tell us about your project vision. Our senior engineering coordinators in Salem will review your requirements and send an actionable technical proposal within 24 hours.
+          </p>
+        </div>
+
+        <!-- Trust markers banner before form -->
+        <div class="flex flex-wrap items-center justify-center gap-6 py-3 px-6 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 font-semibold" data-aos="fade-up" data-aos-delay="100">
+          <span class="flex items-center gap-1.5"><i class="bi bi-shield-check text-emerald-500"></i> Strict NDA Signed First</span>
+          <span class="flex items-center gap-1.5"><i class="bi bi-code-square text-emerald-500"></i> Full Code Ownership</span>
+          <span class="flex items-center gap-1.5"><i class="bi bi-lightning-charge text-emerald-500"></i> 24-Hour Proposal Turnaround</span>
+        </div>
+
+        <!-- Software Inquiry Form -->
+        <div class="bg-[#F8FAFC] dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl" data-aos="zoom-in" data-aos-delay="150">
+          <form id="software-lead-form" action="contact.html" method="GET" class="space-y-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="sw-name" class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">Full Name *</label>
+                <input type="text" id="sw-name" name="name" required placeholder="e.g. Rahul Sharma" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+              </div>
+              <div>
+                <label for="sw-email" class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">Work Email *</label>
+                <input type="email" id="sw-email" name="email" required placeholder="rahul@company.com" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="sw-service" class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">Solution Category *</label>
+                <select id="sw-service" name="service" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                  <option value="Full Stack Web App">Custom Web Application</option>
+                  <option value="Mobile App (iOS/Android)">Cross-Platform Mobile App (iOS / Android)</option>
+                  <option value="UI/UX Design & Prototyping">Product UI/UX &amp; Figma Prototype</option>
+                  <option value="Cloud DevOps & Scaling">Cloud DevOps &amp; Infrastructure</option>
+                  <option value="API & Backend Engineering">API &amp; Backend Microservices</option>
+                  <option value="Custom Enterprise Solution">Comprehensive Enterprise Platform</option>
+                </select>
+              </div>
+              <div>
+                <label for="sw-phone" class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">Phone / WhatsApp Number</label>
+                <input type="tel" id="sw-phone" name="phone" placeholder="+91 93616 80077" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+
+            <div>
+              <label for="sw-message" class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">Project Outline &amp; Goals *</label>
+              <textarea id="sw-message" name="message" required rows="4" placeholder="Share a few details about what you are looking to build, key features, target users, and desired timeline..." class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"></textarea>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3">
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <i class="bi bi-shield-lock text-emerald-500"></i> Protected by mutual non-disclosure commitment.
+              </div>
+              <button type="submit" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-600/20 transition-all cursor-pointer">
+                Submit Project Request <i class="bi bi-send-fill ml-1.5"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Software Division Footer -->
+  <footer class="bg-[#090D16] text-slate-300 pt-16 pb-12 border-t border-slate-800 text-xs">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
+      <!-- Info Column -->
+      <div class="md:col-span-5 space-y-4">
+        <a href="software.html" class="flex items-center space-x-3 group">
+          <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-10 w-auto">
+          <div>
+            <span class="block font-heading font-black text-base text-white tracking-tight">SHAZU SOFT</span>
+            <span class="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider">SOFTWARE LABS</span>
+          </div>
+        </a>
+        <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
+          A dedicated engineering arm of Shazu Soft Technologies building dependable web platforms, native-grade mobile applications, and resilient cloud architectures for modern businesses.
+        </p>
+        <div class="pt-1">
+          <a href="index.html" class="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 font-semibold transition-colors">
+            <i class="bi bi-arrow-left"></i> Return to Main Shazu Soft Technologies Website
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Software Links -->
+      <div class="md:col-span-3 space-y-3">
+        <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Capabilities</h4>
+        <ul class="space-y-2 text-slate-400">
+          <li><a href="#services" class="hover:text-white transition-colors">Full-Stack Web Applications</a></li>
+          <li><a href="#services" class="hover:text-white transition-colors">UI / UX Product Design</a></li>
+          <li><a href="#services" class="hover:text-white transition-colors">Mobile Applications</a></li>
+          <li><a href="#services" class="hover:text-white transition-colors">Cloud &amp; DevOps Pipelines</a></li>
+          <li><a href="#services" class="hover:text-white transition-colors">Analytics &amp; Dashboards</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact details -->
+      <div class="md:col-span-4 space-y-3 text-slate-400">
+        <h4 class="font-heading font-bold text-xs uppercase tracking-wider text-white">Engineering Office</h4>
+        <p class="leading-relaxed">
+          2nd Agraharam, Chairman Rajarathinam Street,<br>
+          Near Kamala Hospital, Salem, Tamil Nadu – 636001
+        </p>
+        <div class="space-y-1 pt-1">
+          <p><span class="text-white font-medium">Direct Line:</span> +91 93616 80077</p>
+          <p><span class="text-white font-medium">Email:</span> info@shazusofttechnologies.org</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom footer details -->
+    <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-slate-500">
+      <p>© 2026 Shazu Soft Technologies Software Division. All Rights Reserved.</p>
+      <div class="flex space-x-6">
+        <a href="privacy.html" class="hover:text-slate-300 transition-colors">Privacy Policy</a>
+        <a href="terms.html" class="hover:text-slate-300 transition-colors">Terms of Service</a>
+        <a href="index.html" class="hover:text-emerald-400 transition-colors">Main Portal</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Action Buttons (WhatsApp & AI Chatbot) -->
+  <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/919361680077?text=Hello%20Shazu%20Soft%20Labs%2C%20I%20am%20interested%20in%20custom%20software%20engineering%20services." target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xl hover:scale-110 transition-transform duration-200 group relative cursor-pointer" aria-label="Chat on WhatsApp">
+      <i class="bi bi-whatsapp text-2xl"></i>
+      <span class="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+        Chat on WhatsApp
+      </span>
+    </a>
+    
+    <!-- AI Chatbot Trigger Button -->
+    <button id="chatbot-toggle-btn" class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center shadow-xl hover:scale-110 transition-transform duration-200 group relative cursor-pointer" aria-label="Ask SST AI Assistant">
+      <i class="bi bi-robot text-2xl"></i>
+      <span class="absolute right-14 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs px-2.5 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+        Ask SST AI
+      </span>
+    </button>
+  </div>
+
+  <!-- AI Chatbot Box Widget -->
+  <div id="chatbot-widget" class="hidden fixed bottom-20 right-6 w-[350px] sm:w-[380px] h-[500px] z-50 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 font-heading">
+    <!-- Chat Header -->
+    <div class="bg-slate-900 text-white p-4 flex items-center justify-between border-b border-slate-800">
+      <div class="flex items-center gap-2.5">
+        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="SST Logo" class="h-9 w-auto">
+        <div>
+          <h4 class="font-extrabold text-sm leading-none text-white">SST AI Assistant</h4>
+          <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-1 mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online • Software Labs
+          </span>
+        </div>
+      </div>
+      <button id="chatbot-close-btn" class="text-slate-400 hover:text-white text-xl focus:outline-none cursor-pointer">
+        <i class="bi bi-x-lg text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Chat Messages Scroll Container -->
+    <div id="chatbot-messages" class="flex-1 min-h-0 p-4 overflow-y-auto bg-slate-50 dark:bg-[#090D16] space-y-3.5 text-xs text-slate-800 dark:text-slate-100">
+      <!-- Bot Intro Message -->
+      <div class="flex items-start gap-2 max-w-[90%]">
+        <div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 text-sm">
+          <i class="bi bi-robot"></i>
+        </div>
+        <div class="bg-white dark:bg-[#1f2937] border border-slate-200 dark:border-slate-800 px-3.5 py-2.5 rounded-2xl rounded-tl-none shadow-xs leading-relaxed text-left">
+          Hello! Welcome to <strong>Shazu Soft Software Labs</strong>. How can I help you today with your custom software, web app, mobile application, or technical consulting requirements?
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing Indicator (hidden by default) -->
+    <div id="chatbot-typing" class="hidden px-4 py-2 bg-slate-100 dark:bg-slate-900 text-[11px] text-slate-500 italic flex items-center gap-1.5">
+      <span class="flex gap-0.5">
+        <span class="w-1 h-1 rounded-full bg-emerald-500 animate-bounce"></span>
+        <span class="w-1 h-1 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.2s]"></span>
+        <span class="w-1 h-1 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.4s]"></span>
+      </span>
+      SST AI is typing...
+    </div>
+
+    <!-- Chat Input Area -->
+    <form id="chatbot-form" class="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] flex gap-2">
+      <input type="text" id="chatbot-input" placeholder="Ask about tech stack, pricing, timelines..." autocomplete="off" class="flex-1 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:border-emerald-500 text-slate-900 dark:text-white">
+      <button type="submit" class="w-9 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all duration-150 cursor-pointer shrink-0">
+        <i class="bi bi-send"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script defer src="js/chatbot.js"></script>
+
+  <!-- Interactive Scripts -->
+  <script>
+    // Initialize AOS smoothly
+    AOS.init({
+      duration: 700,
+      easing: 'ease-out-cubic',
+      once: true,
+      offset: 60
+    });
+
+    // Interactive Dark / Light Mode Handler with Explicit Status Display
+    const themeBtn = document.getElementById('sw-theme-toggle');
+    const themeIcon = document.getElementById('sw-theme-icon');
+    const themeText = document.getElementById('sw-theme-text');
+    const mobileThemeBtn = document.getElementById('sw-mobile-theme-toggle');
+    const mobileThemeIcon = document.getElementById('sw-mobile-theme-icon');
+    const mobileThemeLabel = document.getElementById('sw-mobile-theme-label');
+
+    function applyThemeUI(isDark) {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        if (themeIcon) themeIcon.className = 'bi bi-moon-stars-fill text-indigo-400 text-xs';
+        if (themeText) themeText.textContent = 'Dark';
+        if (mobileThemeIcon) mobileThemeIcon.className = 'bi bi-moon-stars-fill text-indigo-400 text-xs';
+        if (mobileThemeLabel) mobileThemeLabel.textContent = 'Theme: Dark Mode';
+      } else {
+        document.documentElement.classList.remove('dark');
+        if (themeIcon) themeIcon.className = 'bi bi-sun-fill text-amber-500 text-xs';
+        if (themeText) themeText.textContent = 'Light';
+        if (mobileThemeIcon) mobileThemeIcon.className = 'bi bi-sun-fill text-amber-500 text-xs';
+        if (mobileThemeLabel) mobileThemeLabel.textContent = 'Theme: Light Mode';
+      }
+    }
+
+    const currentDark = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    applyThemeUI(currentDark);
+
+    function toggleTheme() {
+      const isNowDark = !document.documentElement.classList.contains('dark');
+      applyThemeUI(isNowDark);
+      localStorage.setItem('theme', isNowDark ? 'dark' : 'light');
+    }
+
+    if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+    if (mobileThemeBtn) mobileThemeBtn.addEventListener('click', toggleTheme);
+
+    // Dedicated Mobile Drawer Logic
+    const openBtn = document.getElementById('sw-mobile-open');
+    const closeBtn = document.getElementById('sw-mobile-close');
+    const drawer = document.getElementById('sw-mobile-drawer');
+    const backdrop = document.getElementById('sw-mobile-backdrop');
+    const navLinks = document.querySelectorAll('.sw-nav-link');
+
+    function openDrawer() {
+      if (drawer && backdrop) {
+        backdrop.classList.remove('hidden');
+        setTimeout(() => { drawer.classList.remove('translate-x-full'); }, 10);
+      }
+    }
+
+    function closeDrawer() {
+      if (drawer && backdrop) {
+        drawer.classList.add('translate-x-full');
+        setTimeout(() => { backdrop.classList.add('hidden'); }, 300);
+      }
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    navLinks.forEach(link => link.addEventListener('click', closeDrawer));
+
+    // Interactive Scope Estimator Logic
+    const typeSelect = document.getElementById('estimator-type');
+    const scaleSelect = document.getElementById('estimator-scale');
+    const timelineEl = document.getElementById('estimator-timeline');
+    const descEl = document.getElementById('estimator-desc');
+
+    const estimates = {
+      starter: { timeline: '2 to 4 Weeks', desc: 'Rapid MVP release with core features, responsive UI, database setup, and cloud hosting.' },
+      growth: { timeline: '4 to 8 Weeks', desc: 'Full custom product with comprehensive UI/UX, microservices/API, automated tests, and CI/CD.' },
+      enterprise: { timeline: '8 to 16+ Weeks', desc: 'Multi-tenant architecture, enterprise role-based security, SLA scaling, and dedicated sprint team.' }
+    };
+
+    function updateEstimate() {
+      if (!scaleSelect || !timelineEl || !descEl) return;
+      const scale = scaleSelect.value;
+      const type = typeSelect ? typeSelect.options[typeSelect.selectedIndex].text : 'Software';
+      const est = estimates[scale] || estimates.growth;
+      timelineEl.textContent = `${est.timeline} (Agile Sprints)`;
+      descEl.textContent = `Tailored for ${type}. ${est.desc}`;
+    }
+
+    if (typeSelect) typeSelect.addEventListener('change', updateEstimate);
+    if (scaleSelect) scaleSelect.addEventListener('change', updateEstimate);
+
+    // Software Contact & RFP Form Submission to Backend / Admin Pipeline
+    const leadForm = document.getElementById('software-lead-form');
+    const submitBtn = leadForm ? leadForm.querySelector('button[type="submit"]') : null;
+
+    if (leadForm) {
+      leadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('sw-name')?.value.trim() || '';
+        const email = document.getElementById('sw-email')?.value.trim() || '';
+        const phone = document.getElementById('sw-phone')?.value.trim() || '';
+        const serviceSelect = document.getElementById('sw-service');
+        const serviceText = serviceSelect ? serviceSelect.options[serviceSelect.selectedIndex].text : 'Custom Solution';
+        const message = document.getElementById('sw-message')?.value.trim() || '';
+
+        if (!name || !email || !message) {
+          alert('Please provide your name, email, and project outline.');
+          return;
+        }
+
+        // Loading state on button
+        const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = `<i class="bi bi-arrow-repeat animate-spin"></i> Submitting RFP...`;
+        }
+
+        // Determine API URL
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+          ? (window.location.port === '5000' ? '' : 'http://localhost:5000') 
+          : (window.ENV?.API_BASE || 'https://shazu-land-back.onrender.com');
+
+        try {
+          const res = await fetch(`${API_BASE}/api/public/contact`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name,
+              email,
+              phone,
+              subject: `Software RFP: ${serviceText}`,
+              service_category: `Software - ${serviceText}`,
+              message: message
+            })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || 'Failed to submit proposal request. Please try again.');
+          }
+
+          // Show success confirmation modal
+          const token = data.inquiry?.token_no || 'SST-LEAD';
+          showSoftwareSuccessModal(name, token, serviceText);
+          leadForm.reset();
+
+        } catch (err) {
+          alert(`Submission Notice: ${err.message}`);
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHtml;
+          }
+        }
+      });
+    }
+
+    function showSoftwareSuccessModal(clientName, tokenNo, serviceName) {
+      // Remove any existing modal
+      const existing = document.getElementById('sw-success-modal');
+      if (existing) existing.remove();
+
+      const modalHtml = `
+        <div id="sw-success-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+          <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 text-center space-y-5 shadow-2xl">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-3xl mx-auto shadow-inner">
+              <i class="bi bi-check2-circle"></i>
+            </div>
+            
+            <div class="space-y-2">
+              <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+                PROPOSAL LOGGED
+              </span>
+              <h3 class="font-heading font-black text-xl text-slate-900 dark:text-white">Project Request Received!</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Thank you, <strong class="text-slate-900 dark:text-white">${clientName}</strong>. Your software inquiry for <strong>${serviceName}</strong> is logged in our central CRM pipeline.
+              </p>
+            </div>
+
+            <div class="p-4 bg-slate-50 dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Your Reference Token:</span>
+              <span class="font-mono font-black text-emerald-600 dark:text-emerald-400 text-base tracking-wide">${tokenNo}</span>
+            </div>
+
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+              A confirmation has been sent to your email. Our lead development team in Salem will review your requirements and reach out within 24 hours.
+            </p>
+
+            <button onclick="document.getElementById('sw-success-modal').remove()" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+              Got It, Thanks!
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+  </script>
+</body>
+</html>
