@@ -23,7 +23,7 @@ async function runHeroSliderTests() {
       FROM information_schema.columns 
       WHERE table_name = 'hero_slides'
     `);
-    console.log('✅ hero_slides columns:', tableRes.rows.map(r => `${r.column_name} (${r.data_type})`).join(', '));
+    console.log(' hero_slides columns:', tableRes.rows.map(r => `${r.column_name} (${r.data_type})`).join(', '));
 
     // 3. Query existing slides
     const initialSlides = await pool.query('SELECT id, badge, title, display_order, is_active FROM hero_slides ORDER BY display_order ASC');
