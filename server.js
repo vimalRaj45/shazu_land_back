@@ -516,6 +516,27 @@ async function initDatabase() {
       );
     `);
 
+    // 11. Memberships Table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS memberships (
+        id SERIAL PRIMARY KEY,
+        association_name VARCHAR(255) NOT NULL,
+        membership_type VARCHAR(100) NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        dob VARCHAR(50),
+        area_of_interest VARCHAR(255),
+        contact_no VARCHAR(50) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        qualification VARCHAR(255),
+        designation VARCHAR(255),
+        organization_address TEXT,
+        declaration_accepted BOOLEAN DEFAULT TRUE,
+        token_no VARCHAR(100),
+        status VARCHAR(50) DEFAULT 'Pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     // Seed initial system startup audit log if table is empty
     const auditCheck = await client.query('SELECT COUNT(*) FROM audit_logs');
     if (parseInt(auditCheck.rows[0].count, 10) === 0) {
@@ -821,6 +842,104 @@ app.post('/api/public/contact', async (request, reply) => {
   sendBrevoEmail({ toEmail: email, toName: name, subject: `Inquiry Received [Ref: ${initialToken}] - SST`, htmlContent: clientHtml });
 
   return { message: 'Inquiry submitted successfully!', inquiry };
+});
+
+// Membership Application Submission
+app.post('/api/public/membership/apply', async (request, reply) => {
+  try {
+    const { 
+      association_name, 
+      membership_type, 
+      name, 
+      dob, 
+      area_of_interest, 
+      contact_no, 
+      email, 
+      qualification, 
+      designation, 
+      organization_address, 
+      declaration_accepted 
+    } = request.body || {};
+
+    if (!name || !email || !contact_no || !membership_type || !association_name) {
+      return reply.status(400).send({ error: 'Please fill in all mandatory fields (Name, Email, Phone, Membership Type, Association).' });
+    }
+
+    if (!declaration_accepted) {
+      return reply.status(400).send({ error: 'Please accept the declaration to proceed with your membership application.' });
+    }
+
+    const tokenNo = generateTokenNo('SST-MEM');
+
+    const result = await pool.query(
+      `INSERT INTO memberships 
+       (association_name, membership_type, name, dob, area_of_interest, contact_no, email, qualification, designation, organization_address, declaration_accepted, token_no, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending') 
+       RETURNING *`,
+      [
+        association_name,
+        membership_type,
+        name,
+        dob || null,
+        area_of_interest || '',
+        contact_no,
+        email.trim().toLowerCase(),
+        qualification || '',
+        designation || '',
+        organization_address || '',
+        Boolean(declaration_accepted),
+        tokenNo
+      ]
+    );
+
+    const membership = result.rows[0];
+
+    // Log to system audit trail
+    await logAudit('CREATE', 'MEMBERSHIP', membership.id, `New ${membership_type} application submitted by ${name} (${email})`, request);
+
+    // Send confirmation email via Brevo
+    const memberEmailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+        <div style="background-color: #123B32; padding: 24px; text-align: center; color: #ffffff;">
+          <h2 style="margin: 0; font-size: 20px;">SHAZU SOFT TECHNOLOGIES</h2>
+          <p style="color: #C47D4C; font-size: 12px; margin: 4px 0 0 0; text-transform: uppercase; font-weight: bold;">Professional Membership Community</p>
+        </div>
+        <div style="padding: 24px; color: #1e293b;">
+          <h3 style="color: #123B32; margin-top: 0;">Membership Application Acknowledgment</h3>
+          <p>Dear <strong>${name}</strong>,</p>
+          <p>We have successfully received your application for <strong>${membership_type}</strong> under the <strong>${association_name}</strong> division.</p>
+          
+          <div style="background-color: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <div style="font-size: 11px; text-transform: uppercase; color: #64748B; font-weight: bold;">Application Reference Token</div>
+            <div style="font-size: 20px; font-family: monospace; font-weight: bold; color: #123B32; margin-top: 4px;">${tokenNo}</div>
+            <div style="font-size: 12px; color: #475569; margin-top: 8px;"><strong>Designation:</strong> ${designation || 'N/A'} | <strong>Qualification:</strong> ${qualification || 'N/A'}</div>
+          </div>
+          
+          <p style="font-size: 13px; color: #64748b;">Our membership executive team will review your submitted credentials and issue your official membership identification within 2 to 3 business days.</p>
+        </div>
+        <div style="background-color: #f8fafc; padding: 12px 24px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0;">
+          © 2026 Shazu Soft Technologies. All rights reserved.
+        </div>
+      </div>
+    `;
+
+    sendBrevoEmail({
+      toEmail: email,
+      toName: name,
+      subject: `Membership Application Received [Token: ${tokenNo}] - SST`,
+      htmlContent: memberEmailHtml
+    });
+
+    return { 
+      success: true, 
+      message: 'Your membership application has been submitted successfully!', 
+      token: tokenNo, 
+      membership 
+    };
+  } catch (err) {
+    app.log.error('Membership apply error:', err);
+    return reply.status(500).send({ error: 'Failed to submit membership application. Please try again.' });
+  }
 });
 
 // Apply for Job
