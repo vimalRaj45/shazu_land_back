@@ -70,11 +70,14 @@ function getEventRegistrationAckEmail({
   }
 
   const verificationNoticeHtml = isPaid ? `
-    <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 16px 0;">
+    <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
       <tr>
-        <td style="background-color: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #d97706; border-radius: 8px; padding: 14px 16px; font-size: 13px; color: #92400e; line-height: 1.6;">
-          <div style="font-weight: 700; margin-bottom: 4px;">Payment Verification in Progress (Within 12 Hours):</div>
-          We have received your registration details and UTR reference ${transaction_id ? `(<code>${transaction_id}</code>)` : ''}. Our accounts team is validating your payment. <strong>Your official QR entry pass will be dispatched to your inbox immediately after verification</strong> within 12 hours. Please stay tuned to your email!
+        <td style="background-color: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #d97706; border-radius: 12px; padding: 18px 18px; font-size: 13px; color: #92400e; line-height: 1.6;">
+          <div style="font-weight: 800; font-size: 14px; margin-bottom: 6px; color: #78350f;">Payment Verification in Progress (Within 12 Hours)</div>
+          We have received your registration details and payment UTR reference ${transaction_id ? `(<code>${transaction_id}</code>)` : ''}. Our accounts desk is validating your transaction.
+          <div style="margin-top: 10px; padding: 10px 12px; background-color: #fef3c7; border-radius: 8px; border: 1px dashed #f59e0b; color: #78350f; font-weight: 600; font-size: 12.5px;">
+            Once your payment is verified, your official <strong>Event Entry QR Pass</strong> will be generated and dispatched directly to your inbox.
+          </div>
         </td>
       </tr>
     </table>
@@ -90,30 +93,10 @@ function getEventRegistrationAckEmail({
   `;
 
   const subject = isPaid
-    ? `Registration Received [Token: ${tokenNo}] - Payment Verification Pending | SST`
-    : `Official Event Pass Confirmed [Token: ${tokenNo}] - SST`;
+    ? `Registration Received: ${event_title} (Payment Verification Pending) | SST`
+    : `Official Event Pass Confirmed [Pass: ${tokenNo}] - SST`;
 
-  const tokenCardHtml = isPaid ? `
-    <!-- Token Display Card for Paid Event (QR sent after verification) -->
-    <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
-      <tr>
-        <td align="center" style="background-color: #fffbeb; border: 1.5px dashed #f59e0b; border-radius: 14px; padding: 20px 16px; text-align: center;">
-          <span style="font-size: 11px; text-transform: uppercase; color: #92400e; font-weight: 700; letter-spacing: 0.5px;">Registration Reference Token</span>
-          
-          <div class="token-text" style="font-size: 22px; font-family: Consolas, Monaco, monospace; font-weight: 800; color: #b45309; letter-spacing: 2px; margin: 10px 0 6px 0;">
-            ${tokenNo}
-          </div>
-          <span style="font-size: 12px; color: #b45309; font-weight: 700;">
-            Status: ${initialStatus}
-          </span>
-          ${transaction_id ? `<div style="font-size: 11.5px; color: #78350f; margin-top: 6px;">UTR Ref: <code>${transaction_id}</code></div>` : ''}
-          <div style="font-size: 11.5px; color: #92400e; margin-top: 10px; font-weight: 600; background: #fef3c7; padding: 8px 12px; border-radius: 8px; display: inline-block;">
-            Your Official Entry QR Pass will be emailed to you once your payment is verified.
-          </div>
-        </td>
-      </tr>
-    </table>
-  ` : `
+  const tokenCardHtml = isPaid ? '' : `
     <!-- Free Event QR Code Card -->
     <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
       <tr>
@@ -128,7 +111,7 @@ function getEventRegistrationAckEmail({
             ${tokenNo}
           </div>
           <span style="font-size: 12px; color: #15803d; font-weight: 700;">
-            Registration Status: ${initialStatus}
+            Registration Status: Confirmed (Free Entry)
           </span>
           <div style="font-size: 11px; color: #64748b; margin-top: 8px;">Scan this QR code at the entrance desk for rapid check-in</div>
         </td>
@@ -140,9 +123,8 @@ function getEventRegistrationAckEmail({
     <p style="margin-top: 0; font-size: 15px; color: #0f172a;">Dear <strong>${name}</strong>,</p>
     <p style="color: #475569; font-size: 13.5px; line-height: 1.6;">Thank you for registering for <strong>"${event_title}"</strong>.</p>
     
-    ${tokenCardHtml}
-
     ${verificationNoticeHtml}
+    ${tokenCardHtml}
     ${audienceDetailHtml}
 
     <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-top: 22px; margin-bottom: 0;">
