@@ -414,10 +414,34 @@ async function initDatabase() {
     await client.query(`ALTER TABLE careers ADD COLUMN IF NOT EXISTS image_url TEXT;`);
     await client.query(`ALTER TABLE courses_services ADD COLUMN IF NOT EXISTS image_url TEXT;`);
 
-    // Add token_no columns if missing
+    // Add target_audience, is_paid, fee_amount, and upi_id columns to events
+    await client.query(`
+      ALTER TABLE events ADD COLUMN IF NOT EXISTS target_audience VARCHAR(50) DEFAULT 'College';
+      ALTER TABLE events ADD COLUMN IF NOT EXISTS is_paid BOOLEAN DEFAULT false;
+      ALTER TABLE events ADD COLUMN IF NOT EXISTS fee_amount VARCHAR(100) DEFAULT '0';
+      ALTER TABLE events ADD COLUMN IF NOT EXISTS upi_id VARCHAR(100) DEFAULT '8807099288@upi';
+    `);
+
+    // Add token_no and audience & payment proof columns to event_registrations
     await client.query(`
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);
       ALTER TABLE applications ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS target_audience VARCHAR(50) DEFAULT 'College';
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS school_name VARCHAR(255);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS grade_standard VARCHAR(100);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS section_roll VARCHAR(100);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS guardian_name VARCHAR(255);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS guardian_phone VARCHAR(50);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS college_name VARCHAR(255);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS degree VARCHAR(100);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS department VARCHAR(100);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS year_of_study VARCHAR(50);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS register_no VARCHAR(100);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS company_name VARCHAR(255);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS designation VARCHAR(100);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS experience_years VARCHAR(50);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS payment_screenshot_url TEXT;
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS fee_amount VARCHAR(100);
     `);
 
     // 7. Contact Lead Inquiries Table (CRM)
@@ -987,37 +1011,89 @@ app.post('/api/public/careers/apply', async (request, reply) => {
 
 // Register for Event
 app.post('/api/public/events/register', async (request, reply) => {
-  const { event_id, event_title, name, email, phone, organization, registration_fee, transaction_id, payment_method } = request.body || {};
+  const {
+    event_id, event_title, name, email, phone, organization, registration_fee, transaction_id, payment_method,
+    target_audience, school_name, grade_standard, section_roll, guardian_name, guardian_phone,
+    college_name, degree, department, year_of_study, register_no,
+    company_name, designation, experience_years, payment_screenshot_url, fee_amount
+  } = request.body || {};
+
   if (!name || !email) {
     return reply.status(400).send({ error: 'Name and Email are required' });
   }
 
   const fee = registration_fee || 'Free';
-  const isPaid = fee !== 'Free' && fee !== '0';
+  const isPaid = fee !== 'Free' && fee !== '0' && fee !== '';
   const initialStatus = isPaid ? 'Pending Verification' : 'Verified';
   const tokenNo = generateTokenNo('SST-PASS');
+  const audience = target_audience || 'College';
 
   const result = await pool.query(
-    `INSERT INTO event_registrations (event_id, event_title, name, email, phone, organization, registration_fee, payment_method, transaction_id, token_no, payment_status)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
-    [event_id || null, event_title || 'General Event', name, email, phone || '', organization || '', fee, payment_method || 'UPI QR', transaction_id || '', tokenNo, initialStatus]
+    `INSERT INTO event_registrations (
+      event_id, event_title, name, email, phone, organization, registration_fee, payment_method, transaction_id, token_no, payment_status,
+      target_audience, school_name, grade_standard, section_roll, guardian_name, guardian_phone,
+      college_name, degree, department, year_of_study, register_no,
+      company_name, designation, experience_years, payment_screenshot_url, fee_amount
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27) RETURNING *`,
+    [
+      event_id || null, event_title || 'General Event', name, email, phone || '', organization || '', fee, payment_method || 'UPI QR', transaction_id || '', tokenNo, initialStatus,
+      audience, school_name || '', grade_standard || '', section_roll || '', guardian_name || '', guardian_phone || '',
+      college_name || '', degree || '', department || '', year_of_study || '', register_no || '',
+      company_name || '', designation || '', experience_years || '', payment_screenshot_url || '', fee_amount || fee
+    ]
   );
 
   const registration = result.rows[0];
+
+  let audienceDetailHtml = '';
+  if (audience === 'School') {
+    audienceDetailHtml = `
+      <div style="background-color: #f8fafc; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; line-height: 1.6;">
+        <strong>🏫 School Particulars:</strong><br>
+        School: ${school_name || 'N/A'}<br>
+        Class / Grade: ${grade_standard || 'N/A'} (Section: ${section_roll || 'N/A'})<br>
+        Guardian / Teacher: ${guardian_name || 'N/A'} (${guardian_phone || 'N/A'})
+      </div>
+    `;
+  } else if (audience === 'College') {
+    audienceDetailHtml = `
+      <div style="background-color: #f8fafc; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; line-height: 1.6;">
+        <strong>🎓 College Particulars:</strong><br>
+        College / University: ${college_name || 'N/A'}<br>
+        Degree & Dept: ${degree || 'B.E/B.Tech'} - ${department || 'N/A'}<br>
+        Year of Study: ${year_of_study || 'N/A'} | Roll/Reg No: ${register_no || 'N/A'}
+      </div>
+    `;
+  } else if (audience === 'Professional') {
+    audienceDetailHtml = `
+      <div style="background-color: #f8fafc; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; line-height: 1.6;">
+        <strong>💼 Professional Particulars:</strong><br>
+        Company / Organization: ${company_name || 'N/A'}<br>
+        Designation: ${designation || 'N/A'} | Experience: ${experience_years || 'N/A'}
+      </div>
+    `;
+  }
 
   const ticketHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #123B32; border-radius: 16px; padding: 28px; color: #0f172a;">
       <div style="text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px;">
         <h2 style="color: #123B32; margin: 0;">SHAZU SOFT TECHNOLOGIES</h2>
-        <span style="display: inline-block; background-color: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: bold; margin-top: 8px;">Registration Reference</span>
+        <span style="display: inline-block; background-color: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: bold; margin-top: 8px;">Official Event Pass Registration</span>
       </div>
       <p>Dear <strong>${name}</strong>,</p>
       <p>Thank you for registering for <strong>"${event_title}"</strong>.</p>
+      
       <div style="background-color: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
         <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: bold;">Your Event Access Token:</span>
         <div style="font-size: 24px; font-family: monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin: 6px 0;">${tokenNo}</div>
-        <span style="font-size: 11px; color: #64748b;">Status: <strong>${initialStatus}</strong></span>
+        <span style="font-size: 12px; color: ${isPaid ? '#b45309' : '#15803d'}; font-weight: bold;">Registration Status: ${initialStatus}</span>
+        ${transaction_id ? `<div style="font-size: 11px; color: #64748b; margin-top: 6px;">UTR Ref: <code>${transaction_id}</code></div>` : ''}
       </div>
+
+      ${audienceDetailHtml}
+
+      <p style="font-size: 12px; color: #64748b;">Please present this token at the event registration desk upon arrival.</p>
+      <p style="font-size: 12px; color: #64748b;">Warm regards,<br><strong>SST Event Operations Team</strong></p>
     </div>
   `;
   sendBrevoEmail({ toEmail: email, toName: name, subject: `Event Registration Confirmation [Token: ${tokenNo}] - SST`, htmlContent: ticketHtml });
@@ -1540,23 +1616,40 @@ app.get('/api/admin/events', { preValidation: [app.authenticate] }, async () => 
 });
 
 app.post('/api/admin/events', { preValidation: [app.authenticate] }, async (request) => {
-  const { title, category, description, event_date, location, registration_fee, registration_link, image_url, status } = request.body;
+  const {
+    title, category, description, event_date, location, registration_fee, registration_link, image_url, status,
+    target_audience, is_paid, fee_amount, upi_id
+  } = request.body || {};
+
+  const cleanFee = is_paid ? (fee_amount || registration_fee || '499') : (registration_fee || 'Free');
   const result = await pool.query(
-    `INSERT INTO events (title, category, description, event_date, location, registration_fee, registration_link, image_url, status)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-    [title, category || 'General', description || '', event_date || '', location || '', registration_fee || 'Free', registration_link || '', image_url || '', status || 'Upcoming']
+    `INSERT INTO events (title, category, description, event_date, location, registration_fee, registration_link, image_url, status, target_audience, is_paid, fee_amount, upi_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
+    [
+      title, category || 'General', description || '', event_date || '', location || '', cleanFee, registration_link || '', image_url || '', status || 'Upcoming',
+      target_audience || 'College', is_paid === true || is_paid === 'true' || cleanFee !== 'Free', cleanFee, upi_id || '8807099288@upi'
+    ]
   );
   return { event: result.rows[0] };
 });
 
 app.put('/api/admin/events/:id', { preValidation: [app.authenticate] }, async (request) => {
   const { id } = request.params;
-  const { title, category, description, event_date, location, registration_fee, registration_link, image_url, status } = request.body;
+  const {
+    title, category, description, event_date, location, registration_fee, registration_link, image_url, status,
+    target_audience, is_paid, fee_amount, upi_id
+  } = request.body || {};
+
+  const cleanFee = is_paid ? (fee_amount || registration_fee || '499') : (registration_fee || 'Free');
   const result = await pool.query(
     `UPDATE events
-     SET title=$1, category=$2, description=$3, event_date=$4, location=$5, registration_fee=$6, registration_link=$7, image_url=$8, status=$9
-     WHERE id=$10 RETURNING *`,
-    [title, category, description, event_date, location, registration_fee, registration_link, image_url, status, id]
+     SET title=$1, category=$2, description=$3, event_date=$4, location=$5, registration_fee=$6, registration_link=$7, image_url=$8, status=$9,
+         target_audience=$10, is_paid=$11, fee_amount=$12, upi_id=$13
+     WHERE id=$14 RETURNING *`,
+    [
+      title, category, description, event_date, location, cleanFee, registration_link, image_url, status,
+      target_audience || 'College', is_paid === true || is_paid === 'true' || cleanFee !== 'Free', cleanFee, upi_id || '8807099288@upi', id
+    ]
   );
   return { event: result.rows[0] };
 });
