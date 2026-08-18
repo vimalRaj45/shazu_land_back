@@ -454,6 +454,8 @@ async function initDatabase() {
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS experience_years VARCHAR(50);
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS payment_screenshot_url TEXT;
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS fee_amount VARCHAR(100);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS attendance_status VARCHAR(50) DEFAULT 'Not Marked';
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS attendance_marked_at TIMESTAMP;
     `);
 
     // 7. Contact Lead Inquiries Table (CRM)
@@ -1201,6 +1203,91 @@ app.put('/api/admin/event-registrations/:id/payment', { preValidation: [app.auth
   return { registration: reg };
 });
 
+// Scan & Verify Pass by Token No, QR payload, or ID
+app.post('/api/admin/event-registrations/scan', { preValidation: [app.authenticate] }, async (request, reply) => {
+  try {
+    const { token_no, query } = request.body || {};
+    let searchToken = (token_no || query || '').trim();
+
+    // If scanned string is JSON, parse out token
+    if (searchToken.startsWith('{') && searchToken.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(searchToken);
+        searchToken = parsed.token || parsed.token_no || searchToken;
+      } catch (e) {}
+    }
+
+    if (!searchToken) {
+      return reply.status(400).send({ error: 'Please provide a valid pass token or QR code payload to scan.' });
+    }
+
+    let regRes = await pool.query(
+      `SELECT r.*, e.title as event_full_title, e.event_date, e.location 
+       FROM event_registrations r
+       LEFT JOIN events e ON r.event_id = e.id
+       WHERE LOWER(r.token_no) = LOWER($1) OR r.token_no ILIKE $2
+       LIMIT 1`,
+      [searchToken, `%${searchToken}%`]
+    );
+
+    if (regRes.rows.length === 0 && !isNaN(parseInt(searchToken, 10))) {
+      regRes = await pool.query(
+        `SELECT r.*, e.title as event_full_title, e.event_date, e.location 
+         FROM event_registrations r
+         LEFT JOIN events e ON r.event_id = e.id
+         WHERE r.id = $1 LIMIT 1`,
+        [parseInt(searchToken, 10)]
+      );
+    }
+
+    if (regRes.rows.length === 0) {
+      return reply.status(404).send({ error: `No registration found matching pass token "${searchToken}".` });
+    }
+
+    const reg = regRes.rows[0];
+    return { success: true, registration: reg };
+  } catch (err) {
+    app.log.error('Scan pass error:', err);
+    return reply.status(500).send({ error: 'Failed to process QR pass verification.' });
+  }
+});
+
+// Update / Toggle Attendance Check-In Status
+app.put('/api/admin/event-registrations/:id/attendance', { preValidation: [app.authenticate] }, async (request, reply) => {
+  try {
+    const { id } = request.params;
+    const { attendance_status } = request.body || {};
+    const status = (attendance_status === 'Present' || attendance_status === 'Attended') ? 'Present' : 'Not Marked';
+    const markedAt = status === 'Present' ? new Date() : null;
+
+    const result = await pool.query(
+      `UPDATE event_registrations 
+       SET attendance_status = $1, attendance_marked_at = $2 
+       WHERE id = $3 
+       RETURNING *`,
+      [status, markedAt, id]
+    );
+
+    if (result.rows.length === 0) {
+      return reply.status(404).send({ error: 'Registration not found' });
+    }
+
+    const reg = result.rows[0];
+    await logAudit(
+      'UPDATE_ATTENDANCE', 
+      'EVENT_REGISTRATION', 
+      reg.id, 
+      `Marked attendance as [${status}] for ${reg.name} (${reg.token_no}) in "${reg.event_title}"`, 
+      request
+    );
+
+    return { success: true, registration: reg, message: `Attendance marked as ${status}.` };
+  } catch (err) {
+    app.log.error('Update attendance error:', err);
+    return reply.status(500).send({ error: 'Failed to update attendance status.' });
+  }
+});
+
 // Candidate Application Status & Stage Update (Clean stage communication, no token boxes)
 app.put('/api/admin/applications/:id/status', { preValidation: [app.authenticate] }, async (request, reply) => {
   const { id } = request.params;
@@ -1396,14 +1483,25 @@ app.get('/api/admin/analytics', { preValidation: [app.authenticate] }, async () 
     pool.query('SELECT COUNT(*) FROM contact_inquiries'),
     pool.query('SELECT page_path, COUNT(*) as views FROM analytics_events GROUP BY page_path ORDER BY views DESC LIMIT 6'),
     pool.query(`
-      SELECT TO_CHAR(created_at, 'DD Mon') as label, COUNT(*) as views 
-      FROM analytics_events 
-      WHERE created_at >= NOW() - INTERVAL '7 days' 
-      GROUP BY TO_CHAR(created_at, 'DD Mon'), DATE_TRUNC('day', created_at) 
-      ORDER BY DATE_TRUNC('day', created_at) ASC
+      WITH date_series AS (
+        SELECT (CURRENT_DATE - (i || ' day')::interval)::date AS day_date,
+               TO_CHAR(CURRENT_DATE - (i || ' day')::interval, 'DD Mon') AS label,
+               i AS day_order
+        FROM generate_series(6, 0, -1) AS i
+      ),
+      event_counts AS (
+        SELECT DATE(created_at) AS event_date, COUNT(*) AS views
+        FROM analytics_events
+        WHERE created_at >= (CURRENT_DATE - INTERVAL '6 days')
+        GROUP BY DATE(created_at)
+      )
+      SELECT ds.label, COALESCE(ec.views, 0) AS views
+      FROM date_series ds
+      LEFT JOIN event_counts ec ON ds.day_date = ec.event_date
+      ORDER BY ds.day_order DESC
     `),
     pool.query('SELECT * FROM applications ORDER BY submitted_at DESC LIMIT 5'),
-    pool.query('SELECT id, name, email, event_title, registration_fee, payment_method, transaction_id, token_no, payment_status, registered_at FROM event_registrations ORDER BY registered_at DESC'),
+    pool.query('SELECT id, name, email, event_title, registration_fee, payment_method, transaction_id, token_no, payment_status, attendance_status, attendance_marked_at, registered_at FROM event_registrations ORDER BY registered_at DESC'),
     pool.query('SELECT id, status, service_category FROM contact_inquiries')
   ]);
 

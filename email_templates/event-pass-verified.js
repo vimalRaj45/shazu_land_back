@@ -10,18 +10,23 @@ function getEventPassVerifiedEmail({ name, email, event_title, tokenNo, fee }) {
     <p style="margin-top: 0; font-size: 15px; color: #0f172a;">Dear <strong>${name}</strong>,</p>
     <p style="color: #334155; font-size: 13.5px; line-height: 1.6;">Great news! Your registration and payment for <strong>"${event_title}"</strong> have been officially <strong>VERIFIED & APPROVED</strong> by SST Administration.</p>
     
-    <!-- Verified Official Ticket Card -->
+    <!-- Verified Official Ticket Card with QR Code -->
     <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 22px 0;">
       <tr>
-        <td align="center" style="background-color: #f0fdf4; border: 2px solid #16a34a; border-radius: 14px; padding: 22px 16px; text-align: center;">
+        <td align="center" style="background-color: #f0fdf4; border: 2px solid #16a34a; border-radius: 16px; padding: 22px 16px; text-align: center;">
           <div style="display: inline-block; background-color: #dcfce7; color: #15803d; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-            ✅ OFFICIAL PASS ISSUED
+            OFFICIAL PASS ISSUED & VERIFIED
           </div>
-          <div style="font-size: 11px; text-transform: uppercase; color: #166534; font-weight: 700; margin-top: 4px;">YOUR EVENT ENTRY TOKEN NUMBER</div>
-          <div class="token-text" style="font-size: 26px; font-family: Consolas, Monaco, monospace; font-weight: 800; color: #15803d; letter-spacing: 3px; margin: 8px 0;">
+          <div style="font-size: 11px; text-transform: uppercase; color: #166534; font-weight: 700; margin-top: 4px;">YOUR EVENT ENTRY QR CODE & TOKEN</div>
+          
+          <div style="margin: 14px 0 10px 0;">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(tokenNo)}&margin=8" alt="Verified Event QR Pass" width="170" height="170" style="display: block; margin: 0 auto; border-radius: 12px; border: 2px solid #16a34a; background: #ffffff; padding: 6px;" />
+          </div>
+
+          <div class="token-text" style="font-size: 22px; font-family: Consolas, Monaco, monospace; font-weight: 800; color: #15803d; letter-spacing: 3px; margin: 6px 0;">
             ${tokenNo}
           </div>
-          <span style="font-size: 12px; color: #166534; font-weight: 600;">Presenter / Attendee Pass for Venue Gate Verification</span>
+          <span style="font-size: 12px; color: #166534; font-weight: 600;">Scan at badge counter for instant check-in & kit collection</span>
         </td>
       </tr>
     </table>
