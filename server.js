@@ -833,12 +833,29 @@ app.post('/api/public/contact', async (request, reply) => {
     return reply.status(400).send({ error: 'Name, Email, and Message are required' });
   }
 
+  const lowerEmail = email.trim().toLowerCase();
+  const cleanMsg = message.trim();
+
+  // Duplicate Check: Check if an active inquiry with the same email and message already exists
+  const existingCheck = await pool.query(
+    `SELECT id, token_no, status FROM contact_inquiries 
+     WHERE LOWER(email) = $1 AND LOWER(TRIM(message)) = LOWER($2) AND status IN ('New Lead', 'Pending', 'Contacted')
+     ORDER BY created_at DESC LIMIT 1`,
+    [lowerEmail, cleanMsg]
+  );
+
+  if (existingCheck.rows.length > 0) {
+    return reply.status(400).send({
+      error: `A matching inquiry with email ${lowerEmail} has already been submitted (Reference Token: ${existingCheck.rows[0].token_no || 'SST-LEAD'}). Our team will get back to you shortly.`
+    });
+  }
+
   const initialToken = generateTokenNo('SST-LEAD');
 
   const result = await pool.query(
     `INSERT INTO contact_inquiries (name, email, phone, subject, service_category, message, token_no)
      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [name, email, phone || '', subject || 'General Inquiry', service_category || 'General', message, initialToken]
+    [name.trim(), lowerEmail, phone || '', subject || 'General Inquiry', service_category || 'General', cleanMsg, initialToken]
   );
 
   const inquiry = result.rows[0];
@@ -846,13 +863,13 @@ app.post('/api/public/contact', async (request, reply) => {
   // Dispatch acknowledgment email using modular template
   const { subject: clientSubject, htmlContent: clientHtml } = getContactInquiryEmail({
     name,
-    email,
+    email: lowerEmail,
     subject,
     service_category,
     tokenNo: initialToken,
-    message
+    message: cleanMsg
   });
-  sendBrevoEmail({ toEmail: email, toName: name, subject: clientSubject, htmlContent: clientHtml });
+  sendBrevoEmail({ toEmail: lowerEmail, toName: name, subject: clientSubject, htmlContent: clientHtml });
 
   return { message: 'Inquiry submitted successfully!', inquiry };
 });
@@ -882,6 +899,23 @@ app.post('/api/public/membership/apply', async (request, reply) => {
       return reply.status(400).send({ error: 'Please accept the declaration to proceed with your membership application.' });
     }
 
+    const lowerEmail = email.trim().toLowerCase();
+    const cleanAssoc = association_name.trim();
+
+    // Duplicate Check: Check if membership for this association with this email already exists
+    const existingCheck = await pool.query(
+      `SELECT id, token_no, status FROM memberships 
+       WHERE LOWER(email) = $1 AND LOWER(TRIM(association_name)) = LOWER($2)
+       LIMIT 1`,
+      [lowerEmail, cleanAssoc]
+    );
+
+    if (existingCheck.rows.length > 0) {
+      return reply.status(400).send({
+        error: `A membership application for "${cleanAssoc}" with email ${lowerEmail} has already been registered (Token: ${existingCheck.rows[0].token_no || 'SST-MEM'}, Status: ${existingCheck.rows[0].status || 'Pending'}).`
+      });
+    }
+
     const tokenNo = generateTokenNo('SST-MEM');
 
     const result = await pool.query(
@@ -890,13 +924,13 @@ app.post('/api/public/membership/apply', async (request, reply) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending') 
        RETURNING *`,
       [
-        association_name,
+        cleanAssoc,
         membership_type,
-        name,
+        name.trim(),
         dob || null,
         area_of_interest || '',
-        contact_no,
-        email.trim().toLowerCase(),
+        contact_no.trim(),
+        lowerEmail,
         qualification || '',
         designation || '',
         organization_address || '',
@@ -908,21 +942,21 @@ app.post('/api/public/membership/apply', async (request, reply) => {
     const membership = result.rows[0];
 
     // Log to system audit trail
-    await logAudit('CREATE', 'MEMBERSHIP', membership.id, `New ${membership_type} application submitted by ${name} (${email})`, request);
+    await logAudit('CREATE', 'MEMBERSHIP', membership.id, `New ${membership_type} application submitted by ${name} (${lowerEmail})`, request);
 
     // Send confirmation email via Brevo modular template
     const { subject: memSubject, htmlContent: memberEmailHtml } = getMembershipAckEmail({
       name,
-      email,
+      email: lowerEmail,
       membership_type,
-      association_name,
+      association_name: cleanAssoc,
       designation,
       qualification,
       tokenNo
     });
 
     sendBrevoEmail({
-      toEmail: email,
+      toEmail: lowerEmail,
       toName: name,
       subject: memSubject,
       htmlContent: memberEmailHtml
@@ -947,10 +981,35 @@ app.post('/api/public/careers/apply', async (request, reply) => {
     return reply.status(400).send({ error: 'Name and Email are required' });
   }
 
+  const lowerEmail = email.trim().toLowerCase();
+  const cleanTitle = (job_title || 'General Application').trim();
+
+  // Duplicate Check: Check if candidate already applied for this job
+  let existingCheck;
+  if (job_id) {
+    existingCheck = await pool.query(
+      'SELECT id, token_no, status FROM applications WHERE job_id = $1 AND LOWER(email) = $2 LIMIT 1',
+      [job_id, lowerEmail]
+    );
+  } else {
+    existingCheck = await pool.query(
+      'SELECT id, token_no, status FROM applications WHERE LOWER(TRIM(job_title)) = LOWER($1) AND LOWER(email) = $2 LIMIT 1',
+      [cleanTitle, lowerEmail]
+    );
+  }
+
+  if (existingCheck.rows.length > 0) {
+    return reply.status(400).send({
+      error: `An application with email ${lowerEmail} has already been submitted for "${cleanTitle}" (Current Status: ${existingCheck.rows[0].status || 'Under Review'}).`
+    });
+  }
+
+  const tokenNo = generateTokenNo('SST-APP');
+
   const result = await pool.query(
-    `INSERT INTO applications (job_id, job_title, applicant_name, email, phone, resume_url, message, status)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, 'Pending') RETURNING *`,
-    [job_id || null, job_title || 'General Application', applicant_name, email, phone || '', resume_url || '', message || '']
+    `INSERT INTO applications (job_id, job_title, applicant_name, email, phone, resume_url, message, token_no, status)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Pending') RETURNING *`,
+    [job_id || null, cleanTitle, applicant_name.trim(), lowerEmail, phone || '', resume_url || '', message || '', tokenNo]
   );
 
   const application = result.rows[0];
@@ -958,10 +1017,10 @@ app.post('/api/public/careers/apply', async (request, reply) => {
   // Dispatch applicant email using modular template
   const { subject: careerSubject, htmlContent: candidateHtml } = getCareerApplicationReceivedEmail({
     applicant_name,
-    email,
-    job_title
+    email: lowerEmail,
+    job_title: cleanTitle
   });
-  sendBrevoEmail({ toEmail: email, toName: applicant_name, subject: careerSubject, htmlContent: candidateHtml });
+  sendBrevoEmail({ toEmail: lowerEmail, toName: applicant_name, subject: careerSubject, htmlContent: candidateHtml });
 
   return { message: 'Application submitted successfully!', application };
 });
@@ -979,6 +1038,30 @@ app.post('/api/public/events/register', async (request, reply) => {
     return reply.status(400).send({ error: 'Name and Email are required' });
   }
 
+  const lowerEmail = email.trim().toLowerCase();
+  const cleanTitle = (event_title || 'General Event').trim();
+
+  // Duplicate Check: Check if user already registered for this event
+  let existingCheck;
+  if (event_id) {
+    existingCheck = await pool.query(
+      'SELECT id, token_no, payment_status FROM event_registrations WHERE event_id = $1 AND LOWER(email) = $2 LIMIT 1',
+      [event_id, lowerEmail]
+    );
+  } else {
+    existingCheck = await pool.query(
+      'SELECT id, token_no, payment_status FROM event_registrations WHERE LOWER(TRIM(event_title)) = LOWER($1) AND LOWER(email) = $2 LIMIT 1',
+      [cleanTitle, lowerEmail]
+    );
+  }
+
+  if (existingCheck.rows.length > 0) {
+    const existing = existingCheck.rows[0];
+    return reply.status(400).send({
+      error: `You are already registered for "${cleanTitle}" with email ${lowerEmail} (Pass Token: ${existing.token_no || 'SST-PASS'}, Status: ${existing.payment_status || 'Registered'}).`
+    });
+  }
+
   const fee = registration_fee || 'Free';
   const isPaid = fee !== 'Free' && fee !== '0' && fee !== '';
   const initialStatus = isPaid ? 'Pending Verification' : 'Verified';
@@ -993,7 +1076,7 @@ app.post('/api/public/events/register', async (request, reply) => {
       company_name, designation, experience_years, payment_screenshot_url, fee_amount
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27) RETURNING *`,
     [
-      event_id || null, event_title || 'General Event', name, email, phone || '', organization || '', fee, payment_method || 'UPI QR', transaction_id || '', tokenNo, initialStatus,
+      event_id || null, cleanTitle, name.trim(), lowerEmail, phone || '', organization || '', fee, payment_method || 'UPI QR', transaction_id || '', tokenNo, initialStatus,
       audience, school_name || '', grade_standard || '', section_roll || '', guardian_name || '', guardian_phone || '',
       college_name || '', degree || '', department || '', year_of_study || '', register_no || '',
       company_name || '', designation || '', experience_years || '', payment_screenshot_url || '', fee_amount || fee
@@ -1004,9 +1087,9 @@ app.post('/api/public/events/register', async (request, reply) => {
 
   // Dispatch Brevo email using modular template
   const { subject: eventSubject, htmlContent: ticketHtml } = getEventRegistrationAckEmail({
-    name,
-    email,
-    event_title,
+    name: name.trim(),
+    email: lowerEmail,
+    event_title: cleanTitle,
     tokenNo,
     isPaid,
     initialStatus,
@@ -1027,30 +1110,49 @@ app.post('/api/public/events/register', async (request, reply) => {
     experience_years
   });
 
-  sendBrevoEmail({ toEmail: email, toName: name, subject: eventSubject, htmlContent: ticketHtml });
+  sendBrevoEmail({ toEmail: lowerEmail, toName: name, subject: eventSubject, htmlContent: ticketHtml });
 
   return { message: 'Registration submitted successfully!', registration };
 });
 
-// Track Analytics & Page Views
+// In-Memory Server-Side Pageview Deduplication Cache (prevents duplicate fast hits within 2.5 seconds)
+const recentTelemetryHits = new Map();
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, timestamp] of recentTelemetryHits.entries()) {
+    if (now - timestamp > 5000) {
+      recentTelemetryHits.delete(key);
+    }
+  }
+}, 10000);
+
+// Track Analytics & Page Views (Strict Mobile / Desktop classification, deduplicated)
 app.post('/api/public/analytics/track', async (request, reply) => {
   try {
     const { page_path, referrer, device_type } = request.body || {};
     const user_agent = request.headers['user-agent'] || '';
-    const ip_address = request.ip || request.raw.socket.remoteAddress || '';
+    const ip_address = request.ip || request.raw.socket.remoteAddress || '127.0.0.1';
 
-    let resolvedDevice = device_type;
+    // Disallow Tablet classification - only Mobile or Desktop
+    let resolvedDevice = (device_type === 'Mobile' || device_type === 'Desktop') ? device_type : null;
     if (!resolvedDevice) {
-      if (/mobile|android|iphone|ipod|blackberry|opera mini|iemobile/i.test(user_agent)) {
+      if (/mobile|android|iphone|ipod|ipad|tablet|blackberry|opera mini|iemobile/i.test(user_agent)) {
         resolvedDevice = 'Mobile';
-      } else if (/ipad|tablet/i.test(user_agent)) {
-        resolvedDevice = 'Tablet';
       } else {
         resolvedDevice = 'Desktop';
       }
     }
 
     const cleanPath = (page_path || 'index.html').trim().replace(/^[/\\]+/, '') || 'index.html';
+
+    // Deduplication check: Ignore identical IP + path logged within 2.5 seconds
+    const dedupKey = `${ip_address}::${cleanPath}`;
+    const lastHit = recentTelemetryHits.get(dedupKey);
+    const now = Date.now();
+    if (lastHit && (now - lastHit < 2500)) {
+      return reply.status(200).send({ status: 'deduplicated' });
+    }
+    recentTelemetryHits.set(dedupKey, now);
 
     await pool.query(
       'INSERT INTO analytics_events (page_path, user_agent, ip_address, device_type, referrer) VALUES ($1, $2, $3, $4, $5)',
@@ -1343,10 +1445,10 @@ app.get('/api/admin/analytics', { preValidation: [app.authenticate] }, async () 
     conversionRate: leads.length > 0 ? ((leads.filter(l => l.status === 'Converted' || l.status === 'Won').length / leads.length) * 100).toFixed(1) : 0
   };
 
-  // Device Breakdown Formatting
-  const deviceCounts = { Mobile: 0, Desktop: 0, Tablet: 0 };
+  // Device Breakdown Formatting (Mobile and Desktop only)
+  const deviceCounts = { Mobile: 0, Desktop: 0 };
   deviceBreakdownRes.rows.forEach(r => {
-    const key = r.device_type === 'Mobile' ? 'Mobile' : (r.device_type === 'Tablet' ? 'Tablet' : 'Desktop');
+    const key = (r.device_type === 'Mobile' || r.device_type === 'Tablet') ? 'Mobile' : 'Desktop';
     deviceCounts[key] = (deviceCounts[key] || 0) + parseInt(r.count, 10);
   });
 
