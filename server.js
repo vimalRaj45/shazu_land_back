@@ -15,6 +15,18 @@ const app = Fastify({
   bodyLimit: 15728640 // 15 MB payload limit for Base64 image BLOB uploads
 });
 
+const {
+  getAdminOtpEmail,
+  getContactInquiryEmail,
+  getMembershipAckEmail,
+  getCareerApplicationReceivedEmail,
+  getCareerApplicationStatusEmail,
+  getEventRegistrationAckEmail,
+  getEventPassVerifiedEmail,
+  getAdminWelcomeEmail,
+  getAdminDirectEmail
+} = require('./email_templates');
+
 // Environment configuration (loaded from .env)
 const PORT = process.env.PORT || 5000;
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -686,34 +698,17 @@ app.post('/api/auth/send-otp', async (request, reply) => {
       [lowerEmail, otpCode, expiresAt]
     );
 
-    // Dispatch Brevo OTP Email
-    const otpHtml = `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
-        <div style="background-color: #123B32; padding: 24px 32px; text-align: center;">
-          <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px;">SHAZU SOFT TECHNOLOGIES</h2>
-          <p style="color: #C47D4C; margin: 4px 0 0 0; font-size: 12px; font-weight: 600; text-transform: uppercase;">Admin Portal Security Verification</p>
-        </div>
-        <div style="padding: 32px;">
-          <h3 style="color: #0f172a; margin-top: 0; font-size: 16px; font-weight: 600;">Sign-In Verification Code</h3>
-          <p style="color: #475569; font-size: 13px; line-height: 1.6;">Hello ${admin.name || 'Admin'},<br>Use the 6-digit one-time password (OTP) below to authenticate into the Shazu Soft Technologies Management Control Center.</p>
-          
-          <div style="background-color: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
-            <div style="font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #123B32; font-family: Consolas, Monaco, monospace;">${otpCode}</div>
-            <div style="font-size: 11px; color: #64748b; margin-top: 8px;">Valid for 10 minutes • Do not share this code with anyone</div>
-          </div>
-
-          <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin-bottom: 0;">If you did not request this login code, please notify your Super Admin immediately.</p>
-        </div>
-        <div style="background-color: #f8fafc; padding: 14px 32px; border-top: 1px solid #f1f5f9; text-align: center; font-size: 11px; color: #94a3b8;">
-          © 2026 Shazu Soft Technologies. All rights reserved.
-        </div>
-      </div>
-    `;
+    // Dispatch Brevo OTP Email using modular template
+    const { subject: otpSubject, htmlContent: otpHtml } = getAdminOtpEmail({
+      name: admin.name || 'Admin',
+      email: lowerEmail,
+      otpCode
+    });
 
     await sendBrevoEmail({
       toEmail: lowerEmail,
       toName: admin.name || 'Admin',
-      subject: `Your Admin Verification Code: ${otpCode} - SST`,
+      subject: otpSubject,
       htmlContent: otpHtml
     });
 
@@ -848,22 +843,16 @@ app.post('/api/public/contact', async (request, reply) => {
 
   const inquiry = result.rows[0];
 
-  const clientHtml = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; color: #1e292b;">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="color: #123B32; margin: 0;">SHAZU SOFT TECHNOLOGIES</h2>
-        <p style="color: #527A68; font-size: 13px; margin-top: 4px;">Thank you for contacting us!</p>
-      </div>
-      <p>Dear <strong>${name}</strong>,</p>
-      <p>We have received your inquiry regarding <strong>"${subject || 'General Inquiry'}"</strong>.</p>
-      <div style="background-color: #E8EFEB; border: 1px border #123B32; padding: 12px; border-radius: 8px; text-align: center; margin: 16px 0;">
-        <span style="font-size: 11px; text-transform: uppercase; color: #123B32; font-weight: bold;">Your Reference Token Number:</span>
-        <div style="font-size: 18px; font-family: monospace; font-weight: bold; color: #123B32; margin-top: 4px;">${initialToken}</div>
-      </div>
-      <p style="font-size: 13px; color: #64748b;">Our Salem operations team will reach out shortly using your reference token.</p>
-    </div>
-  `;
-  sendBrevoEmail({ toEmail: email, toName: name, subject: `Inquiry Received [Ref: ${initialToken}] - SST`, htmlContent: clientHtml });
+  // Dispatch acknowledgment email using modular template
+  const { subject: clientSubject, htmlContent: clientHtml } = getContactInquiryEmail({
+    name,
+    email,
+    subject,
+    service_category,
+    tokenNo: initialToken,
+    message
+  });
+  sendBrevoEmail({ toEmail: email, toName: name, subject: clientSubject, htmlContent: clientHtml });
 
   return { message: 'Inquiry submitted successfully!', inquiry };
 });
@@ -921,36 +910,21 @@ app.post('/api/public/membership/apply', async (request, reply) => {
     // Log to system audit trail
     await logAudit('CREATE', 'MEMBERSHIP', membership.id, `New ${membership_type} application submitted by ${name} (${email})`, request);
 
-    // Send confirmation email via Brevo
-    const memberEmailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
-        <div style="background-color: #123B32; padding: 24px; text-align: center; color: #ffffff;">
-          <h2 style="margin: 0; font-size: 20px;">SHAZU SOFT TECHNOLOGIES</h2>
-          <p style="color: #C47D4C; font-size: 12px; margin: 4px 0 0 0; text-transform: uppercase; font-weight: bold;">Professional Membership Community</p>
-        </div>
-        <div style="padding: 24px; color: #1e293b;">
-          <h3 style="color: #123B32; margin-top: 0;">Membership Application Acknowledgment</h3>
-          <p>Dear <strong>${name}</strong>,</p>
-          <p>We have successfully received your application for <strong>${membership_type}</strong> under the <strong>${association_name}</strong> division.</p>
-          
-          <div style="background-color: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 8px; padding: 16px; margin: 16px 0;">
-            <div style="font-size: 11px; text-transform: uppercase; color: #64748B; font-weight: bold;">Application Reference Token</div>
-            <div style="font-size: 20px; font-family: monospace; font-weight: bold; color: #123B32; margin-top: 4px;">${tokenNo}</div>
-            <div style="font-size: 12px; color: #475569; margin-top: 8px;"><strong>Designation:</strong> ${designation || 'N/A'} | <strong>Qualification:</strong> ${qualification || 'N/A'}</div>
-          </div>
-          
-          <p style="font-size: 13px; color: #64748b;">Our membership executive team will review your submitted credentials and issue your official membership identification within 2 to 3 business days.</p>
-        </div>
-        <div style="background-color: #f8fafc; padding: 12px 24px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0;">
-          © 2026 Shazu Soft Technologies. All rights reserved.
-        </div>
-      </div>
-    `;
+    // Send confirmation email via Brevo modular template
+    const { subject: memSubject, htmlContent: memberEmailHtml } = getMembershipAckEmail({
+      name,
+      email,
+      membership_type,
+      association_name,
+      designation,
+      qualification,
+      tokenNo
+    });
 
     sendBrevoEmail({
       toEmail: email,
       toName: name,
-      subject: `Membership Application Received [Token: ${tokenNo}] - SST`,
+      subject: memSubject,
       htmlContent: memberEmailHtml
     });
 
@@ -981,30 +955,13 @@ app.post('/api/public/careers/apply', async (request, reply) => {
 
   const application = result.rows[0];
 
-  const candidateHtml = `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 560px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
-      <div style="background-color: #123B32; padding: 24px 32px; text-align: center;">
-        <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px;">SHAZU SOFT TECHNOLOGIES</h2>
-        <p style="color: #C47D4C; margin: 4px 0 0 0; font-size: 12px; font-weight: 600; text-transform: uppercase;">Talent Acquisition & Hiring Operations</p>
-      </div>
-      <div style="padding: 32px;">
-        <h3 style="color: #0f172a; margin-top: 0; font-size: 16px; font-weight: 600;">Application Received</h3>
-        <p style="color: #475569; font-size: 13px; line-height: 1.6;">Dear <strong>${applicant_name}</strong>,<br>Thank you for submitting your application for the <strong>"${job_title || 'Engineering'}"</strong> position at Shazu Soft Technologies.</p>
-        
-        <div style="background-color: #f8fafc; border-left: 4px solid #123B32; padding: 14px 18px; border-radius: 6px; margin: 20px 0;">
-          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b;">Current Application Stage</div>
-          <div style="font-size: 15px; font-weight: 700; color: #123B32; margin-top: 2px;">Application Received (Under Review)</div>
-        </div>
-
-        <p style="color: #475569; font-size: 13px; line-height: 1.6;">Our recruitment team is reviewing your profile and credentials. If your qualifications match our current hiring requirements, our Talent Acquisition team will reach out to schedule an introductory discussion.</p>
-        <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin-top: 24px; margin-bottom: 0;">Warm regards,<br><strong>Talent Acquisition Desk</strong><br>Shazu Soft Technologies</p>
-      </div>
-      <div style="background-color: #f8fafc; padding: 14px 32px; border-top: 1px solid #f1f5f9; text-align: center; font-size: 11px; color: #94a3b8;">
-        © 2026 Shazu Soft Technologies. All rights reserved.
-      </div>
-    </div>
-  `;
-  sendBrevoEmail({ toEmail: email, toName: applicant_name, subject: `Application Received: ${job_title || 'Position'} - Shazu Soft Technologies`, htmlContent: candidateHtml });
+  // Dispatch applicant email using modular template
+  const { subject: careerSubject, htmlContent: candidateHtml } = getCareerApplicationReceivedEmail({
+    applicant_name,
+    email,
+    job_title
+  });
+  sendBrevoEmail({ toEmail: email, toName: applicant_name, subject: careerSubject, htmlContent: candidateHtml });
 
   return { message: 'Application submitted successfully!', application };
 });
@@ -1045,58 +1002,32 @@ app.post('/api/public/events/register', async (request, reply) => {
 
   const registration = result.rows[0];
 
-  let audienceDetailHtml = '';
-  if (audience === 'School') {
-    audienceDetailHtml = `
-      <div style="background-color: #f8fafc; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; line-height: 1.6;">
-        <strong>🏫 School Particulars:</strong><br>
-        School: ${school_name || 'N/A'}<br>
-        Class / Grade: ${grade_standard || 'N/A'} (Section: ${section_roll || 'N/A'})<br>
-        Guardian / Teacher: ${guardian_name || 'N/A'} (${guardian_phone || 'N/A'})
-      </div>
-    `;
-  } else if (audience === 'College') {
-    audienceDetailHtml = `
-      <div style="background-color: #f8fafc; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; line-height: 1.6;">
-        <strong>🎓 College Particulars:</strong><br>
-        College / University: ${college_name || 'N/A'}<br>
-        Degree & Dept: ${degree || 'B.E/B.Tech'} - ${department || 'N/A'}<br>
-        Year of Study: ${year_of_study || 'N/A'} | Roll/Reg No: ${register_no || 'N/A'}
-      </div>
-    `;
-  } else if (audience === 'Professional') {
-    audienceDetailHtml = `
-      <div style="background-color: #f8fafc; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; line-height: 1.6;">
-        <strong>💼 Professional Particulars:</strong><br>
-        Company / Organization: ${company_name || 'N/A'}<br>
-        Designation: ${designation || 'N/A'} | Experience: ${experience_years || 'N/A'}
-      </div>
-    `;
-  }
+  // Dispatch Brevo email using modular template
+  const { subject: eventSubject, htmlContent: ticketHtml } = getEventRegistrationAckEmail({
+    name,
+    email,
+    event_title,
+    tokenNo,
+    isPaid,
+    initialStatus,
+    transaction_id,
+    target_audience: audience,
+    school_name,
+    grade_standard,
+    section_roll,
+    guardian_name,
+    guardian_phone,
+    college_name,
+    degree,
+    department,
+    year_of_study,
+    register_no,
+    company_name,
+    designation,
+    experience_years
+  });
 
-  const ticketHtml = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #123B32; border-radius: 16px; padding: 28px; color: #0f172a;">
-      <div style="text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px;">
-        <h2 style="color: #123B32; margin: 0;">SHAZU SOFT TECHNOLOGIES</h2>
-        <span style="display: inline-block; background-color: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: bold; margin-top: 8px;">Official Event Pass Registration</span>
-      </div>
-      <p>Dear <strong>${name}</strong>,</p>
-      <p>Thank you for registering for <strong>"${event_title}"</strong>.</p>
-      
-      <div style="background-color: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
-        <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: bold;">Your Event Access Token:</span>
-        <div style="font-size: 24px; font-family: monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin: 6px 0;">${tokenNo}</div>
-        <span style="font-size: 12px; color: ${isPaid ? '#b45309' : '#15803d'}; font-weight: bold;">Registration Status: ${initialStatus}</span>
-        ${transaction_id ? `<div style="font-size: 11px; color: #64748b; margin-top: 6px;">UTR Ref: <code>${transaction_id}</code></div>` : ''}
-      </div>
-
-      ${audienceDetailHtml}
-
-      <p style="font-size: 12px; color: #64748b;">Please present this token at the event registration desk upon arrival.</p>
-      <p style="font-size: 12px; color: #64748b;">Warm regards,<br><strong>SST Event Operations Team</strong></p>
-    </div>
-  `;
-  sendBrevoEmail({ toEmail: email, toName: name, subject: `Event Registration Confirmation [Token: ${tokenNo}] - SST`, htmlContent: ticketHtml });
+  sendBrevoEmail({ toEmail: email, toName: name, subject: eventSubject, htmlContent: ticketHtml });
 
   return { message: 'Registration submitted successfully!', registration };
 });
@@ -1155,26 +1086,14 @@ app.put('/api/admin/event-registrations/:id/payment', { preValidation: [app.auth
   reg = result.rows[0];
 
   if (payment_status === 'Verified' || payment_status === 'Approved') {
-    const verifiedHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #16a34a; border-radius: 16px; padding: 28px; color: #0f172a;">
-        <div style="text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px;">
-          <h2 style="color: #123B32; margin: 0;">SHAZU SOFT TECHNOLOGIES</h2>
-          <span style="display: inline-block; background-color: #dcfce7; color: #15803d; padding: 6px 16px; border-radius: 99px; font-size: 13px; font-weight: bold; margin-top: 8px;">✅ OFFICIAL PASS APPROVED & ISSUED</span>
-        </div>
-        <p>Dear <strong>${reg.name}</strong>,</p>
-        <p>Great news! Your registration and payment for <strong>"${reg.event_title}"</strong> have been officially <strong>APPROVED</strong> by SST Administration!</p>
-        
-        <div style="background-color: #f0fdf4; border: 2px solid #16a34a; padding: 18px; border-radius: 12px; text-align: center; margin: 20px 0;">
-          <span style="font-size: 11px; text-transform: uppercase; color: #166534; font-weight: bold;">YOUR OFFICIAL EVENT ENTRY TOKEN NO</span>
-          <div style="font-size: 24px; font-family: monospace; font-weight: bold; color: #15803d; letter-spacing: 2px; margin: 8px 0;">${tokenNo}</div>
-          <span style="font-size: 12px; color: #166534;">Presenter / Attendee Token for Venue Gate Verification</span>
-        </div>
-
-        <p style="font-size: 13px; color: #64748b;">Please present your Token Number (<strong>${tokenNo}</strong>) at the venue entrance badge counter.</p>
-        <p style="font-size: 13px; color: #64748b;">Warm regards,<br><strong>SST Event Operations Desk</strong></p>
-      </div>
-    `;
-    sendBrevoEmail({ toEmail: reg.email, toName: reg.name, subject: `🎟️ APPROVED! Event Entry Token: ${tokenNo}`, htmlContent: verifiedHtml });
+    const { subject: passSubject, htmlContent: verifiedHtml } = getEventPassVerifiedEmail({
+      name: reg.name,
+      email: reg.email,
+      event_title: reg.event_title,
+      tokenNo,
+      fee: reg.registration_fee
+    });
+    sendBrevoEmail({ toEmail: reg.email, toName: reg.name, subject: passSubject, htmlContent: verifiedHtml });
   }
 
   return { registration: reg };
@@ -1195,49 +1114,15 @@ app.put('/api/admin/applications/:id/status', { preValidation: [app.authenticate
   );
   appRecord = result.rows[0];
 
-  const isShortlisted = status === 'Shortlisted' || status === 'Approved';
-  const isRejected = status === 'Rejected';
+  // Dispatch candidate status update email using modular template
+  const { subject: statusSubject, htmlContent: candidateHtml } = getCareerApplicationStatusEmail({
+    applicant_name: appRecord.applicant_name,
+    email: appRecord.email,
+    job_title: appRecord.job_title,
+    status
+  });
 
-  let subject = `Application Update: ${appRecord.job_title} - Shazu Soft Technologies`;
-  let stageTitle = `Application Stage: ${status}`;
-  let stageDescription = `Your application for <strong>"${appRecord.job_title}"</strong> has been updated to stage: <strong>${status}</strong>.`;
-
-  if (isShortlisted) {
-    subject = `🎉 Shortlisted for Interview: ${appRecord.job_title} - Shazu Soft Technologies`;
-    stageTitle = `Shortlisted for Interview Round`;
-    stageDescription = `We are pleased to inform you that your job application for <strong>"${appRecord.job_title}"</strong> has been reviewed and shortlisted for the next interview round! Our hiring team will contact you directly with interview schedule details.`;
-  } else if (isRejected) {
-    subject = `Update regarding your application for ${appRecord.job_title} - Shazu Soft Technologies`;
-    stageTitle = `Application Closed`;
-    stageDescription = `Thank you for taking the time to apply for <strong>"${appRecord.job_title}"</strong>. After careful consideration, we have chosen to proceed with other candidates whose experience more closely matches our immediate requirements. We will keep your profile in our talent network for future openings.`;
-  }
-
-  const candidateHtml = `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 560px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
-      <div style="background-color: #123B32; padding: 24px 32px; text-align: center;">
-        <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px;">SHAZU SOFT TECHNOLOGIES</h2>
-        <p style="color: #C47D4C; margin: 4px 0 0 0; font-size: 12px; font-weight: 600; text-transform: uppercase;">Talent Acquisition & Hiring Operations</p>
-      </div>
-      <div style="padding: 32px;">
-        <h3 style="color: #0f172a; margin-top: 0; font-size: 16px; font-weight: 600;">${isShortlisted ? '🎉 Congratulations on being Shortlisted!' : 'Application Status Update'}</h3>
-        <p style="color: #475569; font-size: 13px; line-height: 1.6;">Dear <strong>${appRecord.applicant_name}</strong>,</p>
-        
-        <div style="background-color: ${isShortlisted ? '#f0fdf4' : (isRejected ? '#fef2f2' : '#f8fafc')}; border-left: 4px solid ${isShortlisted ? '#16a34a' : (isRejected ? '#dc2626' : '#123B32')}; padding: 14px 18px; border-radius: 6px; margin: 20px 0;">
-          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: ${isShortlisted ? '#166534' : (isRejected ? '#991b1b' : '#64748b')};">Current Application Stage</div>
-          <div style="font-size: 15px; font-weight: 700; color: ${isShortlisted ? '#15803d' : (isRejected ? '#b91c1c' : '#123B32')}; margin-top: 2px;">${stageTitle}</div>
-        </div>
-
-        <p style="color: #475569; font-size: 13px; line-height: 1.6;">${stageDescription}</p>
-        
-        <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin-top: 24px; margin-bottom: 0;">Warm regards,<br><strong>Talent Acquisition Desk</strong><br>Shazu Soft Technologies</p>
-      </div>
-      <div style="background-color: #f8fafc; padding: 14px 32px; border-top: 1px solid #f1f5f9; text-align: center; font-size: 11px; color: #94a3b8;">
-        © 2026 Shazu Soft Technologies. All rights reserved.
-      </div>
-    </div>
-  `;
-
-  sendBrevoEmail({ toEmail: appRecord.email, toName: appRecord.applicant_name, subject, htmlContent: candidateHtml });
+  sendBrevoEmail({ toEmail: appRecord.email, toName: appRecord.applicant_name, subject: statusSubject, htmlContent: candidateHtml });
 
   return { application: appRecord };
 });
@@ -1249,17 +1134,7 @@ app.post('/api/admin/email/send', { preValidation: [app.authenticate] }, async (
     return reply.status(400).send({ error: 'toEmail, subject, and message are required' });
   }
 
-  const htmlContent = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #123B32; border-radius: 12px; padding: 24px; color: #1e292b;">
-      <div style="margin-bottom: 20px; border-bottom: 2px solid #123B32; padding-bottom: 12px;">
-        <h3 style="color: #123B32; margin: 0;">SHAZU SOFT TECHNOLOGIES</h3>
-        <p style="color: #C47D4C; font-size: 12px; margin: 2px 0 0 0;">Official Communication</p>
-      </div>
-      <p style="white-space: pre-line; line-height: 1.6;">${message}</p>
-      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;">
-      <p style="font-size: 12px; color: #64748b; margin: 0;">Shazu Soft Technologies Management<br>Salem, Tamil Nadu, India</p>
-    </div>
-  `;
+  const { htmlContent } = getAdminDirectEmail({ toName, subject, message });
 
   const success = await sendBrevoEmail({ toEmail, toName: toName || toEmail, subject, htmlContent });
   if (success) {
@@ -1319,34 +1194,17 @@ app.post('/api/admin/users', { preValidation: [requireRole(['super_admin'])] }, 
   );
   const newUser = insertRes.rows[0];
 
-  // Send onboarding email notification via Brevo
-  const welcomeHtml = `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
-      <div style="background-color: #123B32; padding: 24px 32px; text-align: center;">
-        <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 700;">SHAZU SOFT TECHNOLOGIES</h2>
-        <p style="color: #C47D4C; margin: 4px 0 0 0; font-size: 12px; font-weight: 600; text-transform: uppercase;">Admin Portal Access Granted</p>
-      </div>
-      <div style="padding: 32px;">
-        <p>Hello <strong>${newUser.name}</strong>,</p>
-        <p>You have been added as an administrator to the <strong>Shazu Soft Technologies Management Control Center</strong> with the access role of <strong style="color: #123B32; text-transform: uppercase;">${newUser.role.replace('_', ' ')}</strong>.</p>
-        
-        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 20px 0;">
-          <div><strong style="color: #64748b; font-size: 12px;">Assigned Role:</strong> <span style="font-weight: 700; color: #123B32; text-transform: capitalize;">${newUser.role.replace('_', ' ')}</span></div>
-          <div style="margin-top: 6px;"><strong style="color: #64748b; font-size: 12px;">Login Methods:</strong> <span style="color: #334155;">Email OTP Verification or Google One-Click Login</span></div>
-        </div>
-
-        <p style="font-size: 13px; color: #64748b;">Navigate to the Admin sign-in page, enter your registered email, and verify with the instant OTP sent to your inbox.</p>
-      </div>
-      <div style="background-color: #f8fafc; padding: 14px 32px; border-top: 1px solid #f1f5f9; text-align: center; font-size: 11px; color: #94a3b8;">
-        © 2026 Shazu Soft Technologies. All rights reserved.
-      </div>
-    </div>
-  `;
+  // Send onboarding email notification via Brevo modular template
+  const { subject: welcomeSubject, htmlContent: welcomeHtml } = getAdminWelcomeEmail({
+    name: newUser.name,
+    email: lowerEmail,
+    role: newUser.role
+  });
 
   sendBrevoEmail({
     toEmail: lowerEmail,
     toName: newUser.name,
-    subject: 'Welcome to SST Management Team - Admin Access Provisioned',
+    subject: welcomeSubject,
     htmlContent: welcomeHtml
   });
 
