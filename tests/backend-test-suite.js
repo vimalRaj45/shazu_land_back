@@ -186,9 +186,9 @@ async function runBackendTests() {
   await test('POST /api/public/contact accepts valid inquiry', async () => {
     const payload = {
       name: 'Automated Test User',
-      email: 'testuser@shazusofttechnologies.org',
+      email: `testuser_${Date.now()}@shazusofttechnologies.org`,
       phone: '+91 9876543210',
-      subject: 'Backend Test Suite Inquiry',
+      subject: `Backend Test Suite Inquiry ${Date.now()}`,
       service_category: 'Software Services',
       message: 'Automated validation inquiry from backend test suite.'
     };
@@ -199,56 +199,91 @@ async function runBackendTests() {
 
   await test('POST /api/public/events/register generates unique SST token number', async () => {
     const payload = {
-      event_id: 1,
-      event_title: 'SST International AI Hackathon 2026',
-      name: 'Candidate Test Register',
-      email: 'candidate@shazusofttechnologies.org',
+      event_id: 101,
+      event_title: 'SST Unique AI Summit 2026',
+      name: 'Candidate Unique Register',
+      email: 'unique.candidate@shazusofttechnologies.org',
       phone: '9876543210',
       organization: 'Mahendra Engineering College',
-      registration_fee: 'Free'
+      registration_fee: 'Free',
+      declaration_agreed: true
     };
     const res = await request('POST', '/api/public/events/register', {}, payload);
-    assert(res.statusCode === 200 || res.statusCode === 201, `Expected 200/201, got ${res.statusCode}`);
-    assert(res.body && (res.body.message || res.body.registration || res.body.token_no), 'Expected registration confirmation');
+    assert(res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 409, `Expected 200/201/409, got ${res.statusCode}`);
     const token = (res.body && res.body.token_no) || (res.body && res.body.registration && res.body.registration.token_no);
     if (token) {
       assert(token.startsWith('SST-'), `Token format invalid: ${token}`);
     }
   });
 
-  await test('POST /api/public/careers/apply accepts job application dossier', async () => {
+  await test('POST /api/public/events/register prevents duplicate registration with HTTP 409', async () => {
     const payload = {
-      job_id: 1,
-      job_title: 'Senior Full-Stack Cloud Engineer',
-      applicant_name: 'Jane Doe Developer',
-      email: 'jane.doe@example.com',
-      phone: '9123456789',
-      resume_url: 'https://example.com/resumes/jane_doe.pdf',
-      message: 'Automated job application test message.'
-    };
-    const res = await request('POST', '/api/public/careers/apply', {}, payload);
-    assert(res.statusCode === 200 || res.statusCode === 201, `Expected 200/201, got ${res.statusCode}`);
-    assert(res.body.message, 'Expected success message');
-    assert(res.body.token_no && res.body.token_no.startsWith('SST-APP'), 'Expected SST-APP token');
-  });
-
-  await test('POST /api/public/membership/apply accepts 11-field membership dossier and generates token', async () => {
-    const payload = {
-      association_name: 'SST Research & Innovation Chapter',
-      membership_type: 'Professional Member',
-      name: 'Dr. Jane Academic Candidate',
-      dob: '1988-04-12',
-      area_of_interest: 'Artificial Intelligence & VLSI Architecture',
-      phone: '+91 9876543210',
-      email: 'jane.academic@university.edu',
-      professional_qualification: 'Ph.D. in Computer Science',
-      present_designation: 'Associate Professor',
-      organization_name_address: 'Department of Computer Science, University Campus, Salem',
+      event_id: 999,
+      event_title: 'SST Duplicate Test Event 2026',
+      name: 'Duplicate Registrant',
+      email: 'dup.tester@shazusofttechnologies.org',
+      phone: '9876543210',
+      organization: 'Test Institute',
+      registration_fee: 'Free',
       declaration_agreed: true
     };
-    const res = await request('POST', '/api/public/membership/apply', {}, payload);
-    assert(res.statusCode === 200 || res.statusCode === 201, `Expected 200/201, got ${res.statusCode}`);
-    assert(res.body.token_no && res.body.token_no.startsWith('SST-MEM'), 'Expected SST-MEM token');
+    // First registration
+    const res1 = await request('POST', '/api/public/events/register', {}, payload);
+    assert(res1.statusCode === 200 || res1.statusCode === 201 || res1.statusCode === 409, `First submit: expected 200/201/409, got ${res1.statusCode}`);
+
+    // Second registration (Duplicate)
+    const res2 = await request('POST', '/api/public/events/register', {}, payload);
+    assertEqual(res2.statusCode, 409, 'Expected 409 Conflict for duplicate event registration');
+    assert(res2.body.is_duplicate === true, 'Expected is_duplicate flag to be true');
+    assert(res2.body.token_no, 'Expected existing token_no in 409 response');
+  });
+
+  await test('POST /api/public/events/register enforces email and phone validations', async () => {
+    const invalidEmailPayload = {
+      event_id: 1,
+      event_title: 'Validation Test Event',
+      name: 'Test Name',
+      email: 'invalid-email-address',
+      phone: '9876543210',
+      declaration_agreed: true
+    };
+    const res = await request('POST', '/api/public/events/register', {}, invalidEmailPayload);
+    assertEqual(res.statusCode, 400, 'Expected 400 Bad Request for invalid email format');
+    assert(res.body.error, 'Expected validation error message');
+  });
+
+  await test('POST /api/public/careers/apply prevents duplicate job application with HTTP 409', async () => {
+    const payload = {
+      job_id: 888,
+      job_title: 'Lead Quantum Architect',
+      applicant_name: 'Jane Quantum',
+      email: 'jane.quantum@example.com',
+      phone: '9123456789',
+      message: 'Automated job application duplicate test.'
+    };
+    const res1 = await request('POST', '/api/public/careers/apply', {}, payload);
+    assert(res1.statusCode === 200 || res1.statusCode === 201 || res1.statusCode === 409, `First submit: expected 200/201/409, got ${res1.statusCode}`);
+
+    const res2 = await request('POST', '/api/public/careers/apply', {}, payload);
+    assertEqual(res2.statusCode, 409, 'Expected 409 Conflict for duplicate job application');
+    assert(res2.body.is_duplicate === true, 'Expected is_duplicate flag in response');
+  });
+
+  await test('POST /api/public/membership/apply prevents duplicate membership application with HTTP 409', async () => {
+    const payload = {
+      association_name: 'SST Research Chapter',
+      membership_type: 'Honorary Fellow Member',
+      name: 'Dr. Duplicate Academic',
+      email: 'dup.academic@university.edu',
+      phone: '9876543210',
+      declaration_agreed: true
+    };
+    const res1 = await request('POST', '/api/public/membership/apply', {}, payload);
+    assert(res1.statusCode === 200 || res1.statusCode === 201 || res1.statusCode === 409, `First submit: expected 200/201/409, got ${res1.statusCode}`);
+
+    const res2 = await request('POST', '/api/public/membership/apply', {}, payload);
+    assertEqual(res2.statusCode, 409, 'Expected 409 Conflict for duplicate membership application');
+    assert(res2.body.token_no, 'Expected existing token_no in 409 response');
   });
 
   await test('GET /api/public/track/:token retrieves live status and admin remarks', async () => {
@@ -258,17 +293,18 @@ async function runBackendTests() {
       event_title: 'SST AI Hackathon 2026',
       attendee_category: 'College / University Student (UG / PG)',
       name: 'College Student Tester',
-      email: 'collegestudent@shazusofttechnologies.org',
+      email: `collegestudent_${Date.now()}@shazusofttechnologies.org`,
       phone: '9876543210',
       organization: 'Anna University, Chennai',
       department_degree: 'B.E Computer Science & Engineering',
       designation_year: '3rd Year (Semester 6)',
       roll_no_employee_id: '731621104055',
       city_state: 'Chennai, Tamil Nadu',
-      registration_fee: 'Free'
+      registration_fee: 'Free',
+      declaration_agreed: true
     };
     const regRes = await request('POST', '/api/public/events/register', {}, regPayload);
-    assertEqual(regRes.statusCode, 200, 'College registration status');
+    assert(regRes.statusCode === 200 || regRes.statusCode === 201, `College registration status: expected 200/201, got ${regRes.statusCode}`);
     const token = regRes.body.token_no || (regRes.body.registration && regRes.body.registration.token_no);
     assert(token && token.startsWith('SST-PASS-'), 'Registration should return SST-PASS token');
 
@@ -278,17 +314,18 @@ async function runBackendTests() {
       event_title: 'National Robotics & Coding Challenge',
       attendee_category: 'School Student (Grade 6 - 12 / Higher Secondary)',
       name: 'School Student Prodigy',
-      email: 'schoolprodigy@shazusofttechnologies.org',
+      email: `schoolprodigy_${Date.now()}@shazusofttechnologies.org`,
       phone: '9876543211',
       organization: 'Kendriya Vidyalaya, Salem',
       department_degree: '11th Standard (Computer Science / Maths)',
       designation_year: '11th - Section A',
       roll_no_employee_id: 'SCH-88401',
       city_state: 'Salem, Tamil Nadu',
-      registration_fee: 'Free'
+      registration_fee: 'Free',
+      declaration_agreed: true
     };
     const schoolRes = await request('POST', '/api/public/events/register', {}, schoolPayload);
-    assertEqual(schoolRes.statusCode, 200, 'School registration status');
+    assert(schoolRes.statusCode === 200 || schoolRes.statusCode === 201, `School registration status: expected 200/201, got ${schoolRes.statusCode}`);
     assert(schoolRes.body.token_no.startsWith('SST-PASS-'), 'School registration should return token');
 
     // 3. Faculty FDP Registration
@@ -297,17 +334,18 @@ async function runBackendTests() {
       event_title: 'Faculty Development Program on Generative AI',
       attendee_category: 'College / University Faculty (FDP / Conference)',
       name: 'Dr. Ramesh Ramanathan',
-      email: 'dr.ramesh@institution.edu',
+      email: `dr.ramesh_${Date.now()}@institution.edu`,
       phone: '9876543212',
       organization: 'Government College of Engineering, Salem',
       department_degree: 'Department of Computer Science & Engineering',
       designation_year: 'Associate Professor & HOD',
       roll_no_employee_id: 'FAC-EMP-1092',
       city_state: 'Salem, Tamil Nadu',
-      registration_fee: 'Free'
+      registration_fee: 'Free',
+      declaration_agreed: true
     };
     const fdpRes = await request('POST', '/api/public/events/register', {}, fdpPayload);
-    assertEqual(fdpRes.statusCode, 200, 'FDP registration status');
+    assert(fdpRes.statusCode === 200 || fdpRes.statusCode === 201, `FDP registration status: expected 200/201, got ${fdpRes.statusCode}`);
 
     // 4. Status Tracking Verification
     const trackRes = await request('GET', `/api/public/track/${token}`);

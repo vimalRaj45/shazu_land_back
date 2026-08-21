@@ -1111,6 +1111,26 @@ app.setErrorHandler((error, request, reply) => {
 });
 
 // ----------------------------------------------------
+// VALIDATION & DUPLICATE PREVENTION HELPERS
+// ----------------------------------------------------
+const isValidEmailStr = (email) => {
+  if (!email || typeof email !== 'string') return false;
+  return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.trim());
+};
+
+const isValidPhoneStr = (phone) => {
+  if (!phone || String(phone).trim() === '') return true;
+  const clean = String(phone).trim().replace(/[\s\-\(\)\+]/g, '');
+  return /^\d{7,15}$/.test(clean);
+};
+
+const isValidNameStr = (name) => {
+  if (!name || typeof name !== 'string') return false;
+  return name.trim().length >= 2;
+};
+
+
+// ----------------------------------------------------
 // AUTHENTICATION ROUTES (EMAIL OTP, GOOGLE AUTH, PASSWORD)
 // ----------------------------------------------------
 
@@ -1367,16 +1387,77 @@ app.post('/api/public/events/register', async (request, reply) => {
     declaration_agreed
   } = request.body || {};
 
-  if (!name || !email) {
-    return reply.status(400).send({ error: 'Attendee Name and Email Address are required' });
+  const trimmedName = (name || '').trim();
+  const trimmedEmail = (email || '').trim().toLowerCase();
+  const trimmedPhone = (phone || '').trim();
+  const cleanEventTitle = (event_title || 'SST Event').trim();
+  const fee = (registration_fee || 'Free').trim();
+  const isFree = fee.toLowerCase().includes('free') || fee === '0' || fee === '';
+  const cleanTxnId = (transaction_id || '').trim();
+  const validDeclaration = declaration_agreed === true || declaration_agreed === 'true' || declaration_agreed === 'on';
+
+  // Comprehensive Input Validations
+  if (!isValidNameStr(trimmedName)) {
+    return reply.status(400).send({ error: 'Please enter a valid full name (minimum 2 characters).' });
+  }
+
+  if (!isValidEmailStr(trimmedEmail)) {
+    return reply.status(400).send({ error: 'Please enter a valid email address (e.g., name@domain.com).' });
+  }
+
+  if (trimmedPhone && !isValidPhoneStr(trimmedPhone)) {
+    return reply.status(400).send({ error: 'Please enter a valid contact phone number.' });
+  }
+
+  if (!validDeclaration) {
+    return reply.status(400).send({ error: 'You must agree to the event terms and declaration before submitting.' });
+  }
+
+  if (!isFree && cleanTxnId.length < 4) {
+    return reply.status(400).send({ error: 'Please enter a valid Transaction / UTR Reference ID for payment verification.' });
+  }
+
+  // Validate event_id foreign key existence
+  let parsedEventId = event_id ? parseInt(event_id, 10) || null : null;
+  if (parsedEventId) {
+    try {
+      const evCheck = await pool.query('SELECT id FROM events WHERE id = $1', [parsedEventId]);
+      if (!evCheck.rows || evCheck.rows.length === 0) parsedEventId = null;
+    } catch (_) {
+      parsedEventId = null;
+    }
+  }
+
+  // Duplicate Check: Email + Event (by ID or Title)
+  let existingReg;
+  if (parsedEventId) {
+    existingReg = await pool.query(
+      `SELECT token_no, payment_status, registered_at FROM event_registrations 
+       WHERE LOWER(email) = $1 AND event_id = $2 ORDER BY id DESC LIMIT 1`,
+      [trimmedEmail, parsedEventId]
+    );
+  } else {
+    existingReg = await pool.query(
+      `SELECT token_no, payment_status, registered_at FROM event_registrations 
+       WHERE LOWER(email) = $1 AND LOWER(event_title) = LOWER($2) ORDER BY id DESC LIMIT 1`,
+      [trimmedEmail, cleanEventTitle]
+    );
+  }
+
+  if (existingReg.rows && existingReg.rows.length > 0) {
+    const existing = existingReg.rows[0];
+    return reply.status(409).send({
+      error: `You have already registered for "${cleanEventTitle}" using email ${trimmedEmail}.`,
+      is_duplicate: true,
+      token_no: existing.token_no,
+      payment_status: existing.payment_status,
+      registered_at: existing.registered_at
+    });
   }
 
   const tokenNo = generateTokenNo('SST-PASS');
-  const fee = registration_fee || 'Free';
-  const isFree = fee.toLowerCase().includes('free') || fee === '0' || fee === '';
   const initialPaymentStatus = isFree ? 'Verified' : 'Pending Verification';
   const category = attendee_category || 'College / University Student (UG / PG)';
-  const validDeclaration = declaration_agreed === true || declaration_agreed === 'true' || declaration_agreed === 'on';
 
   const result = await pool.query(
     `INSERT INTO event_registrations (
@@ -1386,12 +1467,12 @@ app.post('/api/public/events/register', async (request, reply) => {
       payment_status, declaration_agreed
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *`,
     [
-      event_id ? parseInt(event_id, 10) || null : null,
-      event_title || 'SST Event',
+      parsedEventId,
+      cleanEventTitle,
       category,
-      name,
-      email,
-      phone || '',
+      trimmedName,
+      trimmedEmail,
+      trimmedPhone,
       gender || '',
       organization || '',
       department_degree || '',
@@ -1400,7 +1481,7 @@ app.post('/api/public/events/register', async (request, reply) => {
       city_state || '',
       fee,
       payment_method || 'UPI QR',
-      transaction_id || '',
+      cleanTxnId,
       tokenNo,
       initialPaymentStatus,
       validDeclaration
@@ -1408,12 +1489,12 @@ app.post('/api/public/events/register', async (request, reply) => {
   );
 
   const registration = (result.rows && result.rows[0]) ? result.rows[0] : {
-    event_id,
-    event_title: event_title || 'SST Event',
+    event_id: parsedEventId,
+    event_title: cleanEventTitle,
     attendee_category: category,
-    name,
-    email,
-    phone: phone || '',
+    name: trimmedName,
+    email: trimmedEmail,
+    phone: trimmedPhone,
     gender: gender || '',
     organization: organization || '',
     department_degree: department_degree || '',
@@ -1422,7 +1503,7 @@ app.post('/api/public/events/register', async (request, reply) => {
     city_state: city_state || '',
     registration_fee: fee,
     payment_method: payment_method || 'UPI QR',
-    transaction_id: transaction_id || '',
+    transaction_id: cleanTxnId,
     token_no: tokenNo,
     payment_status: initialPaymentStatus,
     declaration_agreed: validDeclaration,
@@ -1443,8 +1524,8 @@ app.post('/api/public/events/register', async (request, reply) => {
         <div style="padding: 28px;">
           <h3 style="color: #123B32; margin-top: 0;">Registration Confirmed!</h3>
           <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-            Dear <strong>${name}</strong>,<br>
-            Your registration for <strong>${event_title || 'SST Event'}</strong> has been recorded successfully.
+            Dear <strong>${trimmedName}</strong>,<br>
+            Your registration for <strong>${cleanEventTitle}</strong> has been recorded successfully.
           </p>
 
           <div style="background-color: #e8efeb; border: 1.5px dashed #123B32; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
@@ -1459,7 +1540,7 @@ app.post('/api/public/events/register', async (request, reply) => {
             <div style="margin-bottom: 6px;"><strong>Degree / Class / Stream:</strong> ${department_degree || 'N/A'}</div>
             <div style="margin-bottom: 6px;"><strong>Year / Designation:</strong> ${designation_year || 'N/A'}</div>
             ${roll_no_employee_id ? `<div style="margin-bottom: 6px;"><strong>ID / Roll No:</strong> ${roll_no_employee_id}</div>` : ''}
-            <div><strong>Fee:</strong> ${fee} ${transaction_id ? `(UTR: ${transaction_id})` : ''}</div>
+            <div><strong>Fee:</strong> ${fee} ${cleanTxnId ? `(UTR: ${cleanTxnId})` : ''}</div>
           </div>
 
           <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
@@ -1476,9 +1557,9 @@ app.post('/api/public/events/register', async (request, reply) => {
   `;
 
   sendBrevoEmail({
-    toEmail: email,
-    toName: name,
-    subject: `Event Pass Confirmed [Ref: ${tokenNo}]: ${event_title || 'SST Event'} - Shazu Soft`,
+    toEmail: trimmedEmail,
+    toName: trimmedName,
+    subject: `Event Pass Confirmed [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft`,
     htmlContent: passHtml
   });
 
@@ -1488,8 +1569,44 @@ app.post('/api/public/events/register', async (request, reply) => {
 // Contact Form Submission
 app.post('/api/public/contact', async (request, reply) => {
   const { name, email, phone, subject, service_category, message } = request.body || {};
-  if (!name || !email || !message) {
-    return reply.status(400).send({ error: 'Name, Email, and Message are required' });
+  
+  const trimmedName = (name || '').trim();
+  const trimmedEmail = (email || '').trim().toLowerCase();
+  const trimmedPhone = (phone || '').trim();
+  const cleanSubject = (subject || 'General Inquiry').trim();
+  const cleanMessage = (message || '').trim();
+
+  if (!isValidNameStr(trimmedName)) {
+    return reply.status(400).send({ error: 'Please enter your full name (minimum 2 characters).' });
+  }
+
+  if (!isValidEmailStr(trimmedEmail)) {
+    return reply.status(400).send({ error: 'Please enter a valid email address (e.g., name@domain.com).' });
+  }
+
+  if (trimmedPhone && !isValidPhoneStr(trimmedPhone)) {
+    return reply.status(400).send({ error: 'Please enter a valid contact phone number.' });
+  }
+
+  if (cleanMessage.length < 5) {
+    return reply.status(400).send({ error: 'Please enter a detailed message (minimum 5 characters).' });
+  }
+
+  // Duplicate Check: Same email & subject submitted within last 10 minutes
+  const existingInquiry = await pool.query(
+    `SELECT token_no, created_at FROM contact_inquiries 
+     WHERE LOWER(email) = $1 AND LOWER(subject) = LOWER($2) AND created_at >= NOW() - INTERVAL '10 minutes'
+     ORDER BY id DESC LIMIT 1`,
+    [trimmedEmail, cleanSubject]
+  );
+
+  if (existingInquiry.rows && existingInquiry.rows.length > 0) {
+    const existing = existingInquiry.rows[0];
+    return reply.status(409).send({
+      error: `An inquiry regarding "${cleanSubject}" was recently submitted from ${trimmedEmail}.`,
+      is_duplicate: true,
+      token_no: existing.token_no
+    });
   }
 
   const initialToken = generateTokenNo('SST-LEAD');
@@ -1497,7 +1614,7 @@ app.post('/api/public/contact', async (request, reply) => {
   const result = await pool.query(
     `INSERT INTO contact_inquiries (name, email, phone, subject, service_category, message, token_no)
      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [name, email, phone || '', subject || 'General Inquiry', service_category || 'General', message, initialToken]
+    [trimmedName, trimmedEmail, trimmedPhone, cleanSubject, service_category || 'General', cleanMessage, initialToken]
   );
 
   const inquiry = result.rows[0];
@@ -1508,8 +1625,8 @@ app.post('/api/public/contact', async (request, reply) => {
         <h2 style="color: #123B32; margin: 0;">SHAZU SOFT TECHNOLOGIES</h2>
         <p style="color: #527A68; font-size: 13px; margin-top: 4px;">Thank you for contacting us!</p>
       </div>
-      <p>Dear <strong>${name}</strong>,</p>
-      <p>We have received your inquiry regarding <strong>"${subject || 'General Inquiry'}"</strong>.</p>
+      <p>Dear <strong>${trimmedName}</strong>,</p>
+      <p>We have received your inquiry regarding <strong>"${cleanSubject}"</strong>.</p>
       <div style="background-color: #E8EFEB; border: 1px border #123B32; padding: 12px; border-radius: 8px; text-align: center; margin: 16px 0;">
         <span style="font-size: 11px; text-transform: uppercase; color: #123B32; font-weight: bold;">Your Reference Token Number:</span>
         <div style="font-size: 18px; font-family: monospace; font-weight: bold; color: #123B32; margin-top: 4px;">${initialToken}</div>
@@ -1517,7 +1634,7 @@ app.post('/api/public/contact', async (request, reply) => {
       <p style="font-size: 13px; color: #64748b;">Our Salem operations team will reach out shortly using your reference token.</p>
     </div>
   `;
-  sendBrevoEmail({ toEmail: email, toName: name, subject: `Inquiry Received [Ref: ${initialToken}] - SST`, htmlContent: clientHtml });
+  sendBrevoEmail({ toEmail: trimmedEmail, toName: trimmedName, subject: `Inquiry Received [Ref: ${initialToken}] - SST`, htmlContent: clientHtml });
 
   return { message: 'Inquiry submitted successfully!', inquiry };
 });
@@ -1525,8 +1642,57 @@ app.post('/api/public/contact', async (request, reply) => {
 // Apply for Job
 app.post('/api/public/careers/apply', async (request, reply) => {
   const { job_id, job_title, applicant_name, email, phone, resume_url, message } = request.body || {};
-  if (!applicant_name || !email) {
-    return reply.status(400).send({ error: 'Name and Email are required' });
+  
+  const trimmedName = (applicant_name || '').trim();
+  const trimmedEmail = (email || '').trim().toLowerCase();
+  const trimmedPhone = (phone || '').trim();
+  const cleanJobTitle = (job_title || 'General Application').trim();
+  let parsedJobId = job_id ? parseInt(job_id, 10) || null : null;
+  if (parsedJobId) {
+    try {
+      const jobCheck = await pool.query('SELECT id FROM careers WHERE id = $1', [parsedJobId]);
+      if (!jobCheck.rows || jobCheck.rows.length === 0) parsedJobId = null;
+    } catch (_) {
+      parsedJobId = null;
+    }
+  }
+
+  if (!isValidNameStr(trimmedName)) {
+    return reply.status(400).send({ error: 'Please enter your full name (minimum 2 characters).' });
+  }
+
+  if (!isValidEmailStr(trimmedEmail)) {
+    return reply.status(400).send({ error: 'Please enter a valid email address (e.g., name@domain.com).' });
+  }
+
+  if (trimmedPhone && !isValidPhoneStr(trimmedPhone)) {
+    return reply.status(400).send({ error: 'Please enter a valid contact phone number.' });
+  }
+
+  // Duplicate Check: Same email & job position
+  let existingApp;
+  if (parsedJobId) {
+    existingApp = await pool.query(
+      `SELECT token_no, status, created_at FROM applications 
+       WHERE LOWER(email) = $1 AND job_id = $2 ORDER BY id DESC LIMIT 1`,
+      [trimmedEmail, parsedJobId]
+    );
+  } else {
+    existingApp = await pool.query(
+      `SELECT token_no, status, created_at FROM applications 
+       WHERE LOWER(email) = $1 AND LOWER(job_title) = LOWER($2) ORDER BY id DESC LIMIT 1`,
+      [trimmedEmail, cleanJobTitle]
+    );
+  }
+
+  if (existingApp.rows && existingApp.rows.length > 0) {
+    const existing = existingApp.rows[0];
+    return reply.status(409).send({
+      error: `You have already applied for "${cleanJobTitle}" using email ${trimmedEmail}.`,
+      is_duplicate: true,
+      token_no: existing.token_no,
+      status: existing.status
+    });
   }
 
   const tokenNo = generateTokenNo('SST-APP');
@@ -1534,15 +1700,15 @@ app.post('/api/public/careers/apply', async (request, reply) => {
   const result = await pool.query(
     `INSERT INTO applications (job_id, job_title, applicant_name, email, phone, resume_url, message, token_no, status)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Pending') RETURNING *`,
-    [job_id || null, job_title || 'General Application', applicant_name, email, phone || '', resume_url || '', message || '', tokenNo]
+    [parsedJobId, cleanJobTitle, trimmedName, trimmedEmail, trimmedPhone, resume_url || '', message || '', tokenNo]
   );
 
   const application = (result.rows && result.rows[0]) ? result.rows[0] : {
-    job_id: job_id || null,
-    job_title: job_title || 'General Application',
-    applicant_name,
-    email,
-    phone: phone || '',
+    job_id: parsedJobId,
+    job_title: cleanJobTitle,
+    applicant_name: trimmedName,
+    email: trimmedEmail,
+    phone: trimmedPhone,
     resume_url: resume_url || '',
     message: message || '',
     token_no: tokenNo,
@@ -1558,7 +1724,7 @@ app.post('/api/public/careers/apply', async (request, reply) => {
       </div>
       <div style="padding: 32px;">
         <h3 style="color: #0f172a; margin-top: 0; font-size: 16px; font-weight: 600;">Application Received</h3>
-        <p style="color: #475569; font-size: 13px; line-height: 1.6;">Dear <strong>${applicant_name}</strong>,<br>Thank you for submitting your application for the <strong>"${job_title || 'Engineering'}"</strong> position at Shazu Soft Technologies.</p>
+        <p style="color: #475569; font-size: 13px; line-height: 1.6;">Dear <strong>${trimmedName}</strong>,<br>Thank you for submitting your application for the <strong>"${cleanJobTitle}"</strong> position at Shazu Soft Technologies.</p>
         
         <div style="background-color: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
           <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: bold;">Your Job Application Reference Token:</span>
@@ -1574,7 +1740,7 @@ app.post('/api/public/careers/apply', async (request, reply) => {
       </div>
     </div>
   `;
-  sendBrevoEmail({ toEmail: email, toName: applicant_name, subject: `Application Received [Ref: ${tokenNo}]: ${job_title || 'Position'} - Shazu Soft Technologies`, htmlContent: candidateHtml });
+  sendBrevoEmail({ toEmail: trimmedEmail, toName: trimmedName, subject: `Application Received [Ref: ${tokenNo}]: ${cleanJobTitle} - Shazu Soft Technologies`, htmlContent: candidateHtml });
 
   return { message: 'Application submitted successfully!', token_no: tokenNo, application };
 });
@@ -1595,12 +1761,50 @@ app.post('/api/public/membership/apply', async (request, reply) => {
     declaration_agreed
   } = request.body || {};
 
-  if (!name || !email || !membership_type) {
-    return reply.status(400).send({ error: 'Applicant Name, Email, and Membership Type are required' });
+  const trimmedName = (name || '').trim();
+  const trimmedEmail = (email || '').trim().toLowerCase();
+  const trimmedPhone = (phone || '').trim();
+  const cleanMemType = (membership_type || 'Professional').trim();
+  const validDeclaration = declaration_agreed === true || declaration_agreed === 'true' || declaration_agreed === 'on';
+
+  if (!isValidNameStr(trimmedName)) {
+    return reply.status(400).send({ error: 'Please enter your full name (minimum 2 characters).' });
+  }
+
+  if (!isValidEmailStr(trimmedEmail)) {
+    return reply.status(400).send({ error: 'Please enter a valid email address (e.g., name@domain.com).' });
+  }
+
+  if (trimmedPhone && !isValidPhoneStr(trimmedPhone)) {
+    return reply.status(400).send({ error: 'Please enter a valid phone number.' });
+  }
+
+  if (!cleanMemType) {
+    return reply.status(400).send({ error: 'Please select a valid membership type.' });
+  }
+
+  if (!validDeclaration) {
+    return reply.status(400).send({ error: 'You must accept the membership declaration before applying.' });
+  }
+
+  // Duplicate Check: Same email & membership type
+  const existingMem = await pool.query(
+    `SELECT token_no, status, created_at FROM memberships 
+     WHERE LOWER(email) = $1 AND LOWER(membership_type) = LOWER($2) ORDER BY id DESC LIMIT 1`,
+    [trimmedEmail, cleanMemType]
+  );
+
+  if (existingMem.rows && existingMem.rows.length > 0) {
+    const existing = existingMem.rows[0];
+    return reply.status(409).send({
+      error: `A ${cleanMemType} membership application already exists for email ${trimmedEmail}.`,
+      is_duplicate: true,
+      token_no: existing.token_no,
+      status: existing.status
+    });
   }
 
   const tokenNo = generateTokenNo('SST-MEM');
-  const validDeclaration = declaration_agreed === true || declaration_agreed === 'true' || declaration_agreed === 'on';
 
   const result = await pool.query(
     `INSERT INTO memberships (
@@ -1610,12 +1814,12 @@ app.post('/api/public/membership/apply', async (request, reply) => {
     [
       tokenNo,
       association_name || 'SST Professional Academic Network',
-      membership_type || 'Professional',
-      name,
+      cleanMemType,
+      trimmedName,
       dob || '',
       area_of_interest || '',
-      phone || '',
-      email,
+      trimmedPhone,
+      trimmedEmail,
       professional_qualification || '',
       present_designation || '',
       organization_name_address || '',
@@ -1626,12 +1830,12 @@ app.post('/api/public/membership/apply', async (request, reply) => {
   const membership = (result.rows && result.rows[0]) ? result.rows[0] : {
     token_no: tokenNo,
     association_name: association_name || 'SST Professional Academic Network',
-    membership_type: membership_type || 'Professional',
-    name,
+    membership_type: cleanMemType,
+    name: trimmedName,
     dob: dob || '',
     area_of_interest: area_of_interest || '',
-    phone: phone || '',
-    email,
+    phone: trimmedPhone,
+    email: trimmedEmail,
     professional_qualification: professional_qualification || '',
     present_designation: present_designation || '',
     organization_name_address: organization_name_address || '',
@@ -1646,8 +1850,8 @@ app.post('/api/public/membership/apply', async (request, reply) => {
         <h2 style="color: #123B32; margin: 0;">SHAZU SOFT TECHNOLOGIES</h2>
         <span style="display: inline-block; background-color: #dcfce7; color: #15803d; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: bold; margin-top: 8px;">Membership Application Dossier</span>
       </div>
-      <p>Dear <strong>${name}</strong>,</p>
-      <p>We have received your membership application for <strong>${membership_type} Membership</strong> (${association_name || 'SST Network'}).</p>
+      <p>Dear <strong>${trimmedName}</strong>,</p>
+      <p>We have received your membership application for <strong>${cleanMemType} Membership</strong> (${association_name || 'SST Network'}).</p>
       <div style="background-color: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
         <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: bold;">Your Membership Reference Token:</span>
         <div style="font-size: 24px; font-family: monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin: 6px 0;">${tokenNo}</div>
@@ -1656,7 +1860,7 @@ app.post('/api/public/membership/apply', async (request, reply) => {
       <p style="font-size: 13px; color: #64748b;">You can track your membership status anytime using your reference token.</p>
     </div>
   `;
-  sendBrevoEmail({ toEmail: email, toName: name, subject: `Membership Application Received [Ref: ${tokenNo}] - SST`, htmlContent: memberHtml });
+  sendBrevoEmail({ toEmail: trimmedEmail, toName: trimmedName, subject: `Membership Application Received [Ref: ${tokenNo}] - SST`, htmlContent: memberHtml });
 
   return { message: 'Membership application submitted successfully!', token_no: tokenNo, membership };
 });
@@ -2580,6 +2784,36 @@ app.post('/api/admin/audit-logs/clear', { preValidation: [app.authenticate] }, a
   await logAudit('PURGE_AUDIT_LOGS', 'SECURITY', 'SYSTEM', 'Purged audit records older than 90 days', request);
   return { message: 'Audit logs older than 90 days cleared successfully' };
 });
+
+// Safe Database Data Truncation (Preserves hero_slides & admins)
+app.post('/api/admin/system/safe-truncate', { preValidation: [requireRole(['super_admin'])] }, async (request, reply) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('TRUNCATE TABLE event_registrations CASCADE;');
+    await client.query('TRUNCATE TABLE applications CASCADE;');
+    await client.query('TRUNCATE TABLE contact_inquiries CASCADE;');
+    await client.query('TRUNCATE TABLE memberships CASCADE;');
+    await client.query('TRUNCATE TABLE events CASCADE;');
+    await client.query('TRUNCATE TABLE careers CASCADE;');
+    await client.query('TRUNCATE TABLE courses_services CASCADE;');
+    await client.query('TRUNCATE TABLE announcements CASCADE;');
+    await client.query('TRUNCATE TABLE analytics_events CASCADE;');
+    await client.query('TRUNCATE TABLE audit_logs CASCADE;');
+    await client.query('TRUNCATE TABLE admin_otps CASCADE;');
+    await client.query('COMMIT');
+
+    await logAudit('SAFE_TRUNCATE_DATA', 'DATABASE', 'SYSTEM', 'Safely truncated submission & content tables while preserving hero_slides & admin accounts', request);
+    return { success: true, message: 'Database tables safely truncated! Hero section slides and admin accounts remain intact.' };
+  } catch (err) {
+    await client.query('ROLLBACK');
+    app.log.error('Safe truncation failed:', err);
+    return reply.status(500).send({ error: `Truncation failed: ${err.message}` });
+  } finally {
+    client.release();
+  }
+});
+
 
 // ==========================================
 // ⚡ LIVE SUMMARY COUNTS & TODAY'S ACTIVITY FEED
