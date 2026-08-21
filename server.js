@@ -638,37 +638,7 @@ app.get('/api/auth/google/callback', async (request, reply) => {
   }
 });
 
-// 3. DEVELOPMENT BYPASS LOGIN (Instant Super Admin Access for Local Dev)
-app.all('/api/auth/dev-login', async (request, reply) => {
-  const devUser = {
-    id: 1,
-    email: ADMIN_EMAIL || 'vimalraj5207@gmail.com',
-    name: 'Vimal Raj (Dev Super Admin)',
-    role: 'super_admin'
-  };
 
-  const token = app.jwt.sign({ 
-    id: devUser.id, 
-    email: devUser.email, 
-    name: devUser.name, 
-    role: devUser.role 
-  }, { expiresIn: '7d' });
-
-  // Record dev login in audit trail
-  try {
-    await pool.query(`
-      INSERT INTO audit_logs (admin_name, admin_email, action_type, entity_type, details, ip_address, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-    `, [devUser.name, devUser.email, 'LOGIN_DEV_BYPASS', 'AUTH_SESSION', 'Developer bypass authentication triggered', request.ip || '127.0.0.1', 'SUCCESS']);
-  } catch (_) {}
-
-  return reply.send({
-    success: true,
-    token,
-    user: devUser,
-    message: 'Development Bypass Authentication Successful'
-  });
-});
 
 // Brevo Email Dispatch Helper
 async function sendBrevoEmail({ toEmail, toName, subject, htmlContent }) {
@@ -3133,53 +3103,7 @@ app.post('/api/admin/email/send', { preValidation: [app.authenticate] }, async (
   }
 });
 
-app.post('/api/admin/email/test', async (request, reply) => {
-  const { toEmail = 'vimalraj5207@gmail.com' } = request.body || {};
-  
-  const testHtml = `
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8"></head>
-    <body style="font-family: Arial, sans-serif; background-color: #f8fafc; padding: 24px; color: #0f172a;">
-      <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 32px; border: 1px solid #e2e8f0;">
-        <div style="text-align: center; margin-bottom: 24px;">
-          <h1 style="color: #123B32; margin: 0; font-size: 24px;">Shazu Soft Technologies</h1>
-          <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Live Mail Delivery Test Verification</p>
-        </div>
-        <div style="background-color: #e8efeb; padding: 18px; border-radius: 12px; border-left: 4px solid #123B32; margin-bottom: 20px;">
-          <h3 style="margin: 0 0 6px 0; color: #123B32; font-size: 16px;">✅ Email Pipeline Active!</h3>
-          <p style="margin: 0; color: #2d3748; font-size: 14px;">This test message confirms that Brevo API is correctly configured and successfully delivering transactional messages for Shazu Soft Technologies.</p>
-        </div>
-        <div style="background-color: #f1f5f9; padding: 14px 18px; border-radius: 8px; font-size: 13px; color: #334155; margin-bottom: 20px;">
-          <div><strong>Recipient:</strong> ${toEmail}</div>
-          <div style="margin-top: 4px;"><strong>Sender Account:</strong> ${BREVO_SENDER}</div>
-          <div style="margin-top: 4px;"><strong>Dispatched At:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</div>
-        </div>
-        <p style="font-size: 13px; line-height: 1.6; color: #64748b;">
-          All automatic notification emails for Event Passes, Job Application tokens, 11-Field Membership Charters, and Contact Inquiries will be delivered directly through this pipeline.
-        </p>
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
-        <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 0;">
-          &copy; ${new Date().getFullYear()} Shazu Soft Technologies • Salem, Tamil Nadu, India
-        </p>
-      </div>
-    </body>
-    </html>
-  `;
 
-  const result = await sendBrevoEmail({
-    toEmail,
-    toName: 'Vimal Raj (SST Super Admin)',
-    subject: '✅ Live Test Email Verification - Shazu Soft Technologies',
-    htmlContent: testHtml
-  });
-
-  if (result.success) {
-    return { success: true, message: `Live test email successfully delivered to ${toEmail} via Brevo!`, details: result };
-  } else {
-    return reply.status(500).send({ success: false, error: `Email dispatch failed: ${result.error || 'API Error'}`, details: result });
-  }
-});
 
 // Start Server
 async function start() {
