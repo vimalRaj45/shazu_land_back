@@ -2702,8 +2702,32 @@ const handleAttendanceUpdate = async (request, reply) => {
   return { success: true, registration: reg };
 };
 
+// Attendance read handler — GET current attendance status
+const handleGetAttendance = async (request, reply) => {
+  const { id } = request.params;
+  const { rows } = await pool.query(
+    `SELECT id, name, email, event_title, token_no, attendance_status, checked_in_at, payment_status
+     FROM event_registrations WHERE id::text = $1 OR LOWER(token_no) = LOWER($1) LIMIT 1`,
+    [id]
+  );
+  if (!rows || rows.length === 0) {
+    return reply.status(404).send({ error: 'Registration not found' });
+  }
+  return { registration: rows[0] };
+};
+
+// POST — mark attendance (primary)
 app.post('/api/admin/event-registrations/:id/attendance', { preValidation: [app.authenticate] }, handleAttendanceUpdate);
 app.post('/api/public/event-registrations/:id/attendance', handleAttendanceUpdate);
+
+// PUT — alias for POST (for clients that use PUT)
+app.put('/api/admin/event-registrations/:id/attendance', { preValidation: [app.authenticate] }, handleAttendanceUpdate);
+app.put('/api/public/event-registrations/:id/attendance', handleAttendanceUpdate);
+
+// GET — read current attendance status
+app.get('/api/admin/event-registrations/:id/attendance', { preValidation: [app.authenticate] }, handleGetAttendance);
+app.get('/api/public/event-registrations/:id/attendance', handleGetAttendance);
+
 
 // Fetch event attendance roster & metrics summary (Public & Admin)
 const handleAttendanceRoster = async (request) => {
