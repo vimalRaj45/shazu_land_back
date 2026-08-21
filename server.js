@@ -2686,7 +2686,7 @@ const handleAttendanceUpdate = async (request, reply) => {
   const result = await pool.query(
     `UPDATE event_registrations
      SET attendance_status = $1, checked_in_at = ${isPresent ? 'NOW()' : 'NULL'}, updated_at = CURRENT_TIMESTAMP
-     WHERE id::text = $2 OR LOWER(token_no) = LOWER($2) RETURNING *`,
+     WHERE id::text = $2 OR LOWER(token_no) = LOWER($2) OR LOWER(token_no) LIKE '%' || LOWER($2) || '%' RETURNING *`,
     [newStatus, id]
   );
   
