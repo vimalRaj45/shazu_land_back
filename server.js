@@ -946,7 +946,8 @@ async function initDatabase() {
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS city_state VARCHAR(255);
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS declaration_agreed BOOLEAN DEFAULT TRUE;
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS admin_notes TEXT;
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS attendance_status VARCHAR(50) DEFAULT 'Absent';
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS checked_in_at TIMESTAMP;
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
       ALTER TABLE applications ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);
       ALTER TABLE applications ADD COLUMN IF NOT EXISTS admin_notes TEXT;
@@ -1559,9 +1560,23 @@ app.post('/api/public/events/register', async (request, reply) => {
   sendBrevoEmail({
     toEmail: trimmedEmail,
     toName: trimmedName,
-    subject: `Event Pass Confirmed [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft`,
+    subject: isFree ? `Event Pass Confirmed [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft` : `Registration Received [Ref Pending]: ${cleanEventTitle} - Shazu Soft`,
     htmlContent: passHtml
   });
+
+  if (!isFree) {
+    return {
+      message: 'Registration submitted successfully! Payment verification is pending.',
+      is_pending_payment: true,
+      token_no: 'Pending Admin Verification',
+      transaction_id: cleanTxnId,
+      notice: 'Payment Verification Pending. Your entry pass & QR code token will be dispatched to your registered email once payment (UTR) is verified by the admin.',
+      registration: {
+        ...registration,
+        token_no: 'Pending Admin Verification'
+      }
+    };
+  }
 
   return { message: 'Registration submitted successfully!', token_no: tokenNo, registration };
 });
@@ -2643,6 +2658,85 @@ app.delete('/api/admin/careers/:id', { preValidation: [app.authenticate] }, asyn
   await pool.query('DELETE FROM careers WHERE id = $1', [id]);
   return { message: 'Job posting deleted successfully' };
 });
+
+// ==========================================
+// 🎟️ EVENT ATTENDANCE & QR SCANNER ENDPOINTS
+// ==========================================
+
+// Lookup registration by scanned QR token or token string
+app.get('/api/admin/event-registrations/scan/:token', { preValidation: [app.authenticate] }, async (request, reply) => {
+  const { token } = request.params;
+  const cleanToken = (token || '').trim();
+  
+  const { rows } = await pool.query(
+    `SELECT r.*, e.title as event_title_ref
+     FROM event_registrations r
+     LEFT JOIN events e ON r.event_id = e.id
+     WHERE LOWER(r.token_no) = LOWER($1) OR r.id::text = $1 LIMIT 1`,
+    [cleanToken]
+  );
+  
+  if (!rows || rows.length === 0) {
+    return reply.status(404).send({ error: `Registration token "${cleanToken}" not found` });
+  }
+  
+  return { registration: rows[0] };
+});
+
+// Toggle / Update Attendance Check-in Status (Present / Absent)
+app.post('/api/admin/event-registrations/:id/attendance', { preValidation: [app.authenticate] }, async (request, reply) => {
+  const { id } = request.params;
+  const { status } = request.body || {};
+  const isPresent = (status || '').toLowerCase() === 'present';
+  const newStatus = isPresent ? 'Present' : 'Absent';
+  
+  const result = await pool.query(
+    `UPDATE event_registrations
+     SET attendance_status = $1, checked_in_at = ${isPresent ? 'NOW()' : 'NULL'}, updated_at = CURRENT_TIMESTAMP
+     WHERE id = $2 RETURNING *`,
+    [newStatus, id]
+  );
+  
+  if (!result.rows || result.rows.length === 0) {
+    return reply.status(404).send({ error: 'Registration record not found' });
+  }
+  
+  const reg = result.rows[0];
+  await logAudit('ATTENDANCE_CHECKIN', 'EVENT_REGISTRATION', id, `Marked attendance as ${newStatus} for ${reg.name} (${reg.token_no})`, request);
+  
+  return { success: true, registration: reg };
+});
+
+// Fetch event attendance roster & metrics summary
+app.get('/api/admin/events/:eventId/attendance-roster', { preValidation: [app.authenticate] }, async (request) => {
+  const { eventId } = request.params;
+  
+  const evRes = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
+  const event = (evRes.rows && evRes.rows[0]) ? evRes.rows[0] : { id: eventId, title: 'Event' };
+  
+  const { rows } = await pool.query(
+    `SELECT * FROM event_registrations WHERE event_id = $1 ORDER BY id DESC`,
+    [eventId]
+  );
+  
+  const total = rows.length;
+  const verified = rows.filter(r => (r.payment_status || '').toLowerCase().includes('verif') || (r.registration_fee || '').toLowerCase().includes('free')).length;
+  const present = rows.filter(r => (r.attendance_status || '').toLowerCase() === 'present').length;
+  const absent = total - present;
+  
+  return {
+    event,
+    summary: {
+      total,
+      verified,
+      present,
+      absent,
+      checkInPercentage: total > 0 ? ((present / total) * 100).toFixed(1) : 0
+    },
+    roster: rows
+  };
+});
+
 
 // Admin Applications
 app.get('/api/admin/applications', { preValidation: [app.authenticate] }, async () => {
