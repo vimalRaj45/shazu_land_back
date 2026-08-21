@@ -1512,6 +1512,7 @@ app.post('/api/public/events/register', async (request, reply) => {
   };
 
   // Dispatch Official Branded Pass via Brevo
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(tokenNo)}`;
   const passHtml = `
     <!DOCTYPE html>
     <html>
@@ -1523,17 +1524,30 @@ app.post('/api/public/events/register', async (request, reply) => {
           <p style="color: #C47D4C; margin: 4px 0 0 0; font-size: 12px; font-weight: bold; text-transform: uppercase;">Official Event &amp; Contest Registration Pass</p>
         </div>
         <div style="padding: 28px;">
-          <h3 style="color: #123B32; margin-top: 0;">Registration Confirmed!</h3>
+          <h3 style="color: #123B32; margin-top: 0;">${isFree ? '✓ Registration & Entry Pass Confirmed!' : '⏳ Registration Received - Payment Verification Pending'}</h3>
           <p style="font-size: 14px; line-height: 1.6; color: #334155;">
             Dear <strong>${trimmedName}</strong>,<br>
-            Your registration for <strong>${cleanEventTitle}</strong> has been recorded successfully.
+            ${isFree ? `Your registration for <strong>${cleanEventTitle}</strong> is confirmed. Please present your official entry pass QR code below at the event check-in desk.` : `Your registration for <strong>${cleanEventTitle}</strong> has been recorded. Our team is verifying your payment (UTR: ${cleanTxnId || 'N/A'}). Once verified, your official entry pass QR code will be dispatched.`}
           </p>
 
-          <div style="background-color: #e8efeb; border: 1.5px dashed #123B32; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
-            <span style="font-size: 11px; text-transform: uppercase; color: #123B32; font-weight: bold;">Your Official Pass Reference Token:</span>
-            <div style="font-size: 24px; font-family: monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin: 6px 0;">${tokenNo}</div>
-            <span style="font-size: 12px; font-weight: 600; color: #166534;">Status: ${initialPaymentStatus}</span>
-          </div>
+          ${isFree ? `
+            <div style="background-color: #f0fdf4; border: 2px solid #123B32; border-radius: 16px; padding: 20px; text-align: center; margin: 20px 0;">
+              <span style="font-size: 11px; text-transform: uppercase; color: #123B32; font-weight: bold; letter-spacing: 1px;">Official Entry &amp; Attendance QR Code Pass:</span>
+              
+              <div style="margin: 14px 0;">
+                <img src="${qrCodeUrl}" alt="Attendance QR Code Pass" style="width: 180px; height: 180px; display: inline-block; border: 1px solid #cbd5e1; border-radius: 12px; padding: 8px; background: #ffffff;">
+              </div>
+
+              <div style="font-size: 22px; font-family: monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin-bottom: 4px;">${tokenNo}</div>
+              <span style="font-size: 12px; font-weight: bold; color: #166534; background: #dcfce7; padding: 4px 12px; border-radius: 9999px; display: inline-block;">✓ Official Pass Active (Free Entry)</span>
+            </div>
+          ` : `
+            <div style="background-color: #fffbeb; border: 1.5px dashed #d97706; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
+              <span style="font-size: 11px; text-transform: uppercase; color: #92400e; font-weight: bold;">Payment Verification Status:</span>
+              <div style="font-size: 18px; font-weight: bold; color: #b45309; margin: 6px 0;">Pending Verification (UTR: ${cleanTxnId || 'N/A'})</div>
+              <span style="font-size: 12px; color: #78350f;">Official Pass QR Code will be dispatched to your email upon payment verification.</span>
+            </div>
+          `}
 
           <div style="background-color: #f8fafc; border-radius: 10px; padding: 14px 18px; font-size: 12px; color: #334155; margin-bottom: 20px;">
             <div style="margin-bottom: 6px;"><strong>Attendee Category:</strong> ${category}</div>
@@ -2104,29 +2118,35 @@ app.put('/api/admin/event-registrations/:id/payment', { preValidation: [app.auth
   );
   reg = result.rows[0];
 
-  if (payment_status === 'Verified' || payment_status === 'Approved') {
+  if (payment_status === 'Verified' || payment_status === 'Approved' || payment_status === 'Verified / Confirmed') {
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(tokenNo)}`;
     const verifiedHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #16a34a; border-radius: 16px; padding: 28px; color: #0f172a;">
-        <div style="text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px;">
-          <h2 style="color: #123B32; margin: 0;">SHAZU SOFT TECHNOLOGIES</h2>
-          <span style="display: inline-block; background-color: #dcfce7; color: #15803d; padding: 6px 16px; border-radius: 99px; font-size: 13px; font-weight: bold; margin-top: 8px;">✅ OFFICIAL PASS APPROVED & ISSUED</span>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #123B32; border-radius: 16px; padding: 28px; color: #0f172a; background: #ffffff;">
+        <div style="text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px; background: #123B32; padding: 20px; border-radius: 12px; color: #ffffff;">
+          <h2 style="color: #ffffff; margin: 0; font-size: 20px;">SHAZU SOFT TECHNOLOGIES</h2>
+          <span style="display: inline-block; background-color: #dcfce7; color: #15803d; padding: 4px 16px; border-radius: 99px; font-size: 12px; font-weight: bold; margin-top: 8px;">✓ OFFICIAL PAYMENT VERIFIED & PASS ISSUED</span>
         </div>
         <p>Dear <strong>${reg.name}</strong>,</p>
-        <p>Great news! Your registration and payment for <strong>"${reg.event_title}"</strong> have been officially <strong>APPROVED</strong> by SST Administration!</p>
+        <p>Great news! Your payment (UTR: ${reg.transaction_id || 'Verified'}) for <strong>"${reg.event_title}"</strong> has been officially <strong>VERIFIED &amp; APPROVED</strong> by SST Administration!</p>
         
-        <div style="background-color: #f0fdf4; border: 2px solid #16a34a; padding: 18px; border-radius: 12px; text-align: center; margin: 20px 0;">
-          <span style="font-size: 11px; text-transform: uppercase; color: #166534; font-weight: bold;">YOUR OFFICIAL EVENT ENTRY TOKEN NO</span>
-          <div style="font-size: 24px; font-family: monospace; font-weight: bold; color: #15803d; letter-spacing: 2px; margin: 8px 0;">${tokenNo}</div>
-          <span style="font-size: 12px; color: #166534;">Presenter / Attendee Token for Venue Gate Verification</span>
+        <div style="background-color: #f0fdf4; border: 2px solid #16a34a; padding: 20px; border-radius: 16px; text-align: center; margin: 20px 0;">
+          <span style="font-size: 11px; text-transform: uppercase; color: #166534; font-weight: bold; letter-spacing: 1px;">YOUR OFFICIAL ATTENDANCE ENTRY PASS QR CODE</span>
+          
+          <div style="margin: 14px 0;">
+            <img src="${qrCodeUrl}" alt="Attendance QR Code Pass" style="width: 180px; height: 180px; display: inline-block; border: 1px solid #cbd5e1; border-radius: 12px; padding: 8px; background: #ffffff;">
+          </div>
+
+          <div style="font-size: 22px; font-family: monospace; font-weight: bold; color: #15803d; letter-spacing: 2px; margin-bottom: 6px;">${tokenNo}</div>
+          <span style="font-size: 12px; color: #166534; font-weight: bold;">✓ Official Presenter / Attendee Pass Active for Venue Gate Check-In</span>
         </div>
 
         ${admin_notes ? `<div style="background-color: #f8fafc; border-left: 4px solid #123B32; padding: 12px 16px; margin: 16px 0;"><span style="font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase;">ADMIN REMARKS / PASS INSTRUCTIONS:</span><p style="margin: 4px 0 0 0; font-size: 13px; color: #1e293b;">${admin_notes}</p></div>` : ''}
 
-        <p style="font-size: 13px; color: #64748b;">Please present your Token Number (<strong>${tokenNo}</strong>) at the venue entrance badge counter.</p>
+        <p style="font-size: 13px; color: #64748b;">Please present your QR Code Pass (<strong>${tokenNo}</strong>) on your mobile screen or printout at the event check-in desk for entry.</p>
         <p style="font-size: 13px; color: #64748b;">Warm regards,<br><strong>SST Event Operations Desk</strong></p>
       </div>
     `;
-    sendBrevoEmail({ toEmail: reg.email, toName: reg.name, subject: `🎟️ APPROVED! Event Entry Token: ${tokenNo}`, htmlContent: verifiedHtml });
+    sendBrevoEmail({ toEmail: reg.email, toName: reg.name, subject: `🎟️ OFFICIAL PASS APPROVED [Ref: ${tokenNo}]: ${reg.event_title}`, htmlContent: verifiedHtml });
   }
 
   return { registration: reg };
