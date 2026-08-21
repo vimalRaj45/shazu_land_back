@@ -2663,8 +2663,8 @@ app.delete('/api/admin/careers/:id', { preValidation: [app.authenticate] }, asyn
 // 🎟️ EVENT ATTENDANCE & QR SCANNER ENDPOINTS
 // ==========================================
 
-// Lookup registration by scanned QR token or token string
-app.get('/api/admin/event-registrations/scan/:token', { preValidation: [app.authenticate] }, async (request, reply) => {
+// Lookup registration by scanned QR token or token string (Public & Admin)
+const handleScanRegistration = async (request, reply) => {
   const { token } = request.params;
   const cleanToken = (token || '').trim();
   
@@ -2681,10 +2681,13 @@ app.get('/api/admin/event-registrations/scan/:token', { preValidation: [app.auth
   }
   
   return { registration: rows[0] };
-});
+};
+
+app.get('/api/admin/event-registrations/scan/:token', { preValidation: [app.authenticate] }, handleScanRegistration);
+app.get('/api/public/event-registrations/scan/:token', handleScanRegistration);
 
 // Toggle / Update Attendance Check-in Status (Present / Absent)
-app.post('/api/admin/event-registrations/:id/attendance', { preValidation: [app.authenticate] }, async (request, reply) => {
+const handleAttendanceUpdate = async (request, reply) => {
   const { id } = request.params;
   const { status } = request.body || {};
   const isPresent = (status || '').toLowerCase() === 'present';
@@ -2693,7 +2696,7 @@ app.post('/api/admin/event-registrations/:id/attendance', { preValidation: [app.
   const result = await pool.query(
     `UPDATE event_registrations
      SET attendance_status = $1, checked_in_at = ${isPresent ? 'NOW()' : 'NULL'}, updated_at = CURRENT_TIMESTAMP
-     WHERE id = $2 RETURNING *`,
+     WHERE id::text = $2 OR LOWER(token_no) = LOWER($2) RETURNING *`,
     [newStatus, id]
   );
   
@@ -2702,21 +2705,29 @@ app.post('/api/admin/event-registrations/:id/attendance', { preValidation: [app.
   }
   
   const reg = result.rows[0];
-  await logAudit('ATTENDANCE_CHECKIN', 'EVENT_REGISTRATION', id, `Marked attendance as ${newStatus} for ${reg.name} (${reg.token_no})`, request);
+  if (typeof logAudit === 'function') {
+    logAudit('ATTENDANCE_CHECKIN', 'EVENT_REGISTRATION', id, `Marked attendance as ${newStatus} for ${reg.name} (${reg.token_no})`, request).catch(() => {});
+  }
   
   return { success: true, registration: reg };
-});
+};
 
-// Fetch event attendance roster & metrics summary
-app.get('/api/admin/events/:eventId/attendance-roster', { preValidation: [app.authenticate] }, async (request) => {
+app.post('/api/admin/event-registrations/:id/attendance', { preValidation: [app.authenticate] }, handleAttendanceUpdate);
+app.post('/api/public/event-registrations/:id/attendance', handleAttendanceUpdate);
+
+// Fetch event attendance roster & metrics summary (Public & Admin)
+const handleAttendanceRoster = async (request) => {
   const { eventId } = request.params;
   
-  const evRes = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
+  const evRes = await pool.query('SELECT * FROM events WHERE id::text = $1 OR LOWER(title) = LOWER($1) LIMIT 1', [eventId]);
   const event = (evRes.rows && evRes.rows[0]) ? evRes.rows[0] : { id: eventId, title: 'Event' };
+  const cleanTitle = (event.title || '').trim();
   
   const { rows } = await pool.query(
-    `SELECT * FROM event_registrations WHERE event_id = $1 ORDER BY id DESC`,
-    [eventId]
+    `SELECT * FROM event_registrations 
+     WHERE event_id::text = $1 OR (LOWER(event_title) = LOWER($2) AND $2 != '')
+     ORDER BY id DESC`,
+    [eventId, cleanTitle]
   );
   
   const total = rows.length;
@@ -2735,7 +2746,11 @@ app.get('/api/admin/events/:eventId/attendance-roster', { preValidation: [app.au
     },
     roster: rows
   };
-});
+};
+
+app.get('/api/admin/events/:eventId/attendance-roster', { preValidation: [app.authenticate] }, handleAttendanceRoster);
+app.get('/api/public/events/:eventId/attendance-roster', handleAttendanceRoster);
+
 
 
 // Admin Applications
