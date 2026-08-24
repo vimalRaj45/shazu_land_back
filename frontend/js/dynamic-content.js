@@ -68,7 +68,7 @@
     }
   }
 
-  // 2. Load Dynamic Announcements Top Bar (Clean Static Bar, No Moving Marquee, No Close Button)
+  // 2. Load Dynamic Announcements Top Bar (Continuous Smooth Moving Ticker / Marquee)
   window.allAnnouncementsList = [];
   async function loadAnnouncements() {
     const container = document.getElementById('dynamic-announcement-bar');
@@ -78,41 +78,109 @@
     const oldPill = document.getElementById('announcement-floating-trigger');
     if (oldPill) oldPill.remove();
 
+    let announcements = [];
+
     try {
       const res = await fetch(`${API_BASE}/api/public/announcements`);
-      const data = await res.json();
-
-      if (!data.announcements || data.announcements.length === 0) {
-        container.innerHTML = '';
-        container.style.display = 'none';
-        return;
+      if (res.ok) {
+        const data = await res.json();
+        if (data.announcements && data.announcements.length > 0) {
+          announcements = data.announcements;
+        }
       }
-
-      window.allAnnouncementsList = data.announcements;
-      const ann = data.announcements[0];
-      const badgeLabel = (ann.badge_type || 'ANNOUNCEMENT').toUpperCase().trim();
-      const badgeClass = getAnnouncementBadgeClass(badgeLabel);
-
-      container.className = 'w-full relative z-30 bg-[#123B32] text-white border-b border-[#527A68]/40 py-2 px-3 sm:px-6 shadow-xs transition-all';
-      container.style.display = 'block';
-      container.innerHTML = `
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs flex-wrap sm:flex-nowrap">
-          <div class="flex items-center gap-2.5 min-w-0 flex-1">
-            <span class="px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${badgeClass} shrink-0 flex items-center gap-1">
-              <i class="bi bi-megaphone-fill text-[9px]"></i> ${badgeLabel}
-            </span>
-            <span class="font-bold text-white whitespace-nowrap text-xs">${ann.title}:</span>
-            <span class="text-emerald-100 text-xs truncate max-w-[260px] sm:max-w-xl md:max-w-2xl">${ann.content}</span>
-          </div>
-          <div class="flex items-center gap-3 shrink-0">
-            ${ann.link_url ? `<a href="${ann.link_url}" class="text-[11px] font-bold text-amber-300 hover:text-white underline transition-colors flex items-center gap-1"><span>Learn More</span> <i class="bi bi-arrow-right text-[10px]"></i></a>` : ''}
-            <a href="announcements.html" class="text-[11px] font-semibold text-emerald-200 hover:text-white transition-colors">All Announcements (${data.announcements.length})</a>
-          </div>
-        </div>
-      `;
     } catch (err) {
       console.warn('Could not fetch dynamic announcements:', err);
     }
+
+    // Default rich fallback announcements if database has not returned any or offline
+    if (!announcements || announcements.length === 0) {
+      announcements = [
+        {
+          id: 1,
+          title: "Admissions Open",
+          content: "Summer Internship, Hackathon & Research Mentorship Program 2026 – Apply Now!",
+          badge_type: "NEW",
+          link_url: "careers.html"
+        },
+        {
+          id: 2,
+          title: "Upcoming Conference",
+          content: "International Conference on Next-Gen Computing & AI Systems – Call for Papers & Symposia",
+          badge_type: "EVENT",
+          link_url: "events.html"
+        },
+        {
+          id: 3,
+          title: "Software & Digital Transformation",
+          content: "Custom Enterprise Web Applications, Cloud Platforms & AI Solutions live for industry clients",
+          badge_type: "FEATURE",
+          link_url: "software.html"
+        }
+      ];
+    }
+
+    window.allAnnouncementsList = announcements;
+
+    container.className = 'w-full relative z-30 bg-[#123B32] text-white border-b border-[#527A68]/40 py-2 px-3 sm:px-6 shadow-xs transition-all overflow-hidden';
+    container.style.display = 'block';
+
+    const buildItemsHtml = (list) => list.map(ann => {
+      const badgeLabel = (ann.badge_type || 'ANNOUNCEMENT').toUpperCase().trim();
+      const badgeClass = getAnnouncementBadgeClass(badgeLabel);
+      return `
+        <div class="inline-flex items-center gap-2 text-xs font-medium text-white shrink-0">
+          <span class="px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${badgeClass} shrink-0 flex items-center gap-1 shadow-xs">
+            <i class="bi bi-megaphone-fill text-[8px]"></i> ${badgeLabel}
+          </span>
+          <span class="font-bold text-white whitespace-nowrap text-xs">${ann.title}:</span>
+          <span class="text-emerald-100 text-xs whitespace-nowrap">${ann.content}</span>
+          ${ann.link_url ? `
+            <a href="${ann.link_url}" class="text-[11px] font-bold text-amber-300 hover:text-white underline transition-colors flex items-center gap-0.5 ml-1">
+              <span>Learn More</span>
+              <i class="bi bi-arrow-right text-[10px]"></i>
+            </a>
+          ` : ''}
+          <span class="text-emerald-400/50 select-none px-3">•</span>
+        </div>
+      `;
+    }).join('');
+
+    const trackContent = buildItemsHtml(announcements);
+
+    container.innerHTML = `
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs">
+        <!-- Live Indicator Badge (Pinned Left) -->
+        <div class="flex items-center gap-2 shrink-0 bg-[#0d2a24] py-1 px-2.5 rounded-lg border border-[#527A68]/50 shadow-xs z-10">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-[10px] font-black uppercase tracking-wider text-emerald-300 flex items-center gap-1 select-none">
+            Live Updates
+          </span>
+        </div>
+
+        <!-- Continuous Moving Marquee Scroller -->
+        <div class="flex-1 overflow-hidden relative cursor-pointer py-0.5 marquee-mask" title="Hover to pause ticker">
+          <div class="animate-marquee-track flex items-center whitespace-nowrap">
+            <div class="flex items-center shrink-0">
+              ${trackContent}
+            </div>
+            <div class="flex items-center shrink-0" aria-hidden="true">
+              ${trackContent}
+            </div>
+          </div>
+        </div>
+
+        <!-- All Announcements Link (Pinned Right) -->
+        <div class="hidden sm:flex items-center gap-2 shrink-0 z-10 pl-2">
+          <a href="announcements.html" class="text-[11px] font-semibold text-emerald-200 hover:text-white transition-colors bg-[#0d2a24]/80 hover:bg-[#0d2a24] px-2.5 py-1 rounded-lg border border-[#527A68]/40 flex items-center gap-1 shadow-xs">
+            <span>All Notices (${announcements.length})</span>
+            <i class="bi bi-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+      </div>
+    `;
   }
 
   function renderAnnouncementsPageSkeleton(container) {

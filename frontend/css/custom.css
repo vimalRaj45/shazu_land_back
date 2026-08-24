@@ -242,10 +242,21 @@ article p:not(.text-center):not(.text-center *),
 .animate-marquee-track {
   display: inline-flex;
   white-space: nowrap;
-  animation: marquee-scroll 45s linear infinite;
+  animation: marquee-scroll 35s linear infinite;
+  will-change: transform;
 }
 
-/* Dynamic Announcement Bar - Compact Responsive Toggle */
+#dynamic-announcement-bar:hover .animate-marquee-track,
+.animate-marquee-track:hover {
+  animation-play-state: paused !important;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
+}
+
+/* Dynamic Announcement Bar */
 #dynamic-announcement-bar {
   position: relative;
   z-index: 30;
