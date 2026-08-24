@@ -8,7 +8,7 @@
     if (storedTheme) {
       return storedTheme;
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return 'light';
   };
 
   const setTheme = theme => {
@@ -72,12 +72,5 @@
         setTheme(nextTheme);
       }
     });
-  });
-
-  // Listen for system theme changes if user hasn't manually selected
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (!getStoredTheme()) {
-      setTheme(getPreferredTheme());
-    }
   });
 })();

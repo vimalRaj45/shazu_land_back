@@ -194,90 +194,39 @@ function initForms() {
   const contactForm = document.getElementById('contact-form');
   if (contactForm && !contactForm.dataset.mainBound) {
     contactForm.dataset.mainBound = 'true';
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('contact-name')?.value.trim();
-      const email = document.getElementById('contact-email')?.value.trim();
-      const subject = document.getElementById('contact-subject')?.value.trim();
-      const message = document.getElementById('contact-message')?.value.trim();
+      e.stopImmediatePropagation();
+      const name = (document.getElementById('contact-name') || document.getElementById('name'))?.value?.trim();
+      const email = (document.getElementById('contact-email') || document.getElementById('email'))?.value?.trim();
+      const phone = (document.getElementById('contact-phone') || document.getElementById('phone'))?.value?.trim() || '';
+      const subject = (document.getElementById('contact-subject') || document.getElementById('subject'))?.value?.trim() || 'General Inquiry';
+      const category = (document.getElementById('contact-category') || document.getElementById('service_category'))?.value || 'General';
+      const message = (document.getElementById('contact-message') || document.getElementById('message'))?.value?.trim();
 
-      if (!name || !email || !subject || !message) {
-        showToast('Please fill out all required fields.', 'error');
+      if (!name || !email || !message) {
+        if (typeof window.showPublicModalNotice === 'function') {
+          window.showPublicModalNotice('Required Fields Missing', 'Please fill in all required fields (Name, Email, and Message).', true);
+        } else if (typeof showToast === 'function') {
+          showToast('Please fill in Name, Email, and Message.', 'error');
+        }
         return;
       }
 
-      showSuccessModal(
-        'Message Sent!',
-        `Thank you, ${name}. We have received your message regarding "${subject}" and will respond shortly.`
-      );
-      contactForm.reset();
-    });
-  }
-
-  const membershipForm = document.getElementById('membership-form');
-  if (membershipForm && !membershipForm.dataset.mainBound) {
-    membershipForm.dataset.mainBound = 'true';
-    membershipForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('member-name')?.value.trim();
-      const email = document.getElementById('member-email')?.value.trim();
-      const category = document.getElementById('member-category')?.value;
-      const institution = document.getElementById('member-institution')?.value.trim();
-
-      if (!name || !email || !category || !institution) {
-        showToast('Please fill in all the details.', 'error');
-        return;
+      if (typeof window.submitContactInquiry === 'function') {
+        const success = await window.submitContactInquiry(name, email, phone, subject, category, message);
+        if (success) contactForm.reset();
       }
-
-      showSuccessModal(
-        'Registration Submitted!',
-        `Thank you for applying as a ${category}. We will review your application for ${institution} and contact you soon.`
-      );
-      membershipForm.reset();
     });
   }
+
+  // membership-form submission is handled directly via onsubmit in membership.html & dynamic-content.js
 }
 
 // 4. Events Search & Filtering (events.html)
 function initEventsFilter() {
-  const searchInput = document.getElementById('event-search');
-  const filterPills = document.querySelectorAll('.event-filter-pill');
-  const eventCards = document.querySelectorAll('.event-card');
-
-  if (searchInput || filterPills.length > 0) {
-    let currentCategory = 'all';
-    let searchQuery = '';
-
-    const filterEvents = () => {
-      eventCards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        const category = card.getAttribute('data-category');
-        const matchesSearch = text.includes(searchQuery);
-        const matchesCategory = currentCategory === 'all' || category === currentCategory;
-        card.style.display = (matchesSearch && matchesCategory) ? 'block' : 'none';
-      });
-    };
-
-    if (searchInput && !searchInput.dataset.mainBound) {
-      searchInput.dataset.mainBound = 'true';
-      searchInput.addEventListener('input', (e) => {
-        searchQuery = e.target.value.toLowerCase();
-        filterEvents();
-      });
-    }
-
-    filterPills.forEach(pill => {
-      if (pill.dataset.mainBound) return;
-      pill.dataset.mainBound = 'true';
-      pill.addEventListener('click', () => {
-        filterPills.forEach(p => p.classList.remove('bg-brand-green', 'text-white'));
-        filterPills.forEach(p => p.classList.add('bg-white', 'text-brand-secText'));
-        pill.classList.remove('bg-white', 'text-brand-secText');
-        pill.classList.add('bg-brand-green', 'text-white');
-        currentCategory = pill.getAttribute('data-filter') || 'all';
-        filterEvents();
-      });
-    });
+  if (typeof window.applyEventFilters === 'function') {
+    return;
   }
 }
 

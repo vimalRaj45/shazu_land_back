@@ -8,20 +8,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const typingIndicator = document.getElementById('chatbot-typing');
 
   const openChatbot = () => {
-    if (!widget) return;
-    widget.classList.remove('hidden');
+    const w = document.getElementById('chatbot-widget') || widget;
+    if (!w) return;
+    w.classList.remove('hidden');
     document.body.classList.add('chatbot-open');
     setTimeout(() => {
-      if (input) input.focus();
+      const inp = document.getElementById('chatbot-input') || input;
+      if (inp) inp.focus();
       scrollToBottom();
     }, 100);
   };
+  window.openChatbot = openChatbot;
 
   const closeChatbot = () => {
-    if (!widget) return;
-    widget.classList.add('hidden');
+    const w = document.getElementById('chatbot-widget') || widget;
+    if (!w) return;
+    w.classList.add('hidden');
     document.body.classList.remove('chatbot-open');
   };
+  window.closeChatbot = closeChatbot;
 
   // Toggle Widget Visibility
   if (toggleBtn && widget) {

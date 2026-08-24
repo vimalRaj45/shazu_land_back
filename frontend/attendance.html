@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Attendance & Live QR Scanner Hub - Shazu Soft Technologies</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- HTML5 QR Code Scanner Library CDN -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              green: '#123B32',
+              hoverGreen: '#2F5B4E',
+              gold: '#C47D4C',
+              lightBg: '#F8FAFC',
+              darkBg: '#0B0F19'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    #html5-qrcode-anchor { display: none !important; }
+    #reader video { border-radius: 1rem; width: 100% !important; height: auto !important; }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans min-h-full flex flex-col transition-colors duration-200">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- Header Navigation -->
+  <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="flex items-center gap-2.5 group">
+          <img src="img/logo.png" alt="SST Logo" class="h-9 w-auto">
+          <div>
+            <span class="block font-heading font-black text-sm text-[#123B32] dark:text-white leading-none">SHAZU SOFT</span>
+            <span class="block text-[9px] font-bold tracking-widest text-[#C47D4C] uppercase leading-tight">ATTENDANCE HUB</span>
+          </div>
+        </a>
+        <span class="hidden sm:inline-block h-5 w-px bg-slate-200 dark:bg-slate-800"></span>
+        <span class="hidden sm:inline-block text-xs text-slate-500 dark:text-slate-400 font-medium">Event QR Check-In &amp; Roster Management</span>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="admin.html" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all">
+          <i class="bi bi-[#123B32] bi-shield-lock-fill"></i> Admin Portal
+        </a>
+        <a href="events.html" class="px-3 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all">
+          <i class="bi bi-calendar-event"></i> Public Events
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Top Controls: Event Selector & Action Buttons -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Select Event Roster</label>
+          <select id="event-select-dropdown" onchange="handleEventSelectChange()" class="w-full sm:w-96 p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#123B32] dark:text-emerald-400 focus:outline-none focus:border-[#123B32] cursor-pointer">
+            <option value="">Loading events list...</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="relative group">
+            <button type="button" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2 transition-all cursor-pointer">
+              <i class="bi bi-file-earmark-spreadsheet-fill text-sm"></i>
+              <span>Export CSV Report</span>
+              <i class="bi bi-chevron-down text-[10px]"></i>
+            </button>
+            <div class="absolute right-0 top-full pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-50 min-w-[210px]">
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-1.5 space-y-1 text-xs text-slate-700 dark:text-slate-200">
+                <button type="button" onclick="exportAttendanceCSV('all')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 font-medium cursor-pointer">
+                  <i class="bi bi-file-earmark-text text-slate-500"></i>
+                  <span>Export All Roster (CSV)</span>
+                </button>
+                <button type="button" onclick="exportAttendanceCSV('present')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 font-medium text-emerald-600 dark:text-emerald-400 cursor-pointer">
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span>Export Present Only (CSV)</span>
+                </button>
+                <button type="button" onclick="exportAttendanceCSV('verified')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 font-medium text-amber-600 dark:text-amber-400 cursor-pointer">
+                  <i class="bi bi-shield-check"></i>
+                  <span>Export Verified Paid Only (CSV)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <button type="button" onclick="window.print()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2 transition-all cursor-pointer">
+            <i class="bi bi-printer-fill text-sm"></i> Print Roster
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Roster Stat Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
+        <div class="p-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl">
+          <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Registered</span>
+          <span id="stat-total" class="text-xl font-black font-heading text-slate-900 dark:text-white">0</span>
+        </div>
+        <div class="p-3.5 bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 rounded-2xl">
+          <span class="block text-[10px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">Verified Paid</span>
+          <span id="stat-verified" class="text-xl font-black font-heading text-amber-900 dark:text-amber-300">0</span>
+        </div>
+        <div class="p-3.5 bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/40 rounded-2xl">
+          <span class="block text-[10px] font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">Present (Checked-In)</span>
+          <span id="stat-present" class="text-xl font-black font-heading text-emerald-900 dark:text-emerald-300">0</span>
+        </div>
+        <div class="p-3.5 bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 rounded-2xl">
+          <span class="block text-[10px] font-bold text-rose-800 dark:text-rose-400 uppercase tracking-wider">Absent</span>
+          <span id="stat-absent" class="text-xl font-black font-heading text-rose-900 dark:text-rose-300">0</span>
+        </div>
+        <div class="col-span-2 sm:col-span-1 p-3.5 bg-[#123B32] text-white rounded-2xl">
+          <span class="block text-[10px] font-bold text-emerald-200 uppercase tracking-wider">Turnout Rate</span>
+          <span id="stat-rate" class="text-xl font-black font-heading text-emerald-300">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scanner & Search Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT: Live Camera QR Scanner & Search Input (5 Cols) -->
+      <div class="lg:col-span-5 space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="bi bi-qr-code-scan text-[#123B32] dark:text-emerald-400"></i> Live QR Camera Scanner
+            </h3>
+            <button id="btn-toggle-scanner" onclick="toggleCameraScanner()" class="px-3 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-bold transition-all cursor-pointer">
+              Start Camera
+            </button>
+          </div>
+
+          <!-- Camera Scanner Viewport -->
+          <div id="reader-container" class="relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 min-h-[220px] flex items-center justify-center">
+            <div id="reader" class="w-full"></div>
+            <div id="scanner-placeholder" class="text-center p-6 space-y-2 text-slate-400">
+              <i class="bi bi-camera text-3xl block text-slate-600"></i>
+              <p class="text-xs">Click "Start Camera" to scan attendee pass QR codes automatically.</p>
+            </div>
+          </div>
+
+          <!-- Manual Token Search Input -->
+          <form onsubmit="handleManualSearch(event)" class="space-y-2 pt-1">
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">Or Enter Pass Reference Token (SST-PASS-XXXX)</label>
+            <div class="flex gap-2">
+              <input type="text" id="manual-token-input" required placeholder="e.g. SST-PASS-109283" class="flex-1 p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold uppercase focus:outline-none focus:border-[#123B32]">
+              <button type="submit" id="btn-manual-submit" class="px-4 py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 min-w-[120px]">
+                <span>Scan / Check</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT: Attendee Profile Result & Check-in Control (7 Cols) -->
+      <div class="lg:col-span-7">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm min-h-[380px] flex flex-col justify-between" id="attendee-card-container">
+          
+          <div id="attendee-card-empty" class="text-center py-16 space-y-3">
+            <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto text-2xl">
+              <i class="bi bi-person-bounding-box"></i>
+            </div>
+            <h4 class="text-base font-bold text-slate-800 dark:text-white">Scan Pass or Enter Token</h4>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto">Scan an attendee's QR code or type their SST-PASS token to check payment status and record attendance.</p>
+          </div>
+
+          <!-- Dynamic Active Attendee Details View (Hidden by default) -->
+          <div id="attendee-card-content" class="hidden space-y-5">
+            <!-- Header Badges & Token -->
+            <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span id="badge-token" class="px-2.5 py-0.5 bg-slate-900 text-white font-mono text-xs font-bold rounded-md">SST-PASS-0000</span>
+                  <span id="badge-category" class="px-2.5 py-0.5 bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 text-[11px] font-bold rounded-md uppercase">College Student</span>
+                  <span id="badge-payment" class="px-2.5 py-0.5 text-[11px] font-bold rounded-md uppercase">Verified Paid</span>
+                </div>
+                <h3 id="card-name" class="text-xl font-black font-heading text-slate-900 dark:text-white mt-1">Attendee Name</h3>
+                <p id="card-event-title" class="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">Event Title</p>
+              </div>
+              <span id="badge-attendance" class="px-3 py-1 rounded-full text-xs font-extrabold uppercase shadow-2xs">Absent</span>
+            </div>
+
+            <!-- Profile Details Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="p-3 bg-slate-50 dark:bg-slate-950/60 rounded-xl space-y-0.5">
+                <span class="text-[10px] text-slate-400 font-semibold uppercase">Organization / Institution</span>
+                <span id="card-org" class="block font-bold text-slate-800 dark:text-slate-200">Anna University</span>
+              </div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950/60 rounded-xl space-y-0.5">
+                <span class="text-[10px] text-slate-400 font-semibold uppercase">Degree / Department</span>
+                <span id="card-dept" class="block font-bold text-slate-800 dark:text-slate-200">B.E Computer Science</span>
+              </div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950/60 rounded-xl space-y-0.5">
+                <span class="text-[10px] text-slate-400 font-semibold uppercase">Contact Email &amp; Phone</span>
+                <span id="card-contact" class="block font-mono text-slate-700 dark:text-slate-300">email@example.com</span>
+              </div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950/60 rounded-xl space-y-0.5">
+                <span class="text-[10px] text-slate-400 font-semibold uppercase">Fee &amp; Payment Transaction UTR</span>
+                <span id="card-fee-utr" class="block font-mono font-bold text-slate-800 dark:text-slate-200">Free / UTR: N/A</span>
+              </div>
+            </div>
+
+            <!-- Payment Warning Notice (If Paid & Unverified) -->
+            <div id="card-payment-warning" class="hidden p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-center gap-3">
+              <i class="bi bi-exclamation-triangle-fill text-amber-600 text-xl shrink-0"></i>
+              <div class="text-xs text-amber-900 dark:text-amber-200 space-y-0.5">
+                <span class="font-bold block">Payment Verification Pending</span>
+                <span class="text-[11px] block">Attendee registered for a paid pass, but payment (UTR) has not yet been verified by Admin. Please verify payment in Admin Portal.</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons: Mark Present / Mark Absent -->
+            <div class="flex items-center gap-3 pt-2">
+              <button id="btn-mark-present" onclick="setAttendanceStatus('Present')" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <i class="bi bi-check-circle-fill text-base"></i> Mark Present (Check-In)
+              </button>
+              <button id="btn-mark-absent" onclick="setAttendanceStatus('Absent')" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-2xl transition-all cursor-pointer">
+                Mark Absent
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Attendance Roster Table Section -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-base font-bold font-heading text-slate-900 dark:text-white">Event Attendance Roster</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">All registered participants and live attendance check-in statuses</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="relative">
+            <i class="bi bi-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            <input type="text" id="roster-search" oninput="applyRosterFilters()" placeholder="Filter roster..." class="pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-[#123B32]">
+          </div>
+          <select id="roster-filter-status" onchange="applyRosterFilters()" class="p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold focus:outline-none cursor-pointer">
+            <option value="all">All Attendees</option>
+            <option value="present">Present Only</option>
+            <option value="absent">Absent Only</option>
+            <option value="verified">Verified Paid</option>
+            <option value="pending">Pending Payment</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 uppercase font-semibold text-[10px]">
+            <tr>
+              <th class="p-3">Token No</th>
+              <th class="p-3">Attendee Name</th>
+              <th class="p-3">Category</th>
+              <th class="p-3">Organization</th>
+              <th class="p-3">Payment</th>
+              <th class="p-3">Attendance</th>
+              <th class="p-3">Checked-In At</th>
+              <th class="p-3 text-right">Quick Action</th>
+            </tr>
+          </thead>
+          <tbody id="roster-table-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+            <tr><td colspan="8" class="p-8 text-center text-slate-400">Loading attendance roster...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-6 text-center text-xs text-slate-500">
+      &copy; 2026 Shazu Soft Technologies • Live Event Attendance &amp; QR Scanner Engine
+    </div>
+  </footer>
+
+  <!-- Attendance Hub Controller Script -->
+  <script>
+    const API_BASE = window.location.origin;
+    let currentEventId = null;
+    let currentRosterData = [];
+    let activeRegistration = null;
+    let html5QrcodeScanner = null;
+    let isCameraScanning = false;
+
+    function getAuthHeaders() {
+      const token = localStorage.getItem('sst_admin_token');
+      return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadEventsDropdown();
+    });
+
+    async function loadEventsDropdown() {
+      try {
+        const res = await fetch(`${API_BASE}/api/public/events`);
+        const data = await res.json();
+        const events = data.events || [];
+        const select = document.getElementById('event-select-dropdown');
+        if (!events || events.length === 0) {
+          select.innerHTML = '<option value="">No events available</option>';
+          return;
+        }
+
+        select.innerHTML = events.map(ev => `
+          <option value="${ev.id}">${ev.title} (${ev.event_date || 'Upcoming'})</option>
+        `).join('');
+
+        // Parse URL parameters for event pre-selection (e.g. ?event=ICET-2026 or ?event_id=1 or ?title=Hackathon)
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramEvent = (urlParams.get('event') || urlParams.get('event_id') || urlParams.get('title') || urlParams.get('id') || '').toLowerCase().trim();
+
+        let matched = events[0];
+        if (paramEvent) {
+          const found = events.find(ev => 
+            String(ev.id).toLowerCase() === paramEvent || 
+            (ev.title || '').toLowerCase().includes(paramEvent) ||
+            paramEvent.includes((ev.title || '').toLowerCase())
+          );
+          if (found) matched = found;
+        }
+
+        currentEventId = matched.id;
+        select.value = currentEventId;
+        loadEventRoster(currentEventId);
+      } catch (err) {
+        console.error('Failed to load events dropdown:', err);
+      }
+    }
+
+    function handleEventSelectChange() {
+      const select = document.getElementById('event-select-dropdown');
+      if (select && select.value) {
+        currentEventId = select.value;
+        loadEventRoster(currentEventId);
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      const isError = type === 'error';
+      
+      toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl border text-xs font-semibold transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto ${
+        isError 
+          ? 'bg-rose-950/90 text-rose-100 border-rose-700/60' 
+          : 'bg-slate-900/90 text-emerald-300 border-emerald-500/50'
+      }`;
+
+      toast.innerHTML = `
+        <i class="bi ${isError ? 'bi-exclamation-circle-fill text-rose-400' : 'bi-check-circle-fill text-emerald-400'} text-base"></i>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    async function loadEventRoster(eventId) {
+      if (!eventId) return;
+
+      const tbody = document.getElementById('roster-table-body');
+      if (tbody && (!currentRosterData || currentRosterData.length === 0)) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-8 text-center text-slate-400">
+              <div class="inline-flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs">
+                <i class="bi bi-arrow-repeat animate-spin text-emerald-600 dark:text-emerald-400 text-xl"></i>
+                <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Syncing live event roster...</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      try {
+        let res = await fetch(`${API_BASE}/api/public/events/${eventId}/attendance-roster`);
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/api/admin/events/${eventId}/attendance-roster`, { headers: getAuthHeaders() });
+        }
+        if (!res.ok) throw new Error('Could not load roster');
+        const data = await res.json();
+
+        currentRosterData = data.roster || [];
+        updateSummaryStats(data.summary || {});
+        applyRosterFilters();
+      } catch (err) {
+        console.warn('Roster load note:', err.message);
+      }
+    }
+
+    function updateSummaryStats(summary) {
+      document.getElementById('stat-total').textContent = summary.total || 0;
+      document.getElementById('stat-verified').textContent = summary.verified || 0;
+      document.getElementById('stat-present').textContent = summary.present || 0;
+      document.getElementById('stat-absent').textContent = summary.absent || 0;
+      document.getElementById('stat-rate').textContent = (summary.checkInPercentage || 0) + '%';
+    }
+
+    function applyRosterFilters() {
+      const q = (document.getElementById('roster-search')?.value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('roster-filter-status')?.value || 'all';
+
+      const filtered = currentRosterData.filter(reg => {
+        const title = (reg.name || '').toLowerCase();
+        const email = (reg.email || '').toLowerCase();
+        const token = (reg.token_no || '').toLowerCase();
+        const org = (reg.organization || '').toLowerCase();
+        const combined = `${title} ${email} ${token} ${org}`;
+
+        if (q && !combined.includes(q)) return false;
+
+        const att = (reg.attendance_status || 'Absent').toLowerCase();
+        const pay = (reg.payment_status || 'Pending').toLowerCase();
+
+        if (statusFilter === 'present' && att !== 'present') return false;
+        if (statusFilter === 'absent' && att === 'present') return false;
+        if (statusFilter === 'verified' && !pay.includes('verif') && !(reg.registration_fee || '').toLowerCase().includes('free')) return false;
+        if (statusFilter === 'pending' && pay.includes('verif')) return false;
+
+        return true;
+      });
+
+      renderRosterTable(filtered);
+    }
+
+    function renderRosterTable(roster) {
+      const tbody = document.getElementById('roster-table-body');
+      if (!tbody) return;
+
+      if (!roster || roster.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400 font-medium">No registered attendees matching criteria for this event.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = roster.map(reg => {
+        const isPresent = (reg.attendance_status || '').toLowerCase() === 'present';
+        const isPaidVerified = (reg.payment_status || '').toLowerCase().includes('verif') || (reg.registration_fee || '').toLowerCase().includes('free');
+        const formattedTime = reg.checked_in_at ? new Date(reg.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+            <td class="p-3 font-mono font-bold text-slate-900 dark:text-white">${reg.token_no || 'N/A'}</td>
+            <td class="p-3 font-bold text-slate-900 dark:text-white">${reg.name}</td>
+            <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-semibold rounded">${reg.attendee_category || 'Student'}</span></td>
+            <td class="p-3 text-slate-600 dark:text-slate-400">${reg.organization || 'N/A'}</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${isPaidVerified ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300'}">
+                ${isPaidVerified ? 'Verified' : 'Pending'}
+              </span>
+            </td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${isPresent ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'}">
+                ${isPresent ? 'Present' : 'Absent'}
+              </span>
+            </td>
+            <td class="p-3 font-mono text-slate-500 text-[11px]">${formattedTime}</td>
+            <td class="p-3 text-right">
+              <button id="row-btn-${reg.id}" onclick="toggleRowAttendance(${reg.id}, '${isPresent ? 'Absent' : 'Present'}', this)" class="px-2.5 py-1 ${isPresent ? 'bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200' : 'bg-emerald-600 hover:bg-emerald-700 text-white'} text-[11px] font-bold rounded-lg transition-all cursor-pointer inline-flex items-center gap-1">
+                <span>${isPresent ? 'Mark Absent' : 'Check-In'}</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function recalculateStatsAndRender() {
+      const total = currentRosterData.length;
+      const verified = currentRosterData.filter(r => (r.payment_status || '').toLowerCase().includes('verif') || (r.registration_fee || '').toLowerCase().includes('free')).length;
+      const present = currentRosterData.filter(r => (r.attendance_status || '').toLowerCase() === 'present').length;
+      const absent = total - present;
+      const checkInPercentage = total > 0 ? ((present / total) * 100).toFixed(0) : 0;
+
+      updateSummaryStats({ total, verified, present, absent, checkInPercentage });
+      applyRosterFilters();
+    }
+
+    async function toggleRowAttendance(id, newStatus, btnElem) {
+      if (btnElem) {
+        btnElem.disabled = true;
+        btnElem.innerHTML = `<i class="bi bi-arrow-repeat animate-spin text-xs"></i> <span>Updating...</span>`;
+      }
+
+      try {
+        let res = await fetch(`${API_BASE}/api/public/event-registrations/${id}/attendance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/api/admin/event-registrations/${id}/attendance`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ status: newStatus })
+          });
+        }
+        if (!res.ok) throw new Error('Failed to update attendance');
+        
+        const data = await res.json();
+        if (data && data.registration) {
+          const updatedReg = data.registration;
+          const idx = currentRosterData.findIndex(r => String(r.id) === String(updatedReg.id) || (r.token_no && r.token_no === updatedReg.token_no));
+          if (idx !== -1) {
+            currentRosterData[idx] = updatedReg;
+          } else {
+            currentRosterData.unshift(updatedReg);
+          }
+
+          if (activeRegistration && (String(activeRegistration.id) === String(updatedReg.id) || activeRegistration.token_no === updatedReg.token_no)) {
+            activeRegistration = updatedReg;
+            renderActiveAttendeeCard(activeRegistration);
+          }
+        }
+
+        recalculateStatsAndRender();
+        showToast(`Attendance updated to ${newStatus} for ${data.registration ? data.registration.name : 'attendee'}`);
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        if (btnElem) {
+          btnElem.disabled = false;
+        }
+      }
+    }
+
+    async function lookupToken(token) {
+      const input = document.getElementById('manual-token-input');
+      const submitBtn = document.getElementById('btn-manual-submit');
+      
+      if (input) input.disabled = true;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="bi bi-arrow-repeat animate-spin"></i> <span>Checking...</span>`;
+      }
+
+      try {
+        let res = await fetch(`${API_BASE}/api/public/event-registrations/scan/${encodeURIComponent(token)}`);
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/api/admin/event-registrations/scan/${encodeURIComponent(token)}`, {
+            headers: getAuthHeaders()
+          });
+        }
+        if (!res.ok) throw new Error(`Token "${token}" not found in system.`);
+        const data = await res.json();
+        activeRegistration = data.registration;
+        renderActiveAttendeeCard(activeRegistration);
+        showToast(`Found pass for ${activeRegistration.name}`);
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        if (input) input.disabled = false;
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<span>Scan / Check</span>`;
+        }
+      }
+    }
+
+    function handleManualSearch(e) {
+      e.preventDefault();
+      const token = document.getElementById('manual-token-input').value.trim();
+      if (token) lookupToken(token);
+    }
+
+    function renderActiveAttendeeCard(reg) {
+      document.getElementById('attendee-card-empty').classList.add('hidden');
+      document.getElementById('attendee-card-content').classList.remove('hidden');
+
+      const isPresent = (reg.attendance_status || '').toLowerCase() === 'present';
+      const isPaidVerified = (reg.payment_status || '').toLowerCase().includes('verif') || (reg.registration_fee || '').toLowerCase().includes('free');
+
+      document.getElementById('badge-token').textContent = reg.token_no || `PASS-${reg.id}`;
+      document.getElementById('badge-category').textContent = reg.attendee_category || 'Attendee';
+      
+      const pBadge = document.getElementById('badge-payment');
+      pBadge.textContent = isPaidVerified ? 'Verified Paid' : 'Payment Pending';
+      pBadge.className = `px-2.5 py-0.5 text-[11px] font-bold rounded-md uppercase ${isPaidVerified ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300'}`;
+
+      document.getElementById('card-name').textContent = reg.name;
+      document.getElementById('card-event-title').textContent = reg.event_title || 'SST Event';
+      document.getElementById('card-org').textContent = reg.organization || 'N/A';
+      document.getElementById('card-dept').textContent = reg.department_degree || 'N/A';
+      document.getElementById('card-contact').textContent = `${reg.email} • ${reg.phone || 'No phone'}`;
+      document.getElementById('card-fee-utr').textContent = `Fee: ${reg.registration_fee || 'Free'} • UTR: ${reg.transaction_id || 'N/A'}`;
+
+      const attBadge = document.getElementById('badge-attendance');
+      attBadge.textContent = isPresent ? 'PRESENT' : 'ABSENT';
+      attBadge.className = `px-3 py-1 rounded-full text-xs font-extrabold uppercase shadow-2xs ${isPresent ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}`;
+
+      const warningBox = document.getElementById('card-payment-warning');
+      if (!isPaidVerified) warningBox.classList.remove('hidden');
+      else warningBox.classList.add('hidden');
+    }
+
+    async function setAttendanceStatus(status) {
+      if (!activeRegistration) return;
+      
+      const btnPresent = document.getElementById('btn-mark-present');
+      const btnAbsent = document.getElementById('btn-mark-absent');
+      const targetBtn = status === 'Present' ? btnPresent : btnAbsent;
+
+      if (btnPresent) btnPresent.disabled = true;
+      if (btnAbsent) btnAbsent.disabled = true;
+
+      const originalText = targetBtn ? targetBtn.innerHTML : '';
+      if (targetBtn) {
+        targetBtn.innerHTML = `<i class="bi bi-arrow-repeat animate-spin"></i> Saving...`;
+      }
+
+      try {
+        let res = await fetch(`${API_BASE}/api/public/event-registrations/${activeRegistration.id}/attendance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/api/admin/event-registrations/${activeRegistration.id}/attendance`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ status })
+          });
+        }
+        if (!res.ok) throw new Error('Check-in failed');
+        const data = await res.json();
+        
+        if (data && data.registration) {
+          const updatedReg = data.registration;
+          activeRegistration = updatedReg;
+          renderActiveAttendeeCard(activeRegistration);
+
+          const idx = currentRosterData.findIndex(r => String(r.id) === String(updatedReg.id) || (r.token_no && r.token_no === updatedReg.token_no));
+          if (idx !== -1) {
+            currentRosterData[idx] = updatedReg;
+          } else {
+            currentRosterData.unshift(updatedReg);
+          }
+          recalculateStatsAndRender();
+        }
+
+        showToast(`Attendance marked as ${status} for ${activeRegistration.name}`);
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        if (btnPresent) btnPresent.disabled = false;
+        if (btnAbsent) btnAbsent.disabled = false;
+        if (targetBtn) targetBtn.innerHTML = originalText;
+      }
+    }
+
+    function toggleCameraScanner() {
+      const btn = document.getElementById('btn-toggle-scanner');
+      if (isCameraScanning) {
+        stopCameraScanner();
+        btn.textContent = 'Start Camera';
+      } else {
+        startCameraScanner();
+        btn.textContent = 'Stop Camera';
+      }
+    }
+
+    function startCameraScanner() {
+      if (typeof Html5Qrcode === 'undefined') {
+        showToast('QR Scanner library loading... Please retry in a moment.', 'error');
+        return;
+      }
+
+      document.getElementById('scanner-placeholder').classList.add('hidden');
+      html5QrcodeScanner = new Html5Qrcode("reader");
+
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          stopCameraScanner();
+          document.getElementById('btn-toggle-scanner').textContent = 'Start Camera';
+          lookupToken(decodedText);
+        },
+        () => {}
+      ).catch(err => {
+        showToast('Camera access notice: ' + err, 'error');
+        document.getElementById('scanner-placeholder').classList.remove('hidden');
+      });
+
+      isCameraScanning = true;
+    }
+
+    function stopCameraScanner() {
+      if (html5QrcodeScanner && isCameraScanning) {
+        html5QrcodeScanner.stop().then(() => {
+          html5QrcodeScanner.clear();
+          isCameraScanning = false;
+          document.getElementById('scanner-placeholder').classList.remove('hidden');
+        }).catch(() => { isCameraScanning = false; });
+      }
+    }
+
+    // Export CSV Attendance Report (Filtered / All)
+    function exportAttendanceCSV(filterMode = 'all') {
+      if (!currentRosterData || currentRosterData.length === 0) {
+        showToast('No attendance data available to export.', 'error');
+        return;
+      }
+
+      let exportRows = currentRosterData;
+      if (filterMode === 'present') {
+        exportRows = currentRosterData.filter(r => (r.attendance_status || '').toLowerCase() === 'present');
+      } else if (filterMode === 'verified') {
+        exportRows = currentRosterData.filter(r => (r.payment_status || '').toLowerCase().includes('verif') || (r.registration_fee || '').toLowerCase().includes('free'));
+      }
+
+      if (exportRows.length === 0) {
+        showToast(`No records match "${filterMode}" export criteria.`, 'error');
+        return;
+      }
+
+      const headers = ['Token No', 'Name', 'Email', 'Phone', 'Category', 'Organization', 'Department', 'Fee', 'Txn UTR', 'Payment Status', 'Attendance Status', 'Checked-In Timestamp'];
+      const rows = exportRows.map(r => [
+        `"${r.token_no || ''}"`,
+        `"${r.name || ''}"`,
+        `"${r.email || ''}"`,
+        `"${r.phone || ''}"`,
+        `"${r.attendee_category || ''}"`,
+        `"${r.organization || ''}"`,
+        `"${r.department_degree || ''}"`,
+        `"${r.registration_fee || ''}"`,
+        `"${r.transaction_id || ''}"`,
+        `"${r.payment_status || ''}"`,
+        `"${r.attendance_status || 'Absent'}"`,
+        `"${r.checked_in_at ? new Date(r.checked_in_at).toLocaleString() : ''}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `SST_${filterMode.toUpperCase()}_Attendance_Report_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`Exported ${exportRows.length} ${filterMode} attendance records to CSV!`);
+    }
+  </script>
+</body>
+</html>

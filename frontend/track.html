@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Application & Registration Status - Shazu Soft Technologies</title>
+  <meta name="description" content="Check real-time status and official admin remarks for your SST Job Applications, Event Passes, Membership Charters, and Inquiries.">
+
+  <!-- Inter Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+
+  <!-- CSS Stylesheets & Fonts -->
+  <link rel="stylesheet" href="css/custom.css">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              white: '#F5F3EC',
+              cardBg: '#FFFFFF',
+              lightGreen: '#E8EFEB',
+              green: '#123B32',
+              secGreen: '#2F5B4E',
+              accent: '#527A68',
+              copper: '#C47D4C',
+              darkText: '#26322E',
+              secText: '#334E43',
+              border: '#D3DDD7',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="js/theme.js"></script>
+  <script src="js/config.js"></script>
+  <link rel="icon" href="img/logo.png" type="image/png">
+</head>
+<body class="bg-brand-white text-brand-darkText antialiased flex flex-col min-h-screen">
+
+  <!-- Mobile Off-Canvas Backdrop -->
+  <div id="mobile-backdrop" class="mobile-drawer-backdrop"></div>
+
+  <!-- Mobile Side Navigation Drawer -->
+  <aside id="mobile-menu" class="mobile-drawer-content font-heading text-[#0F172A]">
+    <div class="flex-1 overflow-y-auto">
+      <!-- Drawer Header -->
+      <div class="p-4 border-b border-[#E2E8F0] flex items-center justify-between bg-white dark:bg-slate-900">
+        <a href="index.html" class="flex items-center space-x-2.5">
+          <img loading="lazy" decoding="async" src="img/logo.png" alt="SST Logo" class="h-10 w-auto" style="max-height: 40px;">
+          <div class="brand-text-container">
+            <span class="brand-title-text text-base">SHAZU SOFT</span>
+            <span class="brand-sub-text"><span>T</span><span>E</span><span>C</span><span>H</span><span>N</span><span>O</span><span>L</span><span>O</span><span>G</span><span>I</span><span>E</span><span>S</span></span>
+          </div>
+        </a>
+        <button id="mobile-close-btn" class="w-8 h-8 rounded-lg bg-[#E8EFEB] dark:bg-slate-800 text-[#64748B] dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer" aria-label="Close Navigation Menu">
+          <i class="bi bi-x-lg text-xs pointer-events-none"></i>
+        </button>
+      </div>
+
+      <!-- Drawer Nav Links -->
+      <nav class="p-3 space-y-1.5">
+        <a href="index.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-slate-300 hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-estate text-base text-[#123B32]"></i>
+            <span>Home</span>
+          </div>
+        </a>
+
+        <!-- About Us Direct Link -->
+        <a href="about.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <i class="uil uil-info-circle text-base text-[#123B32]"></i>
+          <span>About Us</span>
+        </a>
+
+        <!-- Services Accordion -->
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-slate-300 hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="uil uil-setting text-base text-[#123B32]"></i>
+              <span>Services</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
+          </button>
+          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
+            <a href="education.html" class="block py-1 text-xs text-[#64748B] dark:text-slate-400 hover:text-[#123B32]">Education Services</a>
+            <a href="software.html" target="_blank" rel="noopener noreferrer" class="block py-1 text-xs text-[#64748B] dark:text-slate-400 hover:text-[#123B32]">Software Services</a>
+            <a href="research.html" class="block py-1 text-xs text-[#64748B] dark:text-slate-400 hover:text-[#123B32]">Research Services</a>
+            <a href="track.html" class="block py-1 text-xs font-bold text-[#123B32] dark:text-emerald-400 hover:underline">Track Status</a>
+          </div>
+        </div>
+
+        <!-- Events Accordion -->
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-slate-300 hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="uil uil-calendar-alt text-base text-[#123B32]"></i>
+              <span>Events</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
+          </button>
+          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
+            <a href="events.html" class="block py-1 text-xs text-[#64748B] dark:text-slate-400 hover:text-[#123B32]">Upcoming Events</a>
+            <a href="events.html?type=hackathon" class="block py-1 text-xs text-[#64748B] dark:text-slate-400 hover:text-[#123B32]">Hackathons & Contests</a>
+          </div>
+        </div>
+
+        <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-slate-300 hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-briefcase-alt text-base text-[#123B32]"></i>
+            <span>Career</span>
+          </div>
+        </a>
+        <a href="contact.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-slate-300 hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-envelope text-base text-[#123B32]"></i>
+            <span>Contact Us</span>
+          </div>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Drawer Footer CTA -->
+    <div class="p-4 border-t border-[#E2E8F0] dark:border-slate-800 bg-[#E8EFEB] dark:bg-slate-950">
+      <a href="membership.html" class="flex items-center justify-center gap-2 w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-lg text-xs shadow-xs transition-all">
+        <i class="uil uil-user-plus text-sm"></i> Join Us
+      </a>
+    </div>
+  </aside>
+
+  <!-- Combined Sticky Top Announcement Bar & Header Section -->
+  <div class="sticky top-0 z-40 w-full">
+    
+    <header class="relative z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
+      <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <!-- Brand Logo & Name -->
+        <a href="index.html" class="flex items-center space-x-3 group shrink-0">
+          <img loading="lazy" decoding="async" src="img/logo.png" alt="Shazu Soft Technologies Logo" class="h-14 w-auto shrink-0" style="max-height: 56px;">
+          <div class="brand-text-container">
+            <span class="brand-title-text text-lg">SHAZU SOFT</span>
+            <span class="brand-sub-text"><span>T</span><span>E</span><span>C</span><span>H</span><span>N</span><span>O</span><span>L</span><span>O</span><span>G</span><span>I</span><span>E</span><span>S</span></span>
+          </div>
+        </a>
+
+        <!-- Navigation Links with Dropdown Sub-Menus -->
+        <nav class="hidden lg:flex items-center space-x-1 font-heading shrink-0">
+          <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
+
+          <!-- About Us Direct Link -->
+        <a href="about.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-info-circle text-[14px]"></i>About Us</a>
+
+          <!-- Services Dropdown -->
+          <div class="relative group">
+            <a href="services.html" class="nav-link-pill active flex items-center gap-1">
+              <i class="uil uil-setting text-[14px]"></i>
+              <span>Services</span>
+              <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+            </a>
+            <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[260px]">
+              <div class="nav-dropdown-menu p-1.5 space-y-1">
+                <a href="education.html" class="nav-dropdown-item block px-3.5 py-2">
+                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Education Services</span>
+                  <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Internships, Hackathons & Mentoring</span>
+                </a>
+                <a href="software.html" target="_blank" rel="noopener noreferrer" class="nav-dropdown-item block px-3.5 py-2">
+                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Software Services</span>
+                  <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Full Stack & Web Application Dev</span>
+                </a>
+                <a href="research.html" class="nav-dropdown-item block px-3.5 py-2">
+                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Research Services</span>
+                  <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Conferences, Papers & Patents</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Events Dropdown -->
+          <div class="relative group">
+            <a href="events.html" class="nav-link-pill flex items-center gap-1">
+              <i class="uil uil-calendar-alt text-[14px]"></i>
+              <span>Events</span>
+              <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+            </a>
+            <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+              <div class="nav-dropdown-menu p-1.5 space-y-0.5">
+                <a href="events.html" class="nav-dropdown-item block px-3.5 py-2">
+                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Upcoming Events</span>
+                </a>
+                <a href="events.html?type=hackathon" class="nav-dropdown-item block px-3.5 py-2">
+                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Hackathons & Contests</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+
+          <!-- Contact Dropdown -->
+          <div class="relative group">
+            <a href="contact.html" class="nav-link-pill flex items-center gap-1">
+              <i class="uil uil-envelope text-[14px]"></i>
+              <span>Contact Us</span>
+              <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+            </a>
+            <div class="absolute right-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[230px]">
+              <div class="nav-dropdown-menu p-1.5 space-y-1">
+                <a href="contact.html" class="nav-dropdown-item block px-3.5 py-2">
+                  <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Contact Us</span>
+                  <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Inquiries & Support</span>
+                </a>
+                <a href="track.html" class="nav-dropdown-item block px-3.5 py-2 border-t border-slate-100 dark:border-slate-800/80 mt-0.5">
+                  <span class="block text-xs font-bold text-[#123B32] dark:text-emerald-400 leading-tight"><i class="uil uil-search mr-1 text-[13px]"></i>Track Status</span>
+                  <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Check Token & Application Status</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <!-- CTA Action Button & Theme Toggle -->
+        <div class="flex items-center gap-3">
+          <!-- Light / Dark Theme Toggle Switcher -->
+          <label class="switch" title="Toggle Theme">
+            <input class="theme-toggle-input" type="checkbox" />
+            <div class="slider round">
+              <div class="sun-moon">
+                <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+                <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50"></circle>
+                </svg>
+              </div>
+              <div class="stars">
+                <svg id="star-1" class="star" viewBox="0 0 20 20">
+                  <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+                </svg>
+                <svg id="star-2" class="star" viewBox="0 0 20 20">
+                  <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+                </svg>
+                <svg id="star-3" class="star" viewBox="0 0 20 20">
+                  <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+                </svg>
+                <svg id="star-4" class="star" viewBox="0 0 20 20">
+                  <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+                </svg>
+              </div>
+            </div>
+          </label>
+
+          <div class="hidden lg:block">
+            <a href="membership.html" class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold transition-all duration-150 shadow-xs">
+              Join Us
+            </a>
+          </div>
+        </div>
+
+        <!-- Pure Tailwind Animated Hamburger Bars -->
+        <button id="mobile-menu-btn" class="lg:hidden p-2 text-[#0F172A] hover:text-[#123B32] focus:outline-none cursor-pointer relative z-40 flex flex-col justify-center items-center w-10 h-10 space-y-1.5" aria-label="Toggle Navigation Menu">
+          <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+          <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+          <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+        </button>
+      </div>
+    </header>
+    <div id="dynamic-announcement-bar"></div>
+  </div>
+
+  <!-- Main Status Checker Body -->
+  <main class="flex-1 py-12 md:py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 space-y-10">
+
+      <!-- Hero Header & Search Section -->
+      <div class="text-center space-y-4">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-[#123B32] dark:text-emerald-300 font-extrabold text-xs uppercase tracking-wider">
+          <i class="bi bi-shield-check text-sm"></i>
+          <span>Live Reference Status Engine</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black font-heading text-slate-900 dark:text-white tracking-tight leading-tight">
+          Track Your Application & Registration Status
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
+          Enter your unique Reference Token below to view real-time review progress, verification status, and official administrative notes from Shazu Soft Technologies.
+        </p>
+
+        <!-- Search Bar Input Card -->
+        <div class="max-w-2xl mx-auto pt-4">
+          <form id="track-form" onsubmit="handleTrackSubmit(event)" class="relative flex flex-col sm:flex-row gap-2.5 p-2 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xl">
+            <div class="relative flex-1">
+              <i class="bi bi-upc-scan absolute left-4 top-3.5 text-slate-400 text-base"></i>
+              <input 
+                type="text" 
+                id="track-token-input" 
+                required 
+                placeholder="Enter Reference Token (e.g. SST-PASS-..., SST-APP-...)" 
+                class="w-full pl-11 pr-4 py-3 bg-transparent text-sm sm:text-base font-mono font-bold text-[#0F172A] dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:outline-none uppercase"
+                autocomplete="off"
+              >
+            </div>
+            <button 
+              type="submit" 
+              id="track-btn" 
+              class="px-7 py-3 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shrink-0"
+            >
+              <i id="track-btn-icon" class="bi bi-search text-xs"></i>
+              <span id="track-btn-text">Check Status</span>
+            </button>
+          </form>
+
+          <!-- Quick Token Prefix Helpers -->
+          <div class="flex flex-wrap items-center justify-center gap-2 pt-3 text-[11px] text-slate-500 dark:text-slate-400">
+            <span class="font-bold uppercase tracking-wider text-[10px]">Supported Tokens:</span>
+            <button type="button" onclick="quickFillToken('SST-PASS-')" class="px-2.5 py-1 bg-slate-200/70 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md font-mono text-[10px] cursor-pointer transition-colors">SST-PASS-* (Events)</button>
+            <button type="button" onclick="quickFillToken('SST-APP-')" class="px-2.5 py-1 bg-slate-200/70 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md font-mono text-[10px] cursor-pointer transition-colors">SST-APP-* (Careers)</button>
+            <button type="button" onclick="quickFillToken('SST-MEM-')" class="px-2.5 py-1 bg-slate-200/70 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md font-mono text-[10px] cursor-pointer transition-colors">SST-MEM-* (Memberships)</button>
+            <button type="button" onclick="quickFillToken('SST-LEAD-')" class="px-2.5 py-1 bg-slate-200/70 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md font-mono text-[10px] cursor-pointer transition-colors">SST-LEAD-* (Inquiries)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graceful Shimmer Loading State Indicator -->
+      <div id="track-loading" class="hidden max-w-3xl mx-auto space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+          <div class="flex items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div class="space-y-2 flex-1">
+              <div class="h-5 w-32 bg-emerald-100 dark:bg-emerald-950/60 rounded-md animate-pulse"></div>
+              <div class="h-7 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-lg animate-pulse"></div>
+              <div class="h-4 w-1/2 bg-slate-100 dark:bg-slate-800/60 rounded-md animate-pulse"></div>
+            </div>
+            <div class="w-10 h-10 rounded-full border-3 border-emerald-500 border-t-transparent animate-spin shrink-0"></div>
+          </div>
+          <div class="h-16 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-800 animate-pulse"></div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="h-20 bg-slate-100 dark:bg-slate-800/50 rounded-xl animate-pulse"></div>
+            <div class="h-20 bg-slate-100 dark:bg-slate-800/50 rounded-xl animate-pulse"></div>
+            <div class="h-20 bg-slate-100 dark:bg-slate-800/50 rounded-xl animate-pulse"></div>
+          </div>
+          <div class="flex items-center justify-center gap-2 pt-2 text-xs font-bold text-slate-600 dark:text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span id="loading-stage-text">Connecting to SST Secure Ledger...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error State Card -->
+      <div id="track-error" class="hidden max-w-2xl mx-auto p-6 sm:p-8 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 rounded-2xl text-center space-y-3 shadow-md">
+        <div class="w-14 h-14 rounded-2xl bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-300 flex items-center justify-center mx-auto text-2xl shadow-xs">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3 class="text-base sm:text-lg font-bold text-rose-900 dark:text-rose-200">Reference Token Not Found</h3>
+        <p id="track-error-msg" class="text-xs sm:text-sm text-rose-700 dark:text-rose-300/90 leading-relaxed max-w-md mx-auto">
+          Please check the token format and try again, or check your confirmation email for the exact reference token.
+        </p>
+        <div class="pt-2">
+          <button onclick="document.getElementById('track-token-input').focus()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer">
+            Try Another Token
+          </button>
+        </div>
+      </div>
+
+      <!-- Success Live Status Result Container -->
+      <div id="track-result" class="hidden max-w-3xl mx-auto space-y-6">
+        
+        <!-- Main Status Bento Card -->
+        <div class="sst-card-main bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-8 shadow-xl space-y-6 relative overflow-hidden">
+          
+          <!-- Card Header & Badge -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
+            <div class="space-y-1.5">
+              <div class="flex flex-wrap items-center gap-2">
+                <span id="res-category-badge" class="px-3 py-1 bg-[#123B32] text-white font-extrabold text-[11px] rounded-lg uppercase tracking-wider font-mono shadow-xs">
+                  Event Registration
+                </span>
+                <span class="text-xs text-slate-400 dark:text-slate-500">•</span>
+                <span id="res-date" class="text-xs text-slate-500 dark:text-slate-400 font-medium">Aug 20, 2026</span>
+              </div>
+              <h2 id="res-title" class="text-lg sm:text-2xl font-black font-heading text-slate-900 dark:text-white leading-tight">
+                International Conference on Emerging Computing (ICET-2026)
+              </h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400">
+                Applicant / Delegate: <strong id="res-name" class="text-slate-900 dark:text-slate-200 font-bold">John Doe</strong>
+              </p>
+            </div>
+
+            <!-- Live Status Pill -->
+            <div class="sm:text-right shrink-0">
+              <div class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Current Status</div>
+              <span id="res-status-badge" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-extrabold text-xs rounded-lg border border-emerald-300 dark:border-emerald-700 shadow-xs">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="res-status-text">Verified & Pass Issued</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Token Number Prominent Box -->
+          <div class="sst-box-highlight bg-emerald-50 dark:bg-slate-950/80 border border-emerald-200 dark:border-slate-800 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">Official Reference Token</span>
+              <div id="res-token-no" class="text-lg sm:text-2xl font-mono font-black text-[#123B32] dark:text-emerald-400 tracking-wider break-all">
+                SST-PASS-880709
+              </div>
+            </div>
+            <button onclick="copyCurrentToken()" class="px-4 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs shrink-0">
+              <i class="bi bi-clipboard"></i>
+              <span id="copy-btn-text">Copy Token</span>
+            </button>
+          </div>
+
+          <!-- 4-Stage Visual Progress Timeline -->
+          <div class="space-y-3 pt-2">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <i class="bi bi-diagram-3-fill text-[#123B32] dark:text-emerald-400"></i> Review & Verification Progression
+            </h4>
+            <div id="res-timeline" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <!-- Dynamically populated timeline cards -->
+            </div>
+          </div>
+
+          <!-- SST Operations Admin Remarks / Notes Callout -->
+          <div id="res-admin-notes-container" class="space-y-2 pt-2">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <i class="bi bi-chat-left-quote-fill text-[#123B32] dark:text-emerald-400"></i> Official SST Administration Notes & Remarks
+            </h4>
+            <div class="sst-box-highlight bg-emerald-50 dark:bg-slate-800/80 border-l-4 border-[#123B32] dark:border-emerald-500 border-y border-r border-emerald-200 dark:border-slate-700 p-4 sm:p-5 rounded-r-xl space-y-2 shadow-xs">
+              <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
+                <span class="flex items-center gap-1 text-[#123B32] dark:text-emerald-300 font-extrabold">
+                  <i class="bi bi-patch-check-fill text-xs"></i> Verified by SST Operations Desk
+                </span>
+                <span id="res-updated-time">Updated recently</span>
+              </div>
+              <p id="res-admin-notes" class="text-xs sm:text-sm text-slate-900 dark:text-slate-100 font-medium leading-relaxed">
+                Your dossier has been officially verified. Please present your reference token at the reception desk.
+              </p>
+            </div>
+          </div>
+
+          <!-- Specific Submission Metadata Details Grid -->
+          <div id="res-details-container" class="border-t border-slate-100 dark:border-slate-800 pt-5 space-y-3">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Application Summary & Dossier Parameters
+            </h4>
+            <div id="res-details-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+              <!-- Dynamically populated details -->
+            </div>
+          </div>
+
+          <!-- Footer Actions in Result Card -->
+          <div class="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800">
+            <button onclick="window.print()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer">
+              <i class="bi bi-printer"></i>
+              <span>Print Status Pass</span>
+            </button>
+            <a href="contact.html" class="px-5 py-2.5 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-lg text-xs font-extrabold flex items-center justify-center gap-2 transition-all shadow-md">
+              <i class="bi bi-headset"></i>
+              <span>Contact Support</span>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#17211D] text-[#E4EBE7] pt-12 pb-8 border-t border-emerald-950 mt-auto">
+    <div class="max-w-7xl mx-auto px-6 text-center text-xs text-[#66736D] space-y-2">
+      <p>© 2026 Shazu Soft Technologies. All rights reserved. Registered under Ministry of MSME, Govt of India.</p>
+      <p>Salem Headquarters • Technology & Research Operations Portal</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/dynamic-content.js"></script>
+  <script>
+    let currentLoadedToken = '';
+    let loadingInterval = null;
+
+    function quickFillToken(prefix) {
+      const input = document.getElementById('track-token-input') || document.getElementById('quick-track-input');
+      if (input) {
+        input.value = prefix;
+        input.focus();
+      }
+    }
+    window.quickFillToken = quickFillToken;
+
+    // Mobile menu drawer handlers
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileCloseBtn = document.getElementById('mobile-close-btn');
+    const mobileBackdrop = document.getElementById('mobile-backdrop');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    function toggleMobileDrawer() {
+      if (!mobileMenu || !mobileBackdrop) return;
+      const isOpen = mobileMenu.classList.contains('open');
+      if (isOpen) {
+        mobileMenu.classList.remove('open');
+        mobileBackdrop.classList.remove('active');
+      } else {
+        mobileMenu.classList.add('open');
+        mobileBackdrop.classList.add('active');
+      }
+    }
+
+    if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleMobileDrawer);
+    if (mobileCloseBtn) mobileCloseBtn.addEventListener('click', toggleMobileDrawer);
+    if (mobileBackdrop) mobileBackdrop.addEventListener('click', toggleMobileDrawer);
+
+    // Accordions
+    document.querySelectorAll('.mobile-accordion-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const menu = btn.nextElementSibling;
+        const arrow = btn.querySelector('.accordion-arrow');
+        if (menu) menu.classList.toggle('hidden');
+        if (arrow) arrow.classList.toggle('rotate-180');
+      });
+    });
+
+    // Auto-check on page load if query param or localStorage token exists
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryToken = urlParams.get('token') || localStorage.getItem('sst_last_token');
+      if (queryToken) {
+        const input = document.getElementById('track-token-input');
+        if (input) input.value = queryToken;
+        fetchTokenStatus(queryToken);
+      }
+    });
+
+    function handleTrackSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('track-token-input');
+      const token = (input.value || '').trim();
+      if (!token) return;
+      fetchTokenStatus(token);
+    }
+
+    async function fetchTokenStatus(token) {
+      const loading = document.getElementById('track-loading');
+      const errorCard = document.getElementById('track-error');
+      const resultCard = document.getElementById('track-result');
+      const submitBtn = document.getElementById('track-btn');
+      const btnText = document.getElementById('track-btn-text');
+      const btnIcon = document.getElementById('track-btn-icon');
+      const loadingStageText = document.getElementById('loading-stage-text');
+
+      loading.classList.remove('hidden');
+      errorCard.classList.add('hidden');
+      resultCard.classList.add('hidden');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        if (btnText) btnText.textContent = 'Verifying...';
+        if (btnIcon) btnIcon.className = 'bi bi-arrow-repeat animate-spin text-xs';
+      }
+
+      // Graceful dynamic progress text stages
+      const stages = [
+        'Querying SST Distributed Ledger...',
+        'Decoding Reference Dossier...',
+        'Checking Administrator Notes...',
+        'Finalizing Verification State...'
+      ];
+      let sIdx = 0;
+      if (loadingInterval) clearInterval(loadingInterval);
+      loadingInterval = setInterval(() => {
+        sIdx = (sIdx + 1) % stages.length;
+        if (loadingStageText) loadingStageText.textContent = stages[sIdx];
+      }, 500);
+
+      try {
+        const apiBase = (window.ENV && window.ENV.API_BASE) || window.API_BASE || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? (window.location.port === '5000' ? '' : 'http://localhost:5000') : 'https://shazu-land-back.onrender.com');
+        const res = await fetch(`${apiBase}/api/public/track/${encodeURIComponent(token)}`);
+        const data = await res.json();
+
+        if (!res.ok || !data.found) {
+          throw new Error(data.error || 'Reference token not found in SST registry.');
+        }
+
+        currentLoadedToken = data.token_no;
+        localStorage.setItem('sst_last_token', data.token_no);
+        renderTrackData(data);
+        resultCard.classList.remove('hidden');
+      } catch (err) {
+        const msg = document.getElementById('track-error-msg');
+        if (msg) msg.textContent = err.message || 'Reference token not found. Please verify token prefix.';
+        errorCard.classList.remove('hidden');
+      } finally {
+        if (loadingInterval) clearInterval(loadingInterval);
+        loading.classList.add('hidden');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          if (btnText) btnText.textContent = 'Check Status';
+          if (btnIcon) btnIcon.className = 'bi bi-search text-xs';
+        }
+      }
+    }
+
+    function renderTrackData(data) {
+      document.getElementById('res-category-badge').textContent = data.category_type || 'Record';
+      document.getElementById('res-title').textContent = data.title || 'Official Submission';
+      document.getElementById('res-name').textContent = data.applicant_name || 'Authorized Applicant';
+      document.getElementById('res-token-no').textContent = data.token_no;
+      
+      const createdDate = data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
+      document.getElementById('res-date').textContent = `Submitted on ${createdDate}`;
+
+      // Status Badge
+      const statusBadge = document.getElementById('res-status-badge');
+      const statusText = document.getElementById('res-status-text');
+      statusText.textContent = data.status;
+
+      if (data.status_color === 'emerald') {
+        statusBadge.className = 'inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-extrabold text-xs rounded-lg border border-emerald-300 dark:border-emerald-700 shadow-xs';
+      } else if (data.status_color === 'rose') {
+        statusBadge.className = 'inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 font-extrabold text-xs rounded-lg border border-rose-300 dark:border-rose-700 shadow-xs';
+      } else if (data.status_color === 'blue') {
+        statusBadge.className = 'inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 font-extrabold text-xs rounded-lg border border-blue-300 dark:border-blue-700 shadow-xs';
+      } else {
+        statusBadge.className = 'inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-extrabold text-xs rounded-lg border border-amber-300 dark:border-amber-700 shadow-xs';
+      }
+
+      // Admin Notes Callout
+      const notesContainer = document.getElementById('res-admin-notes-container');
+      const notesEl = document.getElementById('res-admin-notes');
+      const updatedTimeEl = document.getElementById('res-updated-time');
+      if (data.admin_notes && data.admin_notes.trim()) {
+        notesEl.textContent = data.admin_notes;
+        notesContainer.classList.remove('hidden');
+      } else {
+        notesEl.textContent = 'Application received and logged in SST review registry. No additional action required from candidate at this stage.';
+      }
+
+      if (data.updated_at) {
+        updatedTimeEl.textContent = `Last active: ${new Date(data.updated_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+      }
+
+      // Timeline Progression
+      const timelineContainer = document.getElementById('res-timeline');
+      if (data.timeline && data.timeline.length > 0) {
+        timelineContainer.innerHTML = data.timeline.map((step, idx) => {
+          const isDone = step.completed;
+          const isCurrent = step.current;
+          let borderClass = isDone 
+            ? 'border-emerald-400 bg-emerald-50/80 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-200' 
+            : (isCurrent 
+                ? 'border-amber-400 bg-amber-50/80 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 ring-2 ring-amber-400/20' 
+                : 'border-slate-200 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40 text-slate-500 dark:text-slate-400 opacity-70');
+          
+          let iconClass = isDone 
+            ? 'bi-check-circle-fill text-emerald-600 dark:text-emerald-400' 
+            : (isCurrent 
+                ? 'bi-hourglass-split text-amber-600 dark:text-amber-400 animate-spin' 
+                : 'bi-circle text-slate-400');
+
+          return `
+            <div class="p-3.5 rounded-xl border ${borderClass} space-y-1.5 shadow-xs transition-all">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider opacity-80">Stage 0${idx + 1}</span>
+                <i class="bi ${iconClass} text-sm"></i>
+              </div>
+              <div class="text-xs font-bold leading-tight">${step.stage}</div>
+              ${step.date ? `<div class="text-[10px] opacity-75">${new Date(step.date).toLocaleDateString()}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Details Grid
+      const detailsGrid = document.getElementById('res-details-grid');
+      if (data.details) {
+        const items = Object.entries(data.details);
+        detailsGrid.innerHTML = items.map(([k, v]) => `
+          <div class="sst-param-box bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/60 shadow-xs">
+            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-0.5">${k.replace(/_/g, ' ')}</span>
+            <span class="font-bold text-slate-900 dark:text-slate-100 text-xs block truncate" title="${v || '—'}">${v || '—'}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function copyCurrentToken() {
+      if (!currentLoadedToken) return;
+      navigator.clipboard.writeText(currentLoadedToken).then(() => {
+        const btn = document.getElementById('copy-btn-text');
+        if (btn) {
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = 'Copy Token'; }, 2000);
+        }
+      });
+    }
+  </script>
+  <script src="js/main.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script src="js/dynamic-content.js"></script>
+</body>
+</html>

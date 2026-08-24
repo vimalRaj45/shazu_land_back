@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -33,7 +33,7 @@
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
-            heading: ['Outfit', 'sans-serif'],
+            heading: ['Inter', 'sans-serif'],
             mono: ['Fira Code', 'monospace']
           }
         }
@@ -43,7 +43,7 @@
   
   <!-- Bootstrap Icons CDN -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="icon" href="https://shazusofttechnologies.org/sst.svg" type="image/svg+xml">
+  <link rel="icon" href="img/logo.png" type="image/png">
 
   <style>
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -62,8 +62,36 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
+  <script src="js/config.js"></script>
+  <script>
+    // Early global handler to ensure instant clickability before full DOM script parses
+    window.devBypassLogin = async function() {
+      try {
+        const baseUrl = typeof API_BASE !== 'undefined' ? API_BASE : '';
+        const res = await fetch(`${baseUrl}/api/auth/dev-login`, { method: 'POST' });
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem('sst_admin_token', data.token);
+          localStorage.setItem('sst_admin_user', JSON.stringify(data.user));
+          window.location.reload();
+          return;
+        }
+      } catch (e) {
+        console.warn('Dev login fetch error, using fallback session:', e);
+      }
+      const user = {
+        id: 1,
+        email: 'vimalraj5207@gmail.com',
+        name: 'Vimal Raj (Dev Super Admin)',
+        role: 'super_admin'
+      };
+      localStorage.setItem('sst_admin_token', 'dev_bypass_active_local_session');
+      localStorage.setItem('sst_admin_user', JSON.stringify(user));
+      window.location.reload();
+    };
+  </script>
 </head>
-<body class="bg-[#F8FAFC] text-slate-800 font-sans h-full flex flex-col overflow-hidden antialiased">
+<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased">
 
   <!-- TOP GLOBAL NETWORK PROGRESS BAR -->
   <div id="global-progress-bar" class="fixed top-0 left-0 h-1 bg-gradient-to-r from-[#C47D4C] via-emerald-400 to-[#123B32] z-[99999] transition-all duration-300 w-0 opacity-0 pointer-events-none shadow-sm"></div>
@@ -86,7 +114,7 @@
       <!-- Brand Header -->
       <div class="text-center space-y-2">
         <div class="inline-flex items-center justify-center p-3.5 bg-[#123B32]/70 rounded-2xl border border-[#527A68]/40 mb-1 shadow-inner">
-          <img src="images/sst.svg" onerror="this.onerror=null; this.src='https://shazusofttechnologies.org/sst.svg'" alt="SST Logo" class="h-12 w-auto object-contain">
+          <img src="img/logo.png" onerror="this.onerror=null; this.src='img/logo.png'" alt="SST Logo" class="h-12 w-auto object-contain">
         </div>
         <h1 class="text-2xl font-extrabold font-heading text-white tracking-tight">SST Admin Control Panel</h1>
         <p class="text-xs text-slate-400">Enterprise authentication for management team & operations</p>
@@ -171,50 +199,55 @@
   <!-- ========================================== -->
   <!-- 2. MAIN APPLICATION INTERFACE -->
   <!-- ========================================== -->
-  <div id="admin-dashboard-view" class="hidden flex flex-col min-h-screen lg:h-screen overflow-y-auto lg:overflow-hidden bg-[#F8FAFC]">
+  <div id="admin-dashboard-view" class="hidden">
 
-    <!-- TOP HEADER NAVBAR -->
-    <header class="bg-[#123B32] text-white px-4 md:px-6 py-3 flex items-center justify-between border-b border-[#2F5B4E] shadow-md z-30 shrink-0">
+    <!-- TOP HEADER NAVBAR (Single Compact Row, Sticky) -->
+    <header class="sticky top-0 z-30 bg-[#123B32] text-white px-3 sm:px-6 py-2 flex items-center justify-between gap-2 border-b border-[#2F5B4E] shadow-md h-14">
       <!-- Left: Logo & Brand -->
-      <div class="flex items-center gap-3">
-        <a href="index.html" class="flex items-center gap-2.5 group">
-          <div class="p-1.5 bg-white/10 rounded-xl group-hover:bg-white/20 transition-colors flex items-center justify-center">
-            <img src="images/sst.svg" onerror="this.onerror=null; this.src='https://shazusofttechnologies.org/sst.svg'" alt="SST Logo" class="h-7 w-auto object-contain">
+      <div class="flex items-center gap-2 shrink-0">
+        <a href="index.html" class="flex items-center gap-2 group">
+          <div class="p-1 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors flex items-center justify-center">
+            <img src="img/logo.png" onerror="this.onerror=null; this.src='img/logo.png'" alt="SST Logo" class="h-6 w-auto object-contain">
           </div>
-          <span class="font-heading font-extrabold text-sm sm:text-base tracking-tight text-white">SHAZU SOFT</span>
-          <span class="px-2 py-0.5 bg-[#C47D4C] text-[9px] sm:text-[10px] font-mono font-bold uppercase rounded text-white tracking-widest hidden sm:inline">CONTROL PANEL</span>
+          <span class="font-heading font-extrabold text-xs sm:text-sm tracking-tight text-white whitespace-nowrap">SHAZU SOFT</span>
+          <span class="px-1.5 py-0.5 bg-[#C47D4C] text-[9px] font-mono font-bold uppercase rounded text-white tracking-widest hidden lg:inline">CONTROL PANEL</span>
         </a>
       </div>
 
       <!-- Center: Global Search Bar -->
-      <div class="hidden sm:flex items-center flex-1 max-w-xs md:max-w-md mx-4 md:mx-8">
+      <div class="flex items-center flex-1 max-w-[100px] sm:max-w-xs md:max-w-md mx-1 sm:mx-4 min-w-0">
         <div class="relative w-full">
-          <i class="bi bi-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-          <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Search leads, events, UTRs, jobs..." class="w-full bg-white/10 border border-white/15 pl-8 pr-8 py-1.5 rounded-lg text-xs text-white placeholder:text-slate-300 focus:outline-none focus:bg-white/20 focus:border-[#C47D4C] transition-all font-sans">
-          <span class="absolute right-2 top-2 text-[9px] font-mono bg-white/10 text-slate-300 px-1 py-0.5 rounded hidden md:inline"><i class="bi bi-command"></i>K</span>
+          <i class="bi bi-search absolute left-2.5 top-2 text-slate-400 text-xs pointer-events-none"></i>
+          <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Search..." class="w-full bg-white/10 border border-white/15 pl-7 pr-3 py-1 rounded-lg text-xs text-white placeholder:text-slate-300 focus:outline-none focus:bg-white/20 focus:border-[#C47D4C] transition-all font-sans">
         </div>
       </div>
 
-      <!-- Right: User Identity & RBAC Status Badge -->
-      <div class="flex items-center gap-2.5 sm:gap-3">
+      <!-- Right: Activity, Role Badge, Logout — always visible -->
+      <div class="flex items-center gap-1.5 shrink-0">
         
-        <!-- Live RBAC Role Indicator Badge -->
-        <div class="flex items-center gap-2 bg-white/10 border border-white/20 px-3 py-1 rounded-full text-xs text-white font-medium">
-          <i id="rbac-role-icon" class="bi bi-shield-lock-fill text-amber-400"></i>
-          <span id="current-user-name" class="font-bold text-[11px] sm:text-xs">Administrator</span>
-          <span class="text-white/40">|</span>
-          <span id="current-user-role-badge" class="px-2 py-0.2 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded text-[10px] font-mono font-bold uppercase tracking-wider">SUPER ADMIN</span>
+        <!-- TODAY'S ACTIVITY BUTTON -->
+        <button id="btn-today-activity" onclick="openTodayActivityModal()" title="Today's Activity" class="flex items-center gap-1 bg-[#C47D4C]/30 hover:bg-[#C47D4C]/50 border border-[#C47D4C] text-amber-200 px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0">
+          <i class="bi bi-bell-fill text-amber-300 text-xs"></i>
+          <span id="badge-today-total" class="px-1 py-0.5 bg-[#C47D4C] text-white font-mono font-bold text-[10px] rounded leading-none">0</span>
+        </button>
+
+        <!-- RBAC Role Indicator — icon + badge only on mobile, full name on sm+ -->
+        <div class="flex items-center gap-1 sm:gap-1.5 bg-white/10 border border-white/20 px-1.5 sm:px-2.5 py-1 rounded-lg text-xs text-white font-medium shrink-0">
+          <i id="rbac-role-icon" class="bi bi-shield-lock-fill text-amber-400 shrink-0"></i>
+          <span id="current-user-name" class="font-bold text-[11px] truncate hidden sm:block max-w-[90px] md:max-w-[130px]">Vimal Raj</span>
+          <span id="current-user-role-badge" class="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded text-[9px] font-mono font-bold uppercase tracking-wider leading-none hidden md:inline">SUPER ADMIN</span>
         </div>
 
-        <button onclick="logout()" title="Logout Admin" class="flex items-center gap-1.5 bg-red-950/60 hover:bg-red-900/80 border border-red-700/50 px-3 py-1.5 rounded-lg text-xs text-red-200 font-semibold transition-colors cursor-pointer">
+        <!-- LOGOUT — always visible, icon-only on mobile -->
+        <button onclick="logout()" title="Logout" class="flex items-center gap-1 bg-red-950/60 hover:bg-red-900/80 border border-red-700/50 px-2 py-1.5 rounded-lg text-xs text-red-200 font-semibold transition-colors cursor-pointer shrink-0">
           <i class="bi bi-box-arrow-right"></i>
           <span class="hidden sm:inline">Logout</span>
         </button>
       </div>
     </header>
 
-    <!-- HORIZONTAL NAVIGATION TABS BAR (Touch-scrollable) -->
-    <div class="bg-white border-b border-slate-200 px-4 md:px-6 py-2 flex items-center justify-between overflow-x-auto whitespace-nowrap shadow-xs z-20 shrink-0 no-scrollbar">
+    <!-- HORIZONTAL NAVIGATION TABS BAR (Touch-scrollable & Sticky) -->
+    <div class="sticky top-14 z-20 bg-white border-b border-slate-200 px-3 md:px-6 py-1.5 flex items-center justify-start overflow-x-auto whitespace-nowrap shadow-sm no-scrollbar touch-pan-x" style="-webkit-overflow-scrolling: touch">
       <div class="flex items-center gap-1.5 py-0.5 min-w-max">
         
         <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-tab-pill active flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
@@ -225,63 +258,83 @@
         <button onclick="switchTab('leads')" id="nav-leads" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-funnel-fill text-[#C47D4C]"></i>
           <span>Leads CRM</span>
-          <span id="badge-leads-count" class="px-1.5 py-0.2 bg-amber-100 text-amber-800 text-[10px] font-mono font-bold rounded-full">0</span>
+          <span id="badge-leads-count" class="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
         <button onclick="switchTab('registrations')" id="nav-registrations" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-ticket-perforated-fill text-emerald-700"></i>
           <span>Event Registrations & UTRs</span>
-          <span id="badge-registrations-count" class="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold rounded-full">0</span>
+          <span id="badge-registrations-count" class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
         <button onclick="switchTab('events')" id="nav-events" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-calendar-event text-amber-600"></i>
           <span>Events</span>
-          <span id="badge-events-count" class="px-1.5 py-0.2 bg-amber-100 text-amber-700 text-[10px] font-mono font-bold rounded-full">0</span>
+          <span id="badge-events-count" class="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
+
+        <a href="attendance.html" target="_blank" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-qr-code-scan text-emerald-600"></i>
+          <span>Attendance Hub</span>
+          <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold rounded-md leading-none">LIVE</span>
+        </a>
 
         <button onclick="switchTab('careers')" id="nav-careers" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-briefcase text-purple-600"></i>
           <span>Careers</span>
-          <span id="badge-careers-count" class="px-1.5 py-0.2 bg-purple-100 text-purple-700 text-[10px] font-mono font-bold rounded-full">0</span>
+          <span id="badge-careers-count" class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
         <button onclick="switchTab('applications')" id="nav-applications" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-person-lines-fill text-sky-600"></i>
           <span>Job Applications</span>
-          <span id="badge-applications-count" class="px-1.5 py-0.2 bg-sky-100 text-sky-700 text-[10px] font-mono font-bold rounded-full">0</span>
+          <span id="badge-applications-count" class="px-1.5 py-0.5 bg-sky-100 text-sky-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
+        </button>
+
+        <button onclick="switchTab('memberships')" id="nav-memberships" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-award-fill text-emerald-800"></i>
+          <span>Memberships</span>
+          <span id="badge-memberships-count" class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
         <button onclick="switchTab('announcements')" id="nav-announcements" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-megaphone text-blue-600"></i>
           <span>Announcements</span>
-          <span id="badge-announcements-count" class="px-1.5 py-0.2 bg-blue-100 text-blue-700 text-[10px] font-mono font-bold rounded-full">0</span>
+          <span id="badge-announcements-count" class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
         <button onclick="switchTab('offerings')" id="nav-offerings" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-journal-bookmark text-indigo-600"></i>
           <span>Courses & Services</span>
+          <span id="badge-offerings-count" class="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
         <!-- HERO SLIDER & MEDIA TAB -->
         <button onclick="switchTab('slider')" id="nav-slider" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-images text-emerald-600"></i>
           <span>Hero Slider</span>
-          <span id="badge-slider-count" class="px-1.5 py-0.2 bg-emerald-100 text-emerald-700 text-[10px] font-mono font-bold rounded-full">0</span>
+          <span id="badge-slider-count" class="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
+        </button>
+
+        <!-- PHOTO GALLERY (BLOB STORAGE) TAB -->
+        <button onclick="switchTab('gallery')" id="nav-gallery" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-camera-fill text-indigo-600"></i>
+          <span>Gallery</span>
+          <span id="badge-gallery-count" class="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
         <!-- ACCESS MANAGEMENT TAB (Visible to Super Admin) -->
         <button onclick="switchTab('users')" id="nav-users" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-shield-lock-fill text-rose-600"></i>
           <span>Access Management</span>
-          <span id="badge-users-count" class="px-1.5 py-0.2 bg-rose-100 text-rose-800 text-[10px] font-mono font-bold rounded-full">0</span>
+          <span id="badge-users-count" class="px-1.5 py-0.5 bg-rose-100 text-rose-800 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
         <!-- SYSTEM AUDIT TRAIL TAB -->
         <button onclick="switchTab('audit')" id="nav-audit" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-clock-history text-teal-600"></i>
           <span>System Audit Trail</span>
-          <span id="badge-audit-count" class="px-1.5 py-0.2 bg-teal-100 text-teal-800 text-[10px] font-mono font-bold rounded-full">0</span>
+          <span id="badge-audit-count" class="px-1.5 py-0.5 bg-teal-100 text-teal-800 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
       </div>
@@ -290,15 +343,15 @@
     <!-- ========================================== -->
     <!-- UNIVERSAL MULTI-CRITERIA FILTER & EXPORT TOOLBAR -->
     <!-- ========================================== -->
-    <div id="universal-filter-toolbar" class="bg-slate-100/80 border-b border-slate-200 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 z-10 shrink-0">
+    <div id="universal-filter-toolbar" class="bg-white/95 border-b border-slate-200 px-3 md:px-6 py-2 flex flex-wrap items-start gap-2 z-10">
       
       <!-- Left: Filter Inputs Group -->
-      <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[300px]">
+      <div class="flex flex-wrap items-center gap-2 flex-1">
         
         <!-- Live Keyword Search -->
-        <div class="relative min-w-[160px] sm:min-w-[200px]">
+        <div class="relative flex-1 min-w-[120px] sm:min-w-[180px]">
           <i class="bi bi-search absolute left-2.5 top-2 text-slate-400 text-xs"></i>
-          <input type="text" id="filter-search-input" oninput="handleFilterChange('search', this.value)" placeholder="Filter active table..." class="w-full pl-7 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#123B32] shadow-2xs">
+          <input type="text" id="filter-search-input" oninput="handleFilterChange('search', this.value)" placeholder="Filter table..." class="w-full pl-7 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#123B32] shadow-2xs">
         </div>
 
         <!-- Date Range Filter Preset Dropdown -->
@@ -353,16 +406,16 @@
       </div>
 
       <!-- Right: Record Count Badge & Export Buttons -->
-      <div class="flex items-center gap-2">
-        <span id="filter-records-count" class="text-[11px] font-mono font-semibold text-slate-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-          Showing 0 records
+      <div class="flex items-center gap-2 ml-auto shrink-0">
+        <span id="filter-records-count" class="text-[11px] font-mono font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 whitespace-nowrap">
+          0 records
         </span>
 
         <!-- Universal Multi-Format Export Dropdown -->
         <div class="relative group">
-          <button type="button" class="px-3 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+          <button type="button" class="px-2.5 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer">
             <i class="bi bi-download"></i>
-            <span>Export Data</span>
+            <span class="hidden sm:inline">Export Data</span>
             <i class="bi bi-chevron-down text-[10px]"></i>
           </button>
 
@@ -387,8 +440,8 @@
 
     </div>
 
-    <!-- MAIN SCROLLABLE CONTENT BODY -->
-    <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+    <!-- MAIN CONTENT BODY -->
+    <main class="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 max-w-[1600px] mx-auto w-full pb-16">
 
       <!-- ========================================== -->
       <!-- TAB 1: BUSINESS & FINANCIAL REVENUE BI DASHBOARD -->
@@ -817,6 +870,36 @@
       </div>
 
       <!-- ========================================== -->
+      <!-- TAB: MEMBERSHIP APPLICATIONS (11-FIELD) -->
+      <!-- ========================================== -->
+      <div id="tab-memberships" class="hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold font-heading text-slate-900">Academic & Professional Memberships</h2>
+            <p class="text-xs text-slate-500">Review 11-field membership applications, verify credentials, and grant charter status</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[900px] text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold text-[10px]">
+                <tr>
+                  <th class="p-3">Submitted</th>
+                  <th class="p-3">Applicant Profile</th>
+                  <th class="p-3">Category & Association</th>
+                  <th class="p-3">Designation & Org</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="memberships-table-body" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
       <!-- TAB 7: ANNOUNCEMENTS CRUD -->
       <!-- ========================================== -->
       <div id="tab-announcements" class="hidden space-y-4">
@@ -912,6 +995,41 @@
                 </tr>
               </thead>
               <tbody id="slider-table-body" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- TAB: PHOTO GALLERY (BLOB STORAGE) -->
+      <!-- ========================================== -->
+      <div id="tab-gallery" class="hidden space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold font-heading text-slate-900 flex items-center gap-2">
+              <i class="bi bi-camera-fill text-indigo-600"></i>
+              <span>Official Photo Gallery & Events Media</span>
+            </h2>
+            <p class="text-xs text-slate-500">Upload high-resolution event photographs stored directly in database as Base64/BLOB</p>
+          </div>
+          <button id="btn-create-gallery" onclick="openGalleryModal()" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs">
+            <i class="bi bi-cloud-upload-fill"></i> Upload New Photo
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[850px] text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold text-[10px]">
+                <tr>
+                  <th class="p-3">Photo Preview</th>
+                  <th class="p-3">Title & Category</th>
+                  <th class="p-3">Description</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="gallery-table-body" class="divide-y divide-slate-100"></tbody>
             </table>
           </div>
         </div>
@@ -1049,19 +1167,19 @@
   <!-- MODAL CONTAINER BACKDROP -->
   <!-- ========================================== -->
   <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
-    <div id="modal-container" class="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto"></div>
+    <div id="modal-container" class="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar"></div>
   </div>
 
   <!-- JAVASCRIPT LOGIC -->
-  <script src="js/config.js"></script>
   <script>
     // ==========================================
     // STATE MANAGEMENT & RBAC CONTEXT
     // ==========================================
-    const isLocalAdmin = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const API_BASE = isLocalAdmin 
+    var isLocalAdmin = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    var API_BASE = (window.ENV && window.ENV.API_BASE) || (isLocalAdmin 
       ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
-      : (window.SST_CONFIG ? window.SST_CONFIG.API_BASE_URL : 'https://shazu-land-back.onrender.com');
+      : (window.SST_CONFIG ? window.SST_CONFIG.API_BASE_URL : 'https://shazu-land-back.onrender.com'));
+    window.API_BASE = API_BASE;
     let currentTab = 'analytics';
     let currentUser = null; // { id, name, email, role }
 
@@ -1084,9 +1202,11 @@
       events: [],
       careers: [],
       applications: [],
+      memberships: [],
       announcements: [],
       offerings: [],
       slides: [],
+      gallery: [],
       users: [],
       audit: []
     };
@@ -1259,7 +1379,9 @@
       document.getElementById('admin-dashboard-view').classList.remove('hidden');
       
       if (currentUser) {
-        document.getElementById('current-user-name').textContent = currentUser.name || currentUser.email.split('@')[0];
+        const rawName = currentUser.name || currentUser.email.split('@')[0];
+        const cleanName = rawName.replace(/\s*\(Dev Super Admin\)/gi, '').trim();
+        document.getElementById('current-user-name').textContent = cleanName;
         const roleBadge = document.getElementById('current-user-role-badge');
         const roleIcon = document.getElementById('rbac-role-icon');
 
@@ -1282,8 +1404,415 @@
       }
 
       applyRBACRestrictions();
+      loadGlobalSummaryCounts();
       switchTab(currentTab);
     }
+
+    // ==========================================
+    // ⚡ GLOBAL REAL-TIME SUMMARY COUNTS SYNC
+    // ==========================================
+    async function loadGlobalSummaryCounts() {
+      try {
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/today-activity`, {
+          headers: getAuthHeaders()
+        });
+        if (!ok || !data) return;
+
+        const c = data.counts || {};
+        
+        // Update all navigation tab badges immediately with real counts from database
+        const updateBadge = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = val !== undefined ? val : 0;
+        };
+
+        updateBadge('badge-leads-count', c.leads);
+        updateBadge('badge-registrations-count', c.registrations);
+        updateBadge('badge-events-count', c.events);
+        updateBadge('badge-careers-count', c.careers);
+        updateBadge('badge-applications-count', c.applications);
+        updateBadge('badge-memberships-count', c.memberships);
+        updateBadge('badge-announcements-count', c.announcements);
+        updateBadge('badge-offerings-count', c.offerings);
+        updateBadge('badge-users-count', c.users);
+        updateBadge('badge-audit-count', c.audit);
+        updateBadge('badge-today-total', data.todayTotal || 0);
+
+        // Store cached activities
+        window.todayActivitiesData = data.activities || [];
+      } catch (err) {
+        console.warn('Failed to prefetch summary counts:', err);
+      }
+    }
+
+    // ==========================================
+    // ⚡ TODAY'S ACTIVITY FEED DRAWER & NOTIFICATION MODAL
+    // ==========================================
+    async function openTodayActivityModal() {
+      showModal(`
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div class="flex items-center gap-2">
+            <div class="p-2 bg-[#C47D4C]/20 text-[#C47D4C] rounded-xl flex items-center justify-center">
+              <i class="bi bi-lightning-charge-fill text-base"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold font-heading text-slate-900 leading-tight">Today's Live Activity &amp; Records</h3>
+              <p class="text-xs text-slate-500">All submissions, registrations, applications &amp; inquiries received in the last 24h</p>
+            </div>
+          </div>
+          <button onclick="loadGlobalSummaryCounts(); openTodayActivityModal();" title="Refresh Live Feed" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors">
+            <i class="bi bi-arrow-clockwise"></i> <span>Refresh</span>
+          </button>
+        </div>
+
+        <div id="today-activity-container" class="space-y-2.5 max-h-[60vh] overflow-y-auto py-3 no-scrollbar">
+          <div class="p-6 text-center text-slate-400 text-xs">
+            <i class="bi bi-arrow-repeat animate-spin text-lg block mb-1"></i> Fetching live records...
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-3 border-t border-slate-200 text-xs">
+          <span class="text-slate-500 font-medium">Click on any record to open its full dossier</span>
+          <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-semibold cursor-pointer">Close</button>
+        </div>
+      `);
+
+      try {
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/today-activity`, { headers: getAuthHeaders() });
+        const container = document.getElementById('today-activity-container');
+        if (!container) return;
+
+        if (!ok || !data.activities || data.activities.length === 0) {
+          container.innerHTML = `
+            <div class="p-8 text-center bg-slate-50 border border-slate-200 rounded-2xl">
+              <i class="bi bi-calendar2-check text-2xl text-emerald-600 block mb-2"></i>
+              <h4 class="font-bold text-slate-800 text-sm">No New Activity Today Yet</h4>
+              <p class="text-xs text-slate-500 mt-1">New registrations, candidate applications, membership charters, and leads submitted today will appear here live.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = data.activities.map(act => `
+          <div onclick="navigateToActivity('${act.tab}', ${act.record_id})" class="p-3.5 bg-white hover:bg-emerald-50/50 border border-slate-200 hover:border-emerald-300 rounded-xl transition-all shadow-2xs cursor-pointer flex items-start gap-3 group">
+            <div class="p-2.5 rounded-xl bg-slate-100 group-hover:bg-[#123B32] group-hover:text-white text-slate-700 transition-colors shrink-0 flex items-center justify-center">
+              <i class="bi ${act.icon || 'bi-record-circle'} text-sm"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border ${act.badge_class || 'bg-slate-100 text-slate-700 border-slate-200'}">${act.badge}</span>
+                <span class="text-[11px] font-mono text-slate-400 shrink-0"><i class="bi bi-clock"></i> ${act.time_formatted}</span>
+              </div>
+              <h4 class="font-bold text-xs text-slate-900 group-hover:text-[#123B32] transition-colors truncate">${act.title}</h4>
+              <p class="text-[11px] text-slate-500 mt-0.5 truncate">${act.subtitle}</p>
+            </div>
+            <div class="shrink-0 self-center text-slate-400 group-hover:text-[#123B32] transition-colors">
+              <i class="bi bi-chevron-right text-xs"></i>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        const container = document.getElementById('today-activity-container');
+        if (container) container.innerHTML = `<div class="p-4 text-center text-red-500 text-xs">Failed to load today's activity: ${err.message}</div>`;
+      }
+    }
+
+    // ==========================================
+    // ⚡ 1-CLICK DIRECT NAVIGATION TO RECORD DOSSIER
+    // ==========================================
+    async function navigateToActivity(tab, recordId) {
+      closeModal();
+      switchTab(tab);
+      
+      const fetchMap = {
+        applications: loadApplications,
+        registrations: loadRegistrations,
+        memberships: loadMemberships,
+        leads: loadLeads,
+        events: loadEvents,
+        careers: loadCareers,
+        announcements: loadAnnouncements
+      };
+
+      if (fetchMap[tab]) {
+        await fetchMap[tab]();
+      }
+
+      openRowDetails(tab, recordId);
+    }
+
+    // ==========================================
+    // 🔍 UNIVERSAL RECORD DOSSIER MODAL
+    // ==========================================
+    function openRowDetails(tab, id) {
+      id = parseInt(id, 10);
+      const records = tableData[tab] || [];
+      const rec = records.find(r => r.id === id);
+
+      if (!rec) {
+        showToast(`Record #${id} not found or still syncing...`, 'error');
+        return;
+      }
+
+      if (tab === 'registrations') {
+        showModal(`
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="p-2 bg-emerald-100 text-emerald-800 rounded-xl text-lg"><i class="bi bi-pass-fill"></i></span>
+              <div>
+                <h3 class="text-base font-bold text-slate-900 leading-tight">Event Registration Dossier</h3>
+                <span class="text-xs font-mono font-bold text-emerald-700">${rec.token_no || 'Token Pending'}</span>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-md text-xs font-bold ${rec.payment_status === 'Verified' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : (rec.payment_status === 'Rejected' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800 border border-amber-300')}">${rec.payment_status || 'Pending'}</span>
+          </div>
+
+          <div class="space-y-3 py-2 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Attendee Name</span>
+                <span class="font-bold text-slate-900 text-sm block mt-0.5">${rec.name}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Registered At</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${new Date(rec.registered_at).toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Email Address</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5 break-all">${rec.email}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone Number</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.phone || '—'}</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Target Event</span>
+              <span class="font-black text-slate-900 text-sm block">${rec.event_title}</span>
+              <div class="flex items-center gap-2 pt-1 flex-wrap">
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-900 font-mono font-bold text-[11px] rounded">${rec.registration_fee || 'Free'}</span>
+                <span class="text-slate-400">•</span>
+                <span class="text-slate-600 font-mono text-[11px]">Method: ${rec.payment_method || 'Online'}</span>
+                ${rec.transaction_id ? `<span class="text-slate-400">•</span><span class="font-mono font-bold text-emerald-800 text-[11px]">UTR: ${rec.transaction_id}</span>` : ''}
+              </div>
+            </div>
+
+            <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
+              <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">Update Verification Status</span>
+              <div class="flex gap-2 pt-1">
+                <button onclick="updateRegistrationPaymentStatus(${rec.id}, 'Verified'); closeModal();" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-check-circle-fill"></i> Mark Verified & Email Pass</button>
+                <button onclick="updateRegistrationPaymentStatus(${rec.id}, 'Rejected'); closeModal();" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-x-circle"></i> Reject</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-3 border-t border-slate-200">
+            <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'Event Pass Confirmation: ${rec.event_title}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Send Email</button>
+            <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
+          </div>
+        `);
+      } else if (tab === 'applications') {
+        viewApplicationDetailModal(rec.id);
+      } else if (tab === 'memberships') {
+        showModal(`
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="p-2 bg-amber-100 text-amber-800 rounded-xl text-lg"><i class="bi bi-award-fill"></i></span>
+              <div>
+                <h3 class="text-base font-bold text-slate-900 leading-tight">Membership Charter Dossier</h3>
+                <span class="text-xs font-mono font-bold text-amber-700">${rec.token_no || 'Token Pending'}</span>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-md text-xs font-bold ${rec.status === 'Approved' || rec.status === 'Active Member' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300'}">${rec.status || 'Pending'}</span>
+          </div>
+
+          <div class="space-y-2.5 py-2 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Member Full Name</span>
+                <span class="font-bold text-slate-900 text-sm block mt-0.5">${rec.name}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Charter Type</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.membership_type || 'Professional'}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Email & Phone</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5 break-all">${rec.email}</span>
+                <span class="text-slate-500 text-[11px] block mt-0.5">${rec.phone || '—'}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Chapter / Association</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.association_name || 'SST Network'}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Designation</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.present_designation || '—'}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Highest Qualification</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.professional_qualification || '—'}</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Organization & Address</span>
+              <span class="font-medium text-slate-800 text-xs block mt-0.5">${rec.organization_name_address || '—'}</span>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Admin Notes & Remarks</span>
+              <textarea id="modal-membership-notes" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800" placeholder="Add administrative remark for candidate...">${rec.admin_notes || ''}</textarea>
+              <div class="flex justify-end pt-1">
+                <button onclick="updateMembershipStatus(${rec.id}, '${rec.status || 'Pending Review'}', document.getElementById('modal-membership-notes').value); closeModal();" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-lg text-xs cursor-pointer">Save Notes</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-3 border-t border-slate-200">
+            <div class="flex gap-2">
+              <button onclick="updateMembershipStatus(${rec.id}, 'Approved', document.getElementById('modal-membership-notes').value); closeModal();" class="px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-patch-check"></i> Grant Charter</button>
+              <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'Membership Update: ${rec.membership_type}')" class="px-3 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Email</button>
+            </div>
+            <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
+          </div>
+        `);
+      } else if (tab === 'leads') {
+        showModal(`
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="p-2 bg-blue-100 text-blue-800 rounded-xl text-lg"><i class="bi bi-chat-left-quote-fill"></i></span>
+              <div>
+                <h3 class="text-base font-bold text-slate-900 leading-tight">CRM Lead Inquiry Dossier</h3>
+                <span class="text-xs font-mono font-bold text-blue-700">${rec.token_no || 'Token Pending'}</span>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">${rec.status || 'New Lead'}</span>
+          </div>
+
+          <div class="space-y-3 py-2 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Lead Name</span>
+                <span class="font-bold text-slate-900 text-sm block mt-0.5">${rec.name}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Inquiry Category</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.service_category || 'General'}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Email Address</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5 break-all">${rec.email}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone Number</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.phone || '—'}</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Subject</span>
+              <span class="font-bold text-slate-900 text-xs block">${rec.subject || 'General Inquiry'}</span>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block pt-1">Inquiry Message</span>
+              <p class="whitespace-pre-line text-slate-800 leading-relaxed font-medium bg-white p-2.5 rounded-lg border border-slate-200">${rec.message || 'No additional text provided.'}</p>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-3 border-t border-slate-200">
+            <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'RE: ${rec.subject || 'Inquiry Follow-up'}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Send Reply via Brevo</button>
+            <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
+          </div>
+        `);
+      } else if (tab === 'events') {
+        openEventModal(rec.id);
+      } else if (tab === 'careers') {
+        openCareerModal(rec.id);
+      } else if (tab === 'announcements') {
+        openAnnouncementModal(rec.id);
+      }
+    }
+
+    // ==========================================
+    // 📧 DIRECT EMAIL MODAL & DISPATCH ENGINE
+    // ==========================================
+    function openSendEmailModal(toEmail, toName, defaultSubject = '') {
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900 flex items-center gap-2">
+          <i class="bi bi-envelope-paper-fill text-[#123B32]"></i>
+          <span>Dispatch Email via Brevo API</span>
+        </h3>
+        <form onsubmit="submitDirectEmail(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Recipient</label>
+            <input type="text" id="mail-recipient" readonly value="${toName ? `${toName} <${toEmail}>` : toEmail}" data-email="${toEmail}" data-name="${toName || ''}" class="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-700 font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Subject *</label>
+            <input type="text" id="mail-subject" required value="${defaultSubject}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Message Body *</label>
+            <textarea id="mail-body" rows="5" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]" placeholder="Dear ${toName || 'Candidate'},\n\nWe are writing from Shazu Soft Technologies regarding your application..."></textarea>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-semibold">Cancel</button>
+            <button type="submit" id="btn-submit-email" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white font-semibold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send-fill"></i> Dispatch Email</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function submitDirectEmail(e) {
+      e.preventDefault();
+      const recipInput = document.getElementById('mail-recipient');
+      const toEmail = recipInput.getAttribute('data-email');
+      const toName = recipInput.getAttribute('data-name');
+      const subject = document.getElementById('mail-subject').value;
+      const message = document.getElementById('mail-body').value;
+
+      const btn = document.getElementById('btn-submit-email');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="bi bi-arrow-repeat animate-spin"></i> Sending...`;
+      }
+
+      try {
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/email/send`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ toEmail, toName, subject, message })
+        });
+        if (!ok) throw new Error(data.error || 'Failed to dispatch email');
+        showToast('Email delivered successfully via Brevo!');
+        closeModal();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="bi bi-send-fill"></i> Dispatch Email`;
+        }
+      }
+    }
+
+    // ==========================================
+    // 📧 LIVE TEST EMAIL SENDER VIA BREVO
+    // ==========================================
+    // 🛡️ ROLE & PERMISSION HELPERS
+    // ==========================================
 
     function hasPermission(action) {
       if (!currentUser) return true; // Default allow so all actions and modals work smoothly
@@ -1396,7 +1925,7 @@
       document.getElementById('otp-step-1').classList.remove('hidden');
     }
 
-
+    // ==========================================
 
     // ==========================================
     // TAB NAVIGATION ROUTING
@@ -1408,7 +1937,7 @@
       const activeBtn = document.getElementById(`nav-${tabId}`);
       if (activeBtn) activeBtn.classList.add('active');
 
-      const tabs = ['analytics', 'leads', 'registrations', 'events', 'careers', 'applications', 'announcements', 'offerings', 'slider', 'users', 'audit'];
+      const tabs = ['analytics', 'leads', 'registrations', 'events', 'careers', 'applications', 'memberships', 'announcements', 'offerings', 'slider', 'users', 'audit'];
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.add('hidden');
@@ -1416,6 +1945,21 @@
 
       const target = document.getElementById(`tab-${tabId}`);
       if (target) target.classList.remove('hidden');
+
+      // Reset filters when switching tabs so stale filters from previous tab don't hide records
+      filterState.search = '';
+      filterState.status = 'all';
+      filterState.category = 'all';
+      filterState.datePreset = 'all';
+      filterState.dateStart = '';
+      filterState.dateEnd = '';
+
+      const sInput = document.getElementById('filter-search-input');
+      if (sInput) sInput.value = '';
+      const dPreset = document.getElementById('filter-date-preset');
+      if (dPreset) dPreset.value = 'all';
+      const cDate = document.getElementById('filter-custom-date-container');
+      if (cDate) cDate.classList.add('hidden');
 
       populateFilterDropdowns(tabId);
 
@@ -1425,9 +1969,11 @@
       else if (tabId === 'events') loadEvents();
       else if (tabId === 'careers') loadCareers();
       else if (tabId === 'applications') loadApplications();
+      else if (tabId === 'memberships') loadMemberships();
       else if (tabId === 'announcements') loadAnnouncements();
       else if (tabId === 'offerings') loadOfferings();
       else if (tabId === 'slider') loadSlider();
+      else if (tabId === 'gallery') loadGallery();
       else if (tabId === 'users') loadUsers();
       else if (tabId === 'audit') loadAuditLogs();
     }
@@ -1442,7 +1988,22 @@
       statusSelect.innerHTML = '<option value="all">All Statuses</option>';
       categorySelect.innerHTML = '<option value="all">All Categories</option>';
 
-      if (tab === 'leads') {
+      if (tab === 'gallery') {
+        statusSelect.innerHTML += `
+          <option value="active">Active Photos</option>
+          <option value="inactive">Hidden Photos</option>
+        `;
+        categorySelect.innerHTML += `
+          <option value="Conferences & MoUs">Conferences & MoUs</option>
+          <option value="Conferences">Conferences</option>
+          <option value="MoUs & Delegations">MoUs & Delegations</option>
+          <option value="Memberships">Memberships</option>
+          <option value="Hackathons">Hackathons</option>
+          <option value="Workshops">Workshops</option>
+          <option value="Celebrations">Celebrations</option>
+          <option value="General">General</option>
+        `;
+      } else if (tab === 'leads') {
         statusSelect.innerHTML += `
           <option value="New Lead">New Lead</option>
           <option value="Contacted">Contacted</option>
@@ -1461,21 +2022,41 @@
           <option value="Pending Verification">Pending Verification</option>
           <option value="Rejected">Rejected</option>
         `;
+
+        categorySelect.innerHTML = '<option value="all">All Events &amp; Passes</option>';
+        const eventNames = new Set();
+        (tableData.registrations || []).forEach(r => { if (r.event_title && r.event_title.trim()) eventNames.add(r.event_title.trim()); });
+        (tableData.events || []).forEach(e => { if (e.title && e.title.trim()) eventNames.add(e.title.trim()); });
+
+        if (eventNames.size > 0) {
+          categorySelect.innerHTML += '<optgroup label="Filter by Event Name">';
+          eventNames.forEach(evt => {
+            categorySelect.innerHTML += `<option value="${evt.replace(/"/g, '&quot;')}">${evt}</option>`;
+          });
+          categorySelect.innerHTML += '</optgroup>';
+        }
+
         categorySelect.innerHTML += `
-          <option value="UPI QR">UPI QR</option>
-          <option value="NetBanking">NetBanking</option>
-          <option value="Free Pass">Free Pass</option>
+          <optgroup label="Payment Method">
+            <option value="UPI QR">UPI QR</option>
+            <option value="NetBanking">NetBanking</option>
+            <option value="Free Pass">Free Pass</option>
+          </optgroup>
         `;
       } else if (tab === 'events') {
         statusSelect.innerHTML += `
           <option value="Upcoming">Upcoming</option>
-          <option value="Completed">Completed</option>
+          <option value="Completed">Completed / Past</option>
           <option value="Cancelled">Cancelled</option>
         `;
         categorySelect.innerHTML += `
+          <option value="Upcoming Conference">Upcoming Conference</option>
+          <option value="Faculty Development Program">Faculty Development Program</option>
+          <option value="Webinar">Webinar</option>
+          <option value="Hands on Training">Hands on Training</option>
+          <option value="Internship">Internship</option>
           <option value="Hackathon">Hackathon</option>
-          <option value="Workshop">Workshop</option>
-          <option value="Tech Summit">Tech Summit</option>
+          <option value="Seminar">Seminar</option>
         `;
       } else if (tab === 'careers') {
         statusSelect.innerHTML += `
@@ -1490,10 +2071,29 @@
         `;
       } else if (tab === 'applications') {
         statusSelect.innerHTML += `
-          <option value="Pending">Pending</option>
+          <option value="Pending">Pending Review</option>
           <option value="Shortlisted">Shortlisted</option>
-          <option value="Approved">Approved</option>
+          <option value="Approved">Offer / Cleared</option>
+          <option value="Rejected">Closed</option>
+        `;
+
+        categorySelect.innerHTML = '<option value="all">All Job Positions</option>';
+        const jobTitles = new Set();
+        (tableData.applications || []).forEach(a => { if (a.job_title && a.job_title.trim()) jobTitles.add(a.job_title.trim()); });
+        (tableData.careers || []).forEach(c => { if (c.title && c.title.trim()) jobTitles.add(c.title.trim()); });
+        jobTitles.forEach(jt => {
+          categorySelect.innerHTML += `<option value="${jt.replace(/"/g, '&quot;')}">${jt}</option>`;
+        });
+      } else if (tab === 'memberships') {
+        statusSelect.innerHTML += `
+          <option value="Pending Review">Pending Review</option>
+          <option value="Approved">Approved / Active</option>
           <option value="Rejected">Rejected</option>
+        `;
+        categorySelect.innerHTML += `
+          <option value="Professional Member">Professional Member</option>
+          <option value="Institutional Member">Institutional Member</option>
+          <option value="Student Member">Student Member</option>
         `;
       } else if (tab === 'users') {
         statusSelect.innerHTML += `
@@ -1525,6 +2125,9 @@
           <option value="SYSTEM">System Engine</option>
         `;
       }
+
+      statusSelect.value = filterState.status || 'all';
+      categorySelect.value = filterState.category || 'all';
     }
 
     function handleFilterChange(key, value) {
@@ -1560,26 +2163,40 @@
       if (!Array.isArray(items)) return [];
       let result = [...items];
 
-      if (filterState.search.trim()) {
-        const q = filterState.search.toLowerCase();
+      if (filterState.search && filterState.search.trim()) {
+        const q = filterState.search.toLowerCase().trim();
         result = result.filter(item => {
           return Object.values(item).some(val => val && String(val).toLowerCase().includes(q));
         });
       }
 
-      if (filterState.status !== 'all') {
+      if (filterState.status && filterState.status !== 'all') {
+        const targetStatus = filterState.status.toLowerCase().trim();
         result = result.filter(item => {
           if (statusField === 'is_active') {
-            return filterState.status === 'active' ? item.is_active : !item.is_active;
+            return targetStatus === 'active' ? item.is_active : !item.is_active;
           }
-          return String(item[statusField] || '').toLowerCase() === filterState.status.toLowerCase();
+          const itemStatus = String(item[statusField] || '').toLowerCase().trim();
+          return itemStatus === targetStatus || itemStatus.includes(targetStatus) || targetStatus.includes(itemStatus);
         });
       }
 
-      if (filterState.category !== 'all') {
+      if (filterState.category && filterState.category !== 'all') {
+        const selected = filterState.category.toLowerCase().trim();
         result = result.filter(item => {
-          const val = String(item[categoryField] || item.service_category || item.department || item.offering_type || item.role || '').toLowerCase();
-          return val === filterState.category.toLowerCase();
+          const candidateVals = [
+            item[categoryField],
+            item.job_title,
+            item.event_title,
+            item.payment_method,
+            item.service_category,
+            item.department,
+            item.membership_type,
+            item.offering_type,
+            item.role
+          ].filter(Boolean).map(v => String(v).toLowerCase().trim());
+
+          return candidateVals.some(val => val === selected || val.includes(selected) || selected.includes(val));
         });
       }
 
@@ -1837,6 +2454,7 @@
         const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/event-registrations`, { headers: getAuthHeaders() });
         tableData.registrations = data.registrations || [];
         document.getElementById('badge-registrations-count').textContent = tableData.registrations.length;
+        if (currentTab === 'registrations') populateFilterDropdowns('registrations');
         renderRegistrationsTable();
       } catch (err) {
         showToast('Error loading registrations', 'error');
@@ -1930,10 +2548,15 @@
         <tr class="hover:bg-emerald-50/40 cursor-pointer transition-colors" onclick="openRowDetails('events', ${ev.id})">
           <td class="p-3"><span class="px-2 py-0.5 bg-sky-50 text-sky-800 font-bold rounded text-[10px]">${ev.category}</span></td>
           <td class="p-3">
-            <span class="block font-bold text-slate-900">${ev.title}</span>
-            <span class="block text-[11px] text-slate-500 truncate max-w-sm">${ev.description}</span>
+            <div class="flex items-center gap-3">
+              ${ev.image_url ? `<img src="${ev.image_url}" alt="Poster" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shrink-0 shadow-2xs">` : `<div class="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-xs shrink-0"><i class="bi bi-image"></i></div>`}
+              <div class="min-w-0">
+                <span class="block font-bold text-slate-900 truncate max-w-xs">${ev.title}</span>
+                <span class="block text-[11px] text-slate-500 truncate max-w-xs">${ev.description}</span>
+              </div>
+            </div>
           </td>
-          <td class="p-3 text-slate-600 font-mono text-[11px]">${ev.event_date}</td>
+          <td class="p-3 text-slate-600 font-mono text-[11px]">${ev.event_date || 'N/A'}</td>
           <td class="p-3 text-slate-500">${ev.location}</td>
           <td class="p-3">
             <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
@@ -1956,42 +2579,108 @@
       }
       const isEdit = !!id;
       const ev = isEdit ? tableData.events.find(e => e.id === id) : {};
+      const rawCat = ev.category || '';
+      const selectedType = ['Upcoming Conference', 'Faculty Development Program', 'Webinar', 'Hands on Training', 'Internship', 'Hackathon', 'Seminar'].find(t => rawCat.includes(t)) || 'Hackathon';
+      const selectedField = ['Medical & Life Sciences', 'Business & Management', 'Education & Humanities', 'Engineering & Tech'].find(f => rawCat.includes(f)) || 'Engineering & Tech';
 
       showModal(`
         <h3 class="text-base font-bold font-heading text-slate-900">${isEdit ? 'Edit Event' : 'Add New Event'}</h3>
         <form onsubmit="saveEvent(event, ${id || 'null'})" class="space-y-3 text-xs">
           <div>
             <label class="block text-slate-600 font-semibold mb-1">Event Title</label>
-            <input type="text" id="ev-title" required value="${ev.title || ''}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            <input type="text" id="ev-title" required value="${ev.title || ''}" placeholder="National AI Hackathon 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-slate-600 font-semibold mb-1">Category</label>
-              <input type="text" id="ev-category" value="${ev.category || 'Hackathon'}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+              <label class="block text-slate-600 font-semibold mb-1">Event Type (Tier 1)</label>
+              <select id="ev-type" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+                <option value="Upcoming Conference" ${selectedType === 'Upcoming Conference' ? 'selected' : ''}>Upcoming Conference</option>
+                <option value="Faculty Development Program" ${selectedType === 'Faculty Development Program' ? 'selected' : ''}>Faculty Development Program</option>
+                <option value="Webinar" ${selectedType === 'Webinar' ? 'selected' : ''}>Webinar</option>
+                <option value="Hands on Training" ${selectedType === 'Hands on Training' ? 'selected' : ''}>Hands on Training</option>
+                <option value="Internship" ${selectedType === 'Internship' ? 'selected' : ''}>Internship</option>
+                <option value="Hackathon" ${selectedType === 'Hackathon' ? 'selected' : ''}>Hackathon</option>
+                <option value="Seminar" ${selectedType === 'Seminar' ? 'selected' : ''}>Seminar</option>
+              </select>
             </div>
             <div>
-              <label class="block text-slate-600 font-semibold mb-1">Event Date</label>
-              <input type="text" id="ev-date" value="${ev.event_date || ''}" placeholder="Sept 25, 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+              <label class="block text-slate-600 font-semibold mb-1">Field / Domain (Tier 3)</label>
+              <select id="ev-field" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+                <option value="Engineering & Tech" ${selectedField === 'Engineering & Tech' ? 'selected' : ''}>Engineering & Tech</option>
+                <option value="Medical & Life Sciences" ${selectedField === 'Medical & Life Sciences' ? 'selected' : ''}>Medical & Life Sciences</option>
+                <option value="Business & Management" ${selectedField === 'Business & Management' ? 'selected' : ''}>Business & Management</option>
+                <option value="Education & Humanities" ${selectedField === 'Education & Humanities' ? 'selected' : ''}>Education & Humanities</option>
+              </select>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Event Date (Datepicker)</label>
+              <input type="date" id="ev-date" value="${ev.event_date || ''}" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
             <div>
               <label class="block text-slate-600 font-semibold mb-1">Location</label>
               <input type="text" id="ev-location" value="${ev.location || ''}" placeholder="SST Hub, Salem" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
             </div>
-            <div>
-              <label class="block text-slate-600 font-semibold mb-1">Registration Fee</label>
-              <input type="text" id="ev-fee" value="${ev.registration_fee || 'Free'}" placeholder="₹499 / Team or Free" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+          </div>
+
+          <!-- EVENT POSTER IMAGE BLOB UPLOAD -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+            <label class="block text-slate-700 font-semibold text-xs flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><i class="bi bi-image text-[#123B32]"></i> Event Poster Banner (File / BLOB Upload)</span>
+              <span class="text-[10px] text-slate-500">Max 5MB (PNG/JPG/WebP)</span>
+            </label>
+            <input type="file" id="ev-poster-file" accept="image/*" onchange="handleEventPosterUpload(event)" class="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs cursor-pointer">
+            <input type="hidden" id="ev-image-url" value="${ev.image_url || ''}">
+            
+            <div id="ev-poster-preview-container" class="${ev.image_url ? '' : 'hidden'} pt-1 flex items-center gap-3">
+              <img id="ev-poster-preview-img" src="${ev.image_url || ''}" alt="Event Poster Preview" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shadow-2xs">
+              <div class="text-[11px] text-slate-600">
+                <span class="font-bold text-emerald-700 flex items-center gap-1"><i class="bi bi-check-circle-fill"></i> Event Poster Attached</span>
+                <span class="text-slate-400 text-[10px] block">Poster image BLOB will be stored in database and shown on event cards.</span>
+              </div>
             </div>
           </div>
-          <div>
-            <label class="block text-slate-600 font-semibold mb-1">Status</label>
-            <select id="ev-status" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
-              <option value="Upcoming" ${ev.status === 'Upcoming' ? 'selected' : ''}>Upcoming</option>
-              <option value="Completed" ${ev.status === 'Completed' ? 'selected' : ''}>Completed</option>
-              <option value="Cancelled" ${ev.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-            </select>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Registration Fee</label>
+              <input type="text" id="ev-fee" oninput="updateEventQrPreview()" value="${ev.registration_fee || 'Free'}" placeholder="₹499 / Team or Free" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-semibold mb-1">Status (Tier 2)</label>
+              <select id="ev-status" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+                <option value="Upcoming" ${ev.status === 'Upcoming' ? 'selected' : ''}>Upcoming</option>
+                <option value="Completed" ${ev.status === 'Completed' ? 'selected' : ''}>Completed / Past Event</option>
+                <option value="Cancelled" ${ev.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+              </select>
+            </div>
           </div>
+
+          <!-- PAYMENT UPI ID & AUTO QR CODE ENGINE -->
+          <div class="p-3.5 bg-emerald-50/50 border border-emerald-200 rounded-2xl space-y-2.5">
+            <div>
+              <label class="block text-slate-700 font-bold mb-1 flex items-center justify-between text-xs">
+                <span class="flex items-center gap-1.5"><i class="bi bi-wallet2 text-[#123B32]"></i> Payment Receiver UPI ID (VPA)</span>
+                <span class="text-[10px] text-emerald-700 font-semibold bg-emerald-100 px-2 py-0.5 rounded-full">Auto-generates QR</span>
+              </label>
+              <div class="relative">
+                <i class="bi bi-upc-scan text-slate-400 absolute left-3 top-2.5 text-xs"></i>
+                <input type="text" id="ev-upi" oninput="updateEventQrPreview()" value="${ev.upi_id || 'shazusofttechnologies@upi'}" placeholder="e.g. shazusofttechnologies@upi" class="w-full pl-8 pr-3 py-2 bg-white border border-emerald-300 rounded-xl text-slate-900 font-mono text-xs focus:outline-none focus:border-[#123B32]">
+              </div>
+            </div>
+
+            <!-- DYNAMIC LIVE QR PREVIEW CARD -->
+            <div id="ev-qr-preview-box" class="p-2.5 bg-white border border-emerald-200 rounded-xl flex items-center gap-3 shadow-2xs">
+              <div class="bg-white p-1 rounded-lg border border-slate-200 shrink-0">
+                <img id="ev-qr-img-preview" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=upi://pay?pa=shazusofttechnologies@upi%26pn=ShazuSoftTechnologies%26am=499%26cu=INR" alt="QR Preview" class="w-14 h-14 object-contain">
+              </div>
+              <div class="text-[11px] text-slate-600 space-y-0.5">
+                <span class="font-bold text-slate-900 flex items-center gap-1"><i class="bi bi-shield-check text-emerald-600"></i> Auto-Generated Payment QR Ready</span>
+                <span class="text-slate-500 block leading-tight text-[10.5px]">Attendees will scan this QR code directly in events page modal. <strong>UPI ID remains hidden</strong> for security.</span>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label class="block text-slate-600 font-semibold mb-1">Description</label>
             <textarea id="ev-desc" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 h-16 focus:outline-none focus:border-[#123B32]">${ev.description || ''}</textarea>
@@ -2002,16 +2691,82 @@
           </div>
         </form>
       `);
+
+      setTimeout(() => updateEventQrPreview(), 50);
+    }
+
+    function handleEventPosterUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Poster file size should be less than 5MB', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result;
+        const hiddenInput = document.getElementById('ev-image-url');
+        const previewImg = document.getElementById('ev-poster-preview-img');
+        const container = document.getElementById('ev-poster-preview-container');
+        if (hiddenInput) hiddenInput.value = base64Data;
+        if (previewImg && container) {
+          previewImg.src = base64Data;
+          container.classList.remove('hidden');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    window.handleEventPosterUpload = handleEventPosterUpload;
+
+    function updateEventQrPreview() {
+      const upiInput = document.getElementById('ev-upi');
+      const feeInput = document.getElementById('ev-fee');
+      const titleInput = document.getElementById('ev-title');
+      const qrImg = document.getElementById('ev-qr-img-preview');
+      const previewBox = document.getElementById('ev-qr-preview-box');
+
+      if (!upiInput || !qrImg || !previewBox) return;
+
+      const upi = upiInput.value.trim() || 'shazusofttechnologies@upi';
+      const fee = feeInput ? feeInput.value.trim() : 'Free';
+      const title = titleInput ? titleInput.value.trim() : 'SST Event';
+      const isFree = fee.toLowerCase().includes('free') || fee === '0' || fee === '';
+
+      if (isFree) {
+        previewBox.classList.add('opacity-50');
+        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=FREE_EVENT_NO_PAYMENT';
+      } else {
+        previewBox.classList.remove('opacity-50');
+        const numAmount = (fee.match(/\d+/) || ['499'])[0];
+        const upiUri = `upi://pay?pa=${encodeURIComponent(upi)}&pn=Shazu%20Soft%20Technologies&am=${numAmount}&cu=INR&tn=${encodeURIComponent(title.slice(0, 30))}`;
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(upiUri)}`;
+      }
     }
 
     async function saveEvent(e, id = null) {
       e.preventDefault();
+      const eventType = document.getElementById('ev-type').value;
+      const eventField = document.getElementById('ev-field').value;
+      const category = `${eventType} | ${eventField}`;
+      const title = document.getElementById('ev-title').value;
+      const fee = document.getElementById('ev-fee').value;
+      const upi = (document.getElementById('ev-upi')?.value || 'shazusofttechnologies@upi').trim();
+      const numAmount = (fee.match(/\d+/) || ['0'])[0];
+
+      const upiUri = `upi://pay?pa=${encodeURIComponent(upi)}&pn=Shazu%20Soft%20Technologies&am=${numAmount}&cu=INR&tn=${encodeURIComponent(title.slice(0, 30))}`;
+      const payment_qr = (fee.toLowerCase().includes('free') || numAmount === '0')
+        ? ''
+        : `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUri)}`;
+
       const body = {
-        title: document.getElementById('ev-title').value,
-        category: document.getElementById('ev-category').value,
+        title: title,
+        category: category,
         event_date: document.getElementById('ev-date').value,
         location: document.getElementById('ev-location').value,
-        registration_fee: document.getElementById('ev-fee').value,
+        registration_fee: fee,
+        upi_id: upi,
+        payment_qr: payment_qr,
+        image_url: document.getElementById('ev-image-url')?.value || '',
         description: document.getElementById('ev-desc').value,
         status: document.getElementById('ev-status').value
       };
@@ -2176,6 +2931,7 @@
         const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/applications`, { headers: getAuthHeaders() });
         tableData.applications = data.applications || [];
         document.getElementById('badge-applications-count').textContent = tableData.applications.length;
+        if (currentTab === 'applications') populateFilterDropdowns('applications');
         renderApplicationsTable();
       } catch (err) {
         showToast('Error loading applications', 'error');
@@ -2270,6 +3026,90 @@
           await safeFetchJson(`${API_BASE}/api/admin/applications/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
           showToast('Application deleted');
           loadApplications();
+        } catch (err) {
+          showToast('Delete failed', 'error');
+        }
+      });
+    }
+
+    // ==========================================
+    // TAB: MEMBERSHIPS CRUD & STATUS TRACKER
+    // ==========================================
+    async function loadMemberships() {
+      renderTableSkeleton('memberships-table-body');
+      try {
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/memberships`, { headers: getAuthHeaders() });
+        tableData.memberships = data.memberships || [];
+        const badgeEl = document.getElementById('badge-memberships-count');
+        if (badgeEl) badgeEl.textContent = tableData.memberships.length;
+        renderMembershipsTable();
+      } catch (err) {
+        showToast('Error loading memberships', 'error');
+      }
+    }
+
+    function renderMembershipsTable() {
+      const filtered = filterAndSortArray(tableData.memberships, 'created_at', 'name', 'status', 'membership_type');
+      document.getElementById('filter-records-count').textContent = `Showing ${filtered.length} of ${tableData.memberships.length} memberships`;
+
+      const tbody = document.getElementById('memberships-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = filtered.map(m => `
+        <tr class="hover:bg-emerald-50/40 cursor-pointer transition-colors" onclick="openRowDetails('memberships', ${m.id})">
+          <td class="p-3 text-slate-500 font-mono text-[11px]">${new Date(m.created_at).toLocaleDateString()}</td>
+          <td class="p-3">
+            <span class="block font-bold text-slate-900">${m.name}</span>
+            <span class="block text-[11px] text-slate-500">${m.email} • ${m.phone || '-'}</span>
+            <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-[10px] rounded"><i class="bi bi-award"></i> ${m.token_no || 'Token Pending'}</span>
+          </td>
+          <td class="p-3">
+            <span class="font-bold text-slate-900 block">${m.membership_type}</span>
+            <span class="text-[10px] text-slate-500 block truncate max-w-[200px]">${m.association_name || 'SST Network'}</span>
+          </td>
+          <td class="p-3">
+            <span class="font-semibold text-slate-800 block">${m.present_designation || 'Member'}</span>
+            <span class="text-[10px] text-slate-500 block truncate max-w-[220px]">${m.professional_qualification || ''} • ${m.organization_name_address || ''}</span>
+          </td>
+          <td class="p-3" onclick="event.stopPropagation()">
+            <select onchange="updateMembershipStatus(${m.id}, this.value)" class="bg-white text-slate-800 border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-semibold cursor-pointer shadow-2xs">
+              <option value="Pending Review" ${m.status === 'Pending Review' ? 'selected' : ''}>Pending Review</option>
+              <option value="Approved" ${m.status === 'Approved' || m.status === 'Active Member' ? 'selected' : ''}>Approved & Charter Granted</option>
+              <option value="Rejected" ${m.status === 'Rejected' ? 'selected' : ''}>Declined</option>
+            </select>
+          </td>
+          <td class="p-3 text-right space-x-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
+            <button onclick="openRowDetails('memberships', ${m.id})" title="View Full 11-Field Dossier" class="p-1.5 bg-slate-100 hover:bg-[#123B32] hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-eye"></i></button>
+            <button onclick="confirmDeleteMembership(${m.id})" title="Delete Application" class="p-1.5 bg-slate-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No membership applications found.</td></tr>';
+    }
+
+    async function updateMembershipStatus(id, status, admin_notes = undefined) {
+      try {
+        const body = { status };
+        if (admin_notes !== undefined) body.admin_notes = admin_notes;
+
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/memberships/${id}/status`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(body)
+        });
+        if (!ok) throw new Error(data.error || 'Status update failed');
+        showToast(status === 'Approved' ? 'Membership approved! Official dossier confirmation emailed.' : `Status updated to ${status}`);
+        loadMemberships();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function confirmDeleteMembership(id) {
+      showConfirmModal('Delete Membership Dossier', 'Are you sure you want to remove this membership record?', 'Delete Record', async () => {
+        try {
+          await safeFetchJson(`${API_BASE}/api/admin/memberships/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          showToast('Membership deleted');
+          loadMemberships();
         } catch (err) {
           showToast('Delete failed', 'error');
         }
@@ -2402,6 +3242,8 @@
       try {
         const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/courses-services`, { headers: getAuthHeaders() });
         tableData.offerings = data.offerings || [];
+        const badgeOff = document.getElementById('badge-offerings-count');
+        if (badgeOff) badgeOff.textContent = tableData.offerings.length;
         renderOfferingsTable();
       } catch (err) {
         showToast('Error loading courses/services', 'error');
@@ -2782,10 +3624,12 @@
       else if (currentTab === 'events') dataToExport = tableData.events;
       else if (currentTab === 'careers') dataToExport = tableData.careers;
       else if (currentTab === 'applications') dataToExport = tableData.applications;
+      else if (currentTab === 'memberships') dataToExport = tableData.memberships;
       else if (currentTab === 'announcements') dataToExport = tableData.announcements;
       else if (currentTab === 'offerings') dataToExport = tableData.offerings;
       else if (currentTab === 'users') dataToExport = tableData.users;
       else if (currentTab === 'slider') dataToExport = tableData.slides;
+      else if (currentTab === 'gallery') dataToExport = tableData.gallery;
       else if (currentTab === 'audit') dataToExport = tableData.audit;
       else if (currentTab === 'analytics') dataToExport = (tableData.analytics && tableData.analytics.recentTransactions) ? tableData.analytics.recentTransactions : [];
 
@@ -2856,6 +3700,7 @@
               <span class="font-bold text-slate-900 text-sm">${item.name}</span>
               <span class="block text-slate-500 font-mono text-[11px] mt-0.5">${item.email}</span>
               <span class="block text-slate-500 text-[11px]">${item.phone || 'No phone provided'}</span>
+              <div class="mt-2 inline-block px-2.5 py-0.5 bg-slate-100 text-slate-700 font-mono text-[10px] font-bold rounded"><i class="bi bi-ticket-detailed"></i> ${item.token_no || 'Token Pending'}</div>
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="block text-slate-400 font-mono text-[10px] uppercase">Pipeline Stage & Category</span>
@@ -2869,6 +3714,15 @@
             <div class="font-bold text-slate-900 mb-1">${item.subject || 'General Inquiry'}</div>
             <p class="whitespace-pre-line text-slate-700 leading-relaxed">${item.message || 'No additional note provided.'}</p>
           </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+            <label class="block text-slate-700 font-bold flex items-center gap-1.5">
+              <i class="bi bi-pencil-square text-[#123B32]"></i> Admin Notes & Remarks (Candidate can view via Token)
+            </label>
+            <textarea id="modal-admin-notes-${item.id}" rows="2" placeholder="Add official admin feedback or internal action item..." class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#123B32]">${item.admin_notes || ''}</textarea>
+            <div class="flex justify-end">
+              <button onclick="saveRowNotes('leads', ${item.id})" class="px-3 py-1.5 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-lg text-xs font-bold cursor-pointer">Save Remarks</button>
+            </div>
+          </div>
         `;
         actionsHtml = `
           <button onclick="openSendEmailModal('${item.email}', '${item.name}', 'RE: ${item.subject || 'Inquiry Follow-up'}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-envelope-fill"></i> Send Email</button>
@@ -2877,28 +3731,76 @@
       } else if (tabName === 'registrations') {
         title = `Event Pass Dossier: ${item.name}`;
         contentHtml = `
-          <div class="grid grid-cols-2 gap-3 text-xs">
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-              <span class="block text-slate-400 font-mono text-[10px] uppercase">Attendee Profile</span>
-              <span class="font-bold text-slate-900 text-sm">${item.name}</span>
-              <span class="block text-slate-500 font-mono text-[11px] mt-0.5">${item.email}</span>
-              <span class="block text-slate-500 text-[11px]">${item.phone || 'No phone provided'}</span>
-              <div class="mt-2 inline-block px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-xs rounded-lg"><i class="bi bi-pass"></i> ${item.token_no || 'Pass Pending'}</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400 font-mono text-[10px] uppercase">Attendee Profile</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">${item.attendee_category || 'Student (UG / PG)'}</span>
+              </div>
+              <span class="font-bold text-slate-900 text-sm block pt-1">${item.name}</span>
+              <span class="block text-slate-600 font-mono text-[11px]">${item.email}</span>
+              <span class="block text-slate-600 text-[11px]">${item.phone || 'No phone'} ${item.gender ? `• ${item.gender}` : ''}</span>
+              <div class="pt-1.5">
+                <span class="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-xs rounded-lg"><i class="bi bi-pass"></i> ${item.token_no || 'Pass Pending'}</span>
+              </div>
             </div>
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
               <span class="block text-slate-400 font-mono text-[10px] uppercase">Event &amp; Payment Status</span>
               <span class="font-bold text-amber-900 text-xs block">${item.event_title}</span>
-              <span class="inline-block mt-1 px-2 py-0.5 rounded font-mono font-bold text-xs bg-slate-200 text-slate-800">Fee: ${item.registration_fee || 'Free'}</span>
-              <span class="block mt-2 font-mono text-xs font-bold ${item.payment_status === 'Verified' ? 'text-emerald-700' : 'text-amber-700'}">Status: ${item.payment_status}</span>
-              <span class="block text-slate-400 font-mono text-[10px]">Registered: ${new Date(item.registered_at).toLocaleString()}</span>
+              <div class="flex items-center gap-2 pt-1">
+                <span class="px-2 py-0.5 rounded font-mono font-bold text-xs bg-slate-200 text-slate-800">Fee: ${item.registration_fee || 'Free'}</span>
+                <span class="px-2 py-0.5 rounded font-bold text-xs ${item.payment_status === 'Verified' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${item.payment_status}</span>
+              </div>
+              <span class="block text-slate-400 font-mono text-[10px] pt-1">Registered: ${new Date(item.registered_at).toLocaleString()}</span>
             </div>
           </div>
+
+          <!-- Academic & Institutional Details Bento -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+            <h4 class="font-bold text-slate-700 text-xs flex items-center gap-1.5 border-b border-slate-200 pb-1.5">
+              <i class="bi bi-building text-[#123B32]"></i> Academic &amp; Institutional Credentials
+            </h4>
+            <div class="grid grid-cols-2 gap-3 text-[11.5px]">
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-mono">School / College / Organization:</span>
+                <span class="font-bold text-slate-900">${item.organization || 'N/A'}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-mono">Degree &amp; Dept / Class &amp; Stream:</span>
+                <span class="font-semibold text-slate-800">${item.department_degree || 'N/A'}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-mono">Year of Study / Designation:</span>
+                <span class="font-semibold text-slate-800">${item.designation_year || 'N/A'}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-mono">Roll No / Reg No / Staff ID:</span>
+                <span class="font-mono font-semibold text-slate-800">${item.roll_no_employee_id || 'N/A'}</span>
+              </div>
+              <div class="col-span-2">
+                <span class="text-slate-400 block text-[10px] uppercase font-mono">City &amp; State:</span>
+                <span class="font-semibold text-slate-800">${item.city_state || 'Tamil Nadu, India'}</span>
+              </div>
+            </div>
+          </div>
+
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
             <span class="block text-slate-500 font-bold mb-1">Transaction ID / Payment UTR:</span>
             <span class="font-mono font-bold text-sm text-[#123B32]">${item.transaction_id || 'N/A (Free Event / Walk-in)'}</span>
           </div>
+
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+            <label class="block text-slate-700 font-bold flex items-center gap-1.5">
+              <i class="bi bi-pencil-square text-[#123B32]"></i> Admin Remarks &amp; Verification Notes (Attendee will see in Status Checker)
+            </label>
+            <textarea id="modal-admin-notes-${item.id}" rows="2" placeholder="e.g. Venue gate pass issued. Please report at Badge Counter #2..." class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#123B32]">${item.admin_notes || ''}</textarea>
+            <div class="flex justify-end">
+              <button onclick="saveRowNotes('registrations', ${item.id})" class="px-3 py-1.5 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-lg text-xs font-bold cursor-pointer">Save Remarks</button>
+            </div>
+          </div>
         `;
         actionsHtml = `
+          <button onclick="openSendEmailModal('${item.email}', '${item.name}', 'Pass Update: ${item.event_title || 'SST Event'}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-envelope-fill"></i> Email Pass</button>
           ${item.payment_status !== 'Verified' ? `<button onclick="updateRegistrationPaymentStatus(${item.id}, 'Verified'); closeModal();" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-check-circle"></i> Verify Payment</button>` : ''}
           <button onclick="confirmDeleteRegistration(${item.id}); closeModal();" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold">Delete Record</button>
         `;
@@ -2965,6 +3867,7 @@
                 <span class="font-bold text-slate-900 text-sm block">${item.applicant_name}</span>
                 <span class="text-slate-500 font-mono text-xs block mt-0.5">${item.email}</span>
                 <span class="text-slate-500 text-xs block">${item.phone || '-'}</span>
+                <div class="mt-2 inline-block px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-[10px] rounded"><i class="bi bi-hash"></i> ${item.token_no || 'Token Pending'}</div>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <span class="block text-slate-400 font-mono text-[10px] uppercase">Target Position &amp; Stage</span>
@@ -2985,11 +3888,83 @@
               <span class="block text-slate-500 font-bold mb-1">Cover Note / Candidate Message:</span>
               <p class="whitespace-pre-line text-slate-700 leading-relaxed">${item.message || 'No additional note provided.'}</p>
             </div>
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+              <label class="block text-slate-700 font-bold flex items-center gap-1.5">
+                <i class="bi bi-pencil-square text-[#123B32]"></i> Admin Remarks / Feedback (Visible on Token Tracker)
+              </label>
+              <textarea id="modal-admin-notes-${item.id}" rows="2" placeholder="e.g. Technical interview scheduled for Friday 3:00 PM via Google Meet..." class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#123B32]">${item.admin_notes || ''}</textarea>
+              <div class="flex justify-end">
+                <button onclick="saveRowNotes('applications', ${item.id})" class="px-3 py-1.5 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-lg text-xs font-bold cursor-pointer">Save Remarks</button>
+              </div>
+            </div>
           </div>
         `;
         actionsHtml = `
           <button onclick="openSendEmailModal('${item.email}', '${item.applicant_name}', 'Interview Update: ${item.job_title}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-envelope-fill"></i> Send Email</button>
           <button onclick="confirmDeleteApplication(${item.id}); closeModal();" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold">Delete Application</button>
+        `;
+      } else if (tabName === 'memberships') {
+        title = `11-Field Membership Application Dossier: ${item.name}`;
+        contentHtml = `
+          <div class="space-y-3 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="block text-slate-400 font-mono text-[10px] uppercase">1 & 2. Chapter & Membership Type</span>
+                <span class="font-bold text-slate-900 text-sm block">${item.membership_type}</span>
+                <span class="text-slate-600 text-xs block mt-0.5">${item.association_name || 'SST Academic Network'}</span>
+                <div class="mt-2 inline-block px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-[10px] rounded"><i class="bi bi-award"></i> ${item.token_no || 'Token Pending'}</div>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="block text-slate-400 font-mono text-[10px] uppercase">3 & 4. Name & Date of Birth</span>
+                <span class="font-bold text-slate-900 text-sm block">${item.name}</span>
+                <span class="text-slate-600 font-mono text-xs block mt-0.5">DOB: ${item.dob || 'Not specified'}</span>
+                <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase ${item.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">Status: ${item.status}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="block text-slate-400 font-mono text-[10px] uppercase">6 & 7. Contact Details</span>
+                <span class="text-slate-900 font-mono text-xs block">${item.email}</span>
+                <span class="text-slate-600 text-xs block mt-0.5">Phone: ${item.phone || '-'}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="block text-slate-400 font-mono text-[10px] uppercase">8 & 9. Qualification & Role</span>
+                <span class="font-bold text-slate-900 text-xs block">${item.present_designation || 'Member'}</span>
+                <span class="text-slate-600 text-[11px] block mt-0.5">${item.professional_qualification || 'Degree on file'}</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+              <div>
+                <span class="block text-slate-400 font-mono text-[10px] uppercase">5. Area of Interest / Research Domain:</span>
+                <span class="text-slate-800 font-semibold text-xs">${item.area_of_interest || 'Technology & Engineering'}</span>
+              </div>
+              <div class="pt-1 border-t border-slate-200">
+                <span class="block text-slate-400 font-mono text-[10px] uppercase">10. Name & Address of Organization / University:</span>
+                <p class="text-slate-800 text-xs whitespace-pre-line">${item.organization_name_address || 'Not specified'}</p>
+              </div>
+              <div class="pt-1 border-t border-slate-200 flex items-center gap-1.5 text-[11px] text-emerald-800 font-semibold">
+                <i class="bi bi-check2-circle text-emerald-600"></i>
+                <span>11. Declaration Confirmed &amp; Signed Digitally</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+              <label class="block text-slate-700 font-bold flex items-center gap-1.5">
+                <i class="bi bi-pencil-square text-[#123B32]"></i> Official Admin Notes / Council Remarks (Visible on Member Token Tracker)
+              </label>
+              <textarea id="modal-admin-notes-${item.id}" rows="2" placeholder="e.g. Charter approved by Review Board. Official digital credentials dispatch underway..." class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#123B32]">${item.admin_notes || ''}</textarea>
+              <div class="flex justify-end">
+                <button onclick="saveRowNotes('memberships', ${item.id})" class="px-3 py-1.5 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-lg text-xs font-bold cursor-pointer">Save Remarks</button>
+              </div>
+            </div>
+          </div>
+        `;
+        actionsHtml = `
+          <button onclick="openSendEmailModal('${item.email}', '${item.name}', 'SST Membership Update: ${item.token_no}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-envelope-fill"></i> Send Email</button>
+          ${item.status !== 'Approved' ? `<button onclick="updateMembershipStatus(${item.id}, 'Approved'); closeModal();" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-award-fill"></i> Approve Charter</button>` : ''}
+          <button onclick="confirmDeleteMembership(${item.id}); closeModal();" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold">Delete Record</button>
         `;
       } else if (tabName === 'announcements') {
         title = `Announcement Details: ${item.title}`;
@@ -3142,6 +4117,57 @@
     }
 
     // ==========================================
+    // ADMIN REMARKS / NOTES PERSISTENCE HELPER
+    // ==========================================
+    async function saveRowNotes(tab, id) {
+      const textarea = document.getElementById(`modal-admin-notes-${id}`);
+      if (!textarea) return;
+      const notes = textarea.value.trim();
+
+      try {
+        let endpoint = '';
+        let body = { admin_notes: notes };
+
+        if (tab === 'leads') {
+          endpoint = `${API_BASE}/api/admin/leads/${id}/status`;
+          const item = tableData.leads.find(x => x.id === id);
+          body.status = item ? item.status : 'Contacted';
+        } else if (tab === 'registrations') {
+          endpoint = `${API_BASE}/api/admin/event-registrations/${id}/payment`;
+          const item = tableData.registrations.find(x => x.id === id);
+          body.payment_status = item ? item.payment_status : 'Verified';
+        } else if (tab === 'applications') {
+          endpoint = `${API_BASE}/api/admin/applications/${id}/status`;
+          const item = tableData.applications.find(x => x.id === id);
+          body.status = item ? item.status : 'Pending';
+        } else if (tab === 'memberships') {
+          endpoint = `${API_BASE}/api/admin/memberships/${id}/status`;
+          const item = tableData.memberships.find(x => x.id === id);
+          body.status = item ? item.status : 'Pending Review';
+        }
+
+        if (!endpoint) return;
+
+        const { ok, data } = await safeFetchJson(endpoint, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(body)
+        });
+
+        if (!ok) throw new Error(data.error || 'Failed to save remarks');
+        showToast('Admin notes saved! Candidate/attendee can now see these remarks via Token.');
+
+        // Update local cache
+        const item = (tableData[tab] || []).find(x => x.id === id);
+        if (item) item.admin_notes = notes;
+
+        renderCurrentTabFiltered();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ==========================================
     // RE-RENDER DISPATCHER & UI HELPERS
     // ==========================================
     function renderCurrentTabFiltered() {
@@ -3150,10 +4176,12 @@
       else if (currentTab === 'events') renderEventsTable();
       else if (currentTab === 'careers') renderCareersTable();
       else if (currentTab === 'applications') renderApplicationsTable();
+      else if (currentTab === 'memberships') renderMembershipsTable();
       else if (currentTab === 'announcements') renderAnnouncementsTable();
       else if (currentTab === 'offerings') renderOfferingsTable();
       else if (currentTab === 'users') renderUsersTable();
       else if (currentTab === 'slider') renderSliderTable();
+      else if (currentTab === 'gallery') renderGalleryTable();
       else if (currentTab === 'audit') renderAuditTable();
       else if (currentTab === 'analytics') loadAnalytics();
     }
@@ -3373,6 +4401,215 @@
           loadSlider();
         } catch (err) {
           showToast('Error deleting slide', 'error');
+        }
+      });
+    }
+
+    // ==========================================
+    // PHOTO GALLERY (BLOB STORAGE) CRUD
+    // ==========================================
+    async function loadGallery() {
+      try {
+        renderTableLoadingSkeleton('gallery-table-body', 5);
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/gallery`, { headers: getAuthHeaders() });
+        tableData.gallery = data.gallery || [];
+        const badgeCount = document.getElementById('badge-gallery-count');
+        if (badgeCount) badgeCount.textContent = tableData.gallery.length;
+        renderGalleryTable();
+      } catch (err) {
+        showToast('Error loading gallery photos', 'error');
+      }
+    }
+
+    function renderGalleryTable() {
+      const tbody = document.getElementById('gallery-table-body');
+      if (!tbody) return;
+
+      const items = filterAndSortArray(tableData.gallery, 'created_at', 'title', 'is_active', 'category');
+
+      tbody.innerHTML = items.map(item => `
+        <tr class="hover:bg-indigo-50/30 cursor-pointer transition-colors" onclick="openGalleryModal(${item.id})">
+          <td class="p-3">
+            <div class="relative w-24 h-16 rounded-xl overflow-hidden border border-slate-200 bg-slate-900 shadow-2xs group">
+              <img src="${item.image_blob}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='images/software.png'">
+            </div>
+          </td>
+          <td class="p-3">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-300/60 mb-1">${item.category || 'General'}</span>
+            <span class="block font-bold text-slate-900 text-xs leading-snug">${item.title}</span>
+          </td>
+          <td class="p-3 text-slate-500 text-xs max-w-sm leading-relaxed">${item.description || '—'}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${item.is_active !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'}">
+              ${item.is_active !== false ? 'Active' : 'Hidden'}
+            </span>
+          </td>
+          <td class="p-3 text-right space-x-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
+            <button onclick="openGalleryModal(${item.id})" title="Edit Photo" class="p-1.5 bg-slate-100 hover:bg-amber-600 hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-pencil"></i></button>
+            <button onclick="confirmDeleteGallery(${item.id})" title="Delete Photo" class="p-1.5 bg-slate-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-400">No gallery photos uploaded yet. Click "Upload New Photo" to add one.</td></tr>';
+    }
+
+    function openGalleryModal(id = null) {
+      if (!hasPermission('create') && !id) {
+        showToast('Creation is disabled for your access role', 'error');
+        return;
+      }
+      const isEdit = !!id;
+      const item = isEdit ? tableData.gallery.find(g => g.id === id) : {};
+
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900">${isEdit ? 'Edit Gallery Photo' : 'Upload Gallery Photo (Direct DB BLOB)'}</h3>
+        <form onsubmit="saveGallery(event, ${id || 'null'})" class="space-y-3.5 text-xs">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">Select Photo File (Converted & Saved as Base64/BLOB in Database) *</label>
+            
+            <label for="gallery-file-input" class="border-2 border-dashed border-indigo-200 hover:border-[#123B32] rounded-2xl p-5 text-center bg-slate-50 hover:bg-indigo-50/30 transition-colors cursor-pointer block">
+              <input type="file" id="gallery-file-input" accept="image/*" onchange="previewUploadedGallery(event)" class="hidden">
+              <div class="space-y-1.5">
+                <i class="bi bi-cloud-arrow-up-fill text-3xl text-[#123B32]"></i>
+                <div class="font-bold text-slate-800">Click to choose image file from device</div>
+                <div class="text-[10px] text-slate-500">Supports JPG, PNG, WEBP, SVG • Stored directly as BLOB payload in database</div>
+              </div>
+            </label>
+
+            <!-- Image Preview Box -->
+            <div id="gallery-preview-box" class="${item.image_blob ? '' : 'hidden'} mt-3 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="font-semibold text-slate-600">Selected Photo Preview:</span>
+                <span id="gallery-file-meta" class="text-slate-400 font-mono text-[10px]"></span>
+              </div>
+              <div class="h-40 w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 flex items-center justify-center shadow-inner">
+                <img id="gallery-img-preview" src="${item.image_blob || ''}" class="w-full h-full object-contain">
+              </div>
+            </div>
+
+            <!-- Hidden input holding the base64 BLOB -->
+            <input type="hidden" id="gallery-image-blob" value="${item.image_blob || ''}">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-700 font-bold mb-1">Photo Title / Event Name *</label>
+              <input type="text" id="gallery-title" required value="${item.title || ''}" placeholder="e.g. National Hackathon Award Ceremony" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+            <div>
+              <label class="block text-slate-700 font-bold mb-1">Category *</label>
+              <select id="gallery-category" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32] cursor-pointer">
+                <option value="Conferences & MoUs" ${item.category === 'Conferences & MoUs' ? 'selected' : ''}>Conferences & MoUs</option>
+                <option value="Conferences" ${item.category === 'Conferences' ? 'selected' : ''}>Conferences</option>
+                <option value="MoUs & Delegations" ${item.category === 'MoUs & Delegations' ? 'selected' : ''}>MoUs & Delegations</option>
+                <option value="Memberships" ${item.category === 'Memberships' ? 'selected' : ''}>Memberships</option>
+                <option value="Hackathons" ${item.category === 'Hackathons' ? 'selected' : ''}>Hackathons</option>
+                <option value="Workshops" ${item.category === 'Workshops' ? 'selected' : ''}>Workshops</option>
+                <option value="Celebrations" ${item.category === 'Celebrations' ? 'selected' : ''}>Celebrations</option>
+                <option value="General" ${item.category === 'General' ? 'selected' : ''}>General</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">Description / Event Context</label>
+            <textarea id="gallery-description" rows="2" placeholder="Describe the occasion, guests, or milestone..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">${item.description || ''}</textarea>
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <input type="checkbox" id="gallery-is-active" ${item.is_active !== false ? 'checked' : ''} class="w-4 h-4 text-emerald-600 rounded">
+            <label for="gallery-is-active" class="text-xs font-semibold text-slate-700">Display in Active Homepage Photo Gallery</label>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold">Cancel</button>
+            <button type="submit" class="px-5 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold shadow-sm">${isEdit ? 'Update Photo' : 'Save & Store in Database'}</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function previewUploadedGallery(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 12 * 1024 * 1024) {
+        showToast('Image size exceeds 12MB limit', 'error');
+        return;
+      }
+
+      const metaEl = document.getElementById('gallery-file-meta');
+      if (metaEl) {
+        metaEl.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target.result;
+        const blobInput = document.getElementById('gallery-image-blob');
+        const previewBox = document.getElementById('gallery-preview-box');
+        const imgPreview = document.getElementById('gallery-img-preview');
+        if (blobInput) blobInput.value = dataUrl;
+        if (imgPreview) imgPreview.src = dataUrl;
+        if (previewBox) previewBox.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveGallery(e, id) {
+      e.preventDefault();
+      const title = document.getElementById('gallery-title').value.trim();
+      const category = document.getElementById('gallery-category').value.trim();
+      const description = document.getElementById('gallery-description').value.trim();
+      const image_blob = document.getElementById('gallery-image-blob').value.trim();
+      const is_active = document.getElementById('gallery-is-active').checked;
+
+      if (!image_blob) {
+        showToast('Please select and upload an image file', 'error');
+        return;
+      }
+
+      const payload = { title, category, description, image_blob, is_active };
+
+      try {
+        if (id) {
+          const res = await safeFetchJson(`${API_BASE}/api/admin/gallery/${id}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error(res.data?.error || 'Failed to update gallery photo');
+          showToast('Gallery photo updated');
+        } else {
+          const res = await safeFetchJson(`${API_BASE}/api/admin/gallery`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error(res.data?.error || 'Failed to save photo');
+          showToast('Photo uploaded and stored in database as BLOB');
+        }
+        closeModal();
+        loadGallery();
+      } catch (err) {
+        showToast(err.message || 'Error saving gallery photo', 'error');
+      }
+    }
+
+    function confirmDeleteGallery(id) {
+      if (!hasPermission('delete')) {
+        showToast('Deletion disabled for your role', 'error');
+        return;
+      }
+      showConfirmModal('Delete Gallery Photo', 'Are you sure you want to permanently delete this photo from the database gallery?', 'Delete Photo', async () => {
+        try {
+          await safeFetchJson(`${API_BASE}/api/admin/gallery/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+          });
+          showToast('Gallery photo deleted');
+          loadGallery();
+        } catch (err) {
+          showToast('Error deleting photo', 'error');
         }
       });
     }
