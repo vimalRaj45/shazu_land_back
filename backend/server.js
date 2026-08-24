@@ -128,92 +128,7 @@ const mockDb = {
     { id: 1, title: 'ICET-2026 International Conference Call for Papers', category: 'Conference', link_url: '/events.html', is_pinned: true, status: 'Active', created_at: new Date() },
     { id: 2, title: 'SST 36-Hour National Innovation Hackathon Registration Open', category: 'Hackathon', link_url: '/events.html', is_pinned: true, status: 'Active', created_at: new Date() }
   ],
-  events: [
-    {
-      id: 1,
-      title: 'International Conference on Emerging Computing & AI Frontiers (ICET-2026)',
-      category: 'Upcoming Conference | Engineering & Tech',
-      description: 'Centralized global conference addressing neural architectures, deep reasoning models, and cloud database security.',
-      event_date: 'Sept 28, 2026',
-      location: 'Salem, Tamil Nadu (Hybrid)',
-      registration_fee: '₹1,499',
-      status: 'Upcoming',
-      image_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
-      created_at: new Date()
-    },
-    {
-      id: 2,
-      title: 'National Level 36-Hour SST Innovation Hackathon 2026',
-      category: 'Hackathon | Engineering & Tech',
-      description: 'Competitive rapid prototyping challenge to solve sustainable urbanization and fintech automation under strict 36-hour sprint constraints.',
-      event_date: 'Oct 12-14, 2026',
-      location: 'SST Innovation Hub, Salem',
-      registration_fee: '₹499 / Team',
-      status: 'Upcoming',
-      image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80',
-      created_at: new Date()
-    },
-    {
-      id: 3,
-      title: 'Faculty Development Program on Generative AI & Curriculum Modernization',
-      category: 'Faculty Development Program | Education & Humanities',
-      description: 'Intensive 5-day pedagogy enrichment workshop designed for college professors and lecturers to integrate AI development sandboxes into engineering curricula.',
-      event_date: 'Nov 05-09, 2026',
-      location: 'Virtual Classroom / Salem Center',
-      registration_fee: 'Free',
-      status: 'Upcoming',
-      image_url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80',
-      created_at: new Date()
-    },
-    {
-      id: 4,
-      title: 'Global Webinar on Medical Informatics & Biomedical Data Audits',
-      category: 'Webinar | Medical & Life Sciences',
-      description: 'Expert panel session featuring international clinical data scientists discussing machine learning pipelines in oncology analytics and patient privacy regulations.',
-      event_date: 'Oct 20, 2026',
-      location: 'Live Stream Webinar',
-      registration_fee: 'Free',
-      status: 'Upcoming',
-      image_url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80',
-      created_at: new Date()
-    },
-    {
-      id: 5,
-      title: 'Hands-on Training in Full-Stack Fastify & PostgreSQL Engineering',
-      category: 'Hands on Training | Engineering & Tech',
-      description: 'Practical code-along masterclass covering asynchronous microservices, JWT authentication, and relational database indexing for high throughput systems.',
-      event_date: 'Nov 18, 2026',
-      location: 'SST Labs, Salem',
-      registration_fee: '₹799',
-      status: 'Upcoming',
-      image_url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80',
-      created_at: new Date()
-    },
-    {
-      id: 6,
-      title: 'Winter Industrial Internship & Corporate Mentorship Program',
-      category: 'Internship | Engineering & Tech',
-      description: 'Structured 8-week corporate residency connecting aspiring software engineers with senior developers to build scalable enterprise web solutions.',
-      event_date: 'Dec 01, 2026 - Jan 25, 2027',
-      location: 'Salem & Remote',
-      registration_fee: '₹1,999',
-      status: 'Upcoming',
-      image_url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-      created_at: new Date()
-    },
-    {
-      id: 7,
-      title: 'Executive Seminar on Corporate Digital Transformation & MSME Scaling',
-      category: 'Seminar | Business & Management',
-      description: 'Leadership colloquium on digital business adoption, cloud enterprise migration, and capital resource optimization for emerging technology leaders.',
-      event_date: 'Aug 14, 2026',
-      location: 'Grand Palace Hall, Salem',
-      registration_fee: 'Free',
-      status: 'Past',
-      image_url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
-      created_at: new Date()
-    }
-  ],
+  events: [],
   careers: [],
   gallery: [
     {
@@ -1065,20 +980,7 @@ async function initDatabase() {
       `);
     }
 
-    // Seed default events if empty
-    const eventCheck = await client.query('SELECT COUNT(*) FROM events');
-    if (parseInt(eventCheck.rows[0].count, 10) === 0) {
-      await client.query(`
-        INSERT INTO events (title, category, description, event_date, location, registration_fee, status, image_url) VALUES
-        ('International Conference on Emerging Computing & AI Frontiers (ICET-2026)', 'Upcoming Conference | Engineering & Tech', 'Centralized global conference addressing neural architectures, deep reasoning models, and cloud database security. Selected papers published with DOI indexing.', 'Sept 28, 2026', 'Salem, Tamil Nadu (Hybrid)', '₹1,499', 'Upcoming', 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80'),
-        ('National Level 36-Hour SST Innovation Hackathon 2026', 'Hackathon | Engineering & Tech', 'Competitive rapid prototyping challenge to solve sustainable urbanization and fintech automation under strict 36-hour sprint constraints with ₹1.5L prize pool.', 'Oct 12-14, 2026', 'SST Innovation Hub, Salem', '₹499 / Team', 'Upcoming', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80'),
-        ('Faculty Development Program on Generative AI & Curriculum Modernization', 'Faculty Development Program | Education & Humanities', 'Intensive 5-day pedagogy enrichment workshop designed for college professors and lecturers to integrate AI development sandboxes into engineering curricula.', 'Nov 05-09, 2026', 'Virtual Classroom / Salem Center', 'Free', 'Upcoming', 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80'),
-        ('Global Webinar on Medical Informatics & Biomedical Data Audits', 'Webinar | Medical & Life Sciences', 'Expert panel session featuring international clinical data scientists discussing machine learning pipelines in oncology analytics and patient privacy regulations.', 'Oct 20, 2026', 'Live Stream Webinar', 'Free', 'Upcoming', 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80'),
-        ('Hands-on Training in Full-Stack Fastify & PostgreSQL Engineering', 'Hands on Training | Engineering & Tech', 'Practical code-along masterclass covering asynchronous microservices, JWT authentication, and relational database indexing for high throughput systems.', 'Nov 18, 2026', 'SST Labs, Salem', '₹799', 'Upcoming', 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80'),
-        ('Winter Industrial Internship & Corporate Mentorship Program', 'Internship | Engineering & Tech', 'Structured 8-week corporate residency connecting aspiring software engineers with senior developers to build scalable enterprise web solutions.', 'Dec 01, 2026 - Jan 25, 2027', 'Salem & Remote', '₹1,999', 'Upcoming', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80'),
-        ('Executive Seminar on Corporate Digital Transformation & MSME Scaling', 'Seminar | Business & Management', 'Leadership colloquium on digital business adoption, cloud enterprise migration, and capital resource optimization for emerging technology leaders.', 'Aug 14, 2026', 'Grand Palace Hall, Salem', 'Free', 'Past', 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80');
-      `);
-    }
+
 
 
     // 9. Analytics Events & Page Views
