@@ -117,8 +117,18 @@
             <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
           </button>
           <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
-            <a href="events.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Upcoming Events</a>
-            <a href="events.html?type=hackathon" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Hackathons & Contests</a>
+            <a href="events.html?type=conference" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-mortarboard-fill text-amber-500 text-[10px]"></i> Conferences & Symposia
+            </a>
+            <a href="events.html?type=hackathon" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-trophy-fill text-emerald-500 text-[10px]"></i> Hackathons & Contests
+            </a>
+            <a href="events.html?type=fdp" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-person-video3 text-blue-500 text-[10px]"></i> FDP & Workshops
+            </a>
+            <a href="events.html?type=courses" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-journal-code text-purple-500 text-[10px]"></i> Professional Courses
+            </a>
           </div>
         </div>
 
@@ -194,18 +204,32 @@
 
         <!-- Events Dropdown -->
         <div class="relative group">
-          <a href="events.html" class="nav-link-pill flex items-center gap-1">
+          <a href="events.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-calendar-alt text-[14px]"></i>
             <span>Events</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
           </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[240px]">
             <div class="nav-dropdown-menu p-1.5 space-y-0.5">
-              <a href="events.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Upcoming Events</span>
+              <a href="events.html?type=conference" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-mortarboard-fill text-amber-500"></i> Conferences & Symposia
+                </span>
               </a>
               <a href="events.html?type=hackathon" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Hackathons & Contests</span>
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-trophy-fill text-emerald-500"></i> Hackathons & Contests
+                </span>
+              </a>
+              <a href="events.html?type=fdp" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-person-video3 text-blue-500"></i> FDP & Workshops
+                </span>
+              </a>
+              <a href="events.html?type=courses" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-journal-code text-purple-500"></i> Professional Courses
+                </span>
               </a>
             </div>
           </div>
