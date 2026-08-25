@@ -132,6 +132,14 @@
           </div>
         </div>
 
+        <!-- Gallery Direct Link -->
+        <a href="gallery.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="bi bi-images text-base text-[#123B32]"></i>
+            <span>Gallery</span>
+          </div>
+        </a>
+
         <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <div class="flex items-center gap-3">
             <i class="uil uil-briefcase-alt text-base text-[#123B32]"></i>
@@ -236,11 +244,14 @@
           </div>
         </div>
 
-        <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+        <!-- Gallery Nav Pill -->
+        <a href="gallery.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="bi bi-images text-[14px]"></i>Gallery</a>
+
+        <a href="careers.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
 
         <!-- Contact Dropdown -->
         <div class="relative group">
-          <a href="contact.html" class="nav-link-pill flex items-center gap-1">
+          <a href="contact.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-envelope text-[14px]"></i>
             <span>Contact Us</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
@@ -551,9 +562,6 @@
           <div class="space-y-2">
             <h4 class="font-heading font-bold text-brand-green">Establish Campus Chapters</h4>
             <p class="text-brand-secText text-[11.5px] leading-relaxed">
-              Institutional members gain formal rights to charter local student chapters, inviting guest developers to give expert seminars right inside their premises.
-            </p>
-          </div>
         </div>
       </div>
     </section>
@@ -570,8 +578,7 @@
         </div>
 
         <form id="membership-form" onsubmit="window.submitMembershipApplication(event)" class="space-y-6 border border-slate-200 dark:border-slate-800 p-6 sm:p-8 rounded-3xl bg-[#F8FAFC] dark:bg-slate-950/70 shadow-xl backdrop-blur-md">
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <!-- 1. Association Name -->
             <div>
               <label for="member-association" class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5 flex items-center gap-1.5">
@@ -591,7 +598,7 @@
                 <i class="bi bi-award text-emerald-600 dark:text-emerald-400"></i> Membership Type *
               </label>
               <select id="member-category" required class="w-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all cursor-pointer">
-                <option value="Professional Member">Professional Member (Engineers, Faculty & Scientists)</option>
+                <option value="Professional Member">Professional Member (Faculty & Scientists)</option>
                 <option value="Institutional Member">Institutional Member (Universities, Colleges & Corporates)</option>
                 <option value="Student Member">Student Member (UG/PG & Research Scholars)</option>
               </select>

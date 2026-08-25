@@ -414,13 +414,7 @@
     }
   }
 
-  window.eventFilterState = {
-    type: 'all',
-    search: '',
-    status: 'all',
-    field: 'all'
-  };
-
+  // 4. Load Dynamic Events & Courses Listing
   function renderEventsSkeleton(container) {
     if (!container) return;
     container.innerHTML = Array.from({ length: 3 }).map(() => `
@@ -448,7 +442,6 @@
     `).join('');
   }
 
-  // 4. Load Dynamic Events & Courses Listing
   async function loadEvents() {
     const container = document.getElementById('dynamic-events-container');
     if (!container) return;
@@ -475,18 +468,55 @@
       }));
 
       window.allEventsData = [...(evRes.events || []), ...coursesAsEvents];
+      if (typeof window.handleEventTypeUrlParam === 'function') window.handleEventTypeUrlParam();
       window.applyEventFilters();
       if (typeof window.handleSharedEventParam === 'function') window.handleSharedEventParam();
     } catch (err) {
       console.warn('Could not fetch events/courses from DB:', err);
       window.allEventsData = [];
+      if (typeof window.handleEventTypeUrlParam === 'function') window.handleEventTypeUrlParam();
       window.applyEventFilters();
     }
   }
 
   window.eventFilterState = window.eventFilterState || { type: 'all', search: '', status: 'all', field: 'all' };
 
-  
+  window.handleEventTypeUrlParam = function() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const rawType = urlParams.get('type') || urlParams.get('category');
+      if (!rawType) return;
+
+      const t = rawType.toLowerCase();
+      let targetType = 'all';
+      if (t.includes('conf') || t.includes('sympos')) targetType = 'Upcoming Conference';
+      else if (t.includes('hack') || t.includes('contest')) targetType = 'Hackathon';
+      else if (t.includes('fdp') || t.includes('faculty') || t.includes('seminar')) targetType = 'Faculty Development Program';
+      else if (t.includes('course') || t.includes('train')) targetType = 'Courses & Training';
+      else if (t.includes('intern')) targetType = 'Internship';
+      else if (t.includes('webinar')) targetType = 'Webinar';
+      else targetType = rawType;
+
+      window.eventFilterState = window.eventFilterState || { type: 'all', search: '', status: 'all', field: 'all' };
+      window.eventFilterState.type = targetType;
+
+      const select = document.getElementById('event-type-select');
+      if (select) select.value = targetType;
+
+      const tabs = document.querySelectorAll('.event-quick-tab');
+      tabs.forEach(b => {
+        const onclickAttr = b.getAttribute('onclick') || '';
+        if (onclickAttr.toLowerCase().includes(targetType.toLowerCase()) || onclickAttr.toLowerCase().includes(t)) {
+          b.className = 'event-quick-tab shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-[#123B32] text-white dark:bg-emerald-600 shadow-xs cursor-pointer transition-all flex items-center gap-1.5';
+        } else {
+          b.className = 'event-quick-tab shrink-0 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#123B32] hover:text-white dark:hover:bg-emerald-600 transition-all cursor-pointer flex items-center gap-1.5';
+        }
+      });
+    } catch (e) {
+      console.warn('Type parameter handler note:', e);
+    }
+  };
+
   window.selectEventCategoryQuick = function(type, btnEl) {
     window.eventFilterState = window.eventFilterState || { type: 'all', search: '', status: 'all', field: 'all' };
     window.eventFilterState.type = type;
@@ -779,12 +809,76 @@
     renderGalleryShowcase();
   };
 
+  window.scrollGalleryReel = function(delta) {
+    const reel = document.getElementById('dynamic-gallery-reel');
+    if (reel) {
+      reel.scrollBy({ left: delta, behavior: 'smooth' });
+    }
+  };
+
   function renderGalleryShowcase() {
     const container = document.getElementById('dynamic-gallery-container');
+    const reel = document.getElementById('dynamic-gallery-reel');
+    if (!container && !reel) return;
+
+    const allItems = window.allGalleryData || [];
+
+    // 1. Populate Horizontal Highlights Reel
+    if (reel) {
+      const reelItems = allItems.length > 0 ? allItems.slice(0, 8) : [
+        {
+          title: 'International Computing Conference & Summit',
+          category: 'Conferences',
+          description: 'Keynote sessions and global research presentations on Generative AI and systems.',
+          image_blob: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80'
+        },
+        {
+          title: 'Annual 48-Hour Hackathon & Build Sprint',
+          category: 'Hackathons',
+          description: 'Over 50 teams building cutting-edge full stack and AI prototypes.',
+          image_blob: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80'
+        },
+        {
+          title: 'Institutional MoU Signing & Lab Inception',
+          category: 'MoUs',
+          description: 'Partnership ceremonies connecting academia with high-impact industry tech.',
+          image_blob: 'https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?auto=format&fit=crop&w=800&q=80'
+        },
+        {
+          title: 'Hands-on Cloud & DevOps Masterclass',
+          category: 'Workshops',
+          description: 'Live lab architectures, containerization, and modern deployment pipelines.',
+          image_blob: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80'
+        }
+      ];
+
+      reel.innerHTML = reelItems.map(item => `
+        <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="shrink-0 w-72 sm:w-84 h-56 rounded-3xl overflow-hidden relative group cursor-pointer border border-slate-200 dark:border-slate-800 bg-slate-950 shadow-md hover:shadow-2xl transition-all duration-300 snap-start flex flex-col justify-end">
+          <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" onerror="this.src='images/software.png'">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent"></div>
+          
+          <div class="relative z-10 p-5 space-y-1.5 text-white">
+            <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-500/90 text-white font-extrabold text-[9px] uppercase tracking-wider backdrop-blur-md shadow-xs">
+              ${item.category || 'HIGHLIGHT'}
+            </span>
+            <h3 class="text-sm font-bold font-heading line-clamp-1 group-hover:text-emerald-300 transition-colors">
+              ${item.title}
+            </h3>
+            ${item.description ? `<p class="text-[11px] text-slate-300 line-clamp-2 leading-relaxed opacity-90">${item.description}</p>` : ''}
+          </div>
+
+          <div class="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 2. Populate Grid
     if (!container) return;
 
     const cat = (window.activeGalleryCategory || 'all').toLowerCase();
-    const items = (window.allGalleryData || []).filter(item => {
+    const items = allItems.filter(item => {
       if (cat === 'all') return true;
       const c = (item.category || '').toLowerCase();
       return c.includes(cat) || cat.includes(c);
@@ -819,7 +913,7 @@
         </div>
       </div>
     `).join('');
-  }
+  };
 
   window.openGalleryLightbox = function(encodedImg, encodedTitle, encodedCat, encodedDesc) {
     const img = decodeURIComponent(encodedImg);

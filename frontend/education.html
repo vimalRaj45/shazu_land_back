@@ -132,6 +132,14 @@
           </div>
         </div>
 
+        <!-- Gallery Direct Link -->
+        <a href="gallery.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="bi bi-images text-base text-[#123B32]"></i>
+            <span>Gallery</span>
+          </div>
+        </a>
+
         <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <div class="flex items-center gap-3">
             <i class="uil uil-briefcase-alt text-base text-[#123B32]"></i>
@@ -235,11 +243,14 @@
           </div>
         </div>
 
-        <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+        <!-- Gallery Nav Pill -->
+        <a href="gallery.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="bi bi-images text-[14px]"></i>Gallery</a>
+
+        <a href="careers.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
 
         <!-- Contact Dropdown -->
         <div class="relative group">
-          <a href="contact.html" class="nav-link-pill flex items-center gap-1">
+          <a href="contact.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-envelope text-[14px]"></i>
             <span>Contact Us</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
@@ -334,9 +345,80 @@
         <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
         <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
       </button>
+        <label class="switch" title="Toggle Theme">
+          <input class="theme-toggle-input" type="checkbox" />
+          <div class="slider round">
+            <div class="sun-moon">
+              <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+
+              <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+            </div>
+            <div class="stars">
+              <svg id="star-1" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-2" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-3" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-4" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+            </div>
+          </div>
+        </label>
+
+        <div class="hidden lg:block">
+          <a href="membership.html" class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold transition-all duration-150 shadow-xs">
+            Join Us
+          </a>
+        </div>
+      </div>
+
+      <!-- Pure Tailwind Animated Hamburger Bars -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 text-[#0F172A] hover:text-[#123B32] focus:outline-none cursor-pointer relative z-40 flex flex-col justify-center items-center w-10 h-10 space-y-1.5" aria-label="Toggle Navigation Menu">
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+      </button>
     </div>
   </header>
-    <div id="dynamic-announcement-bar"></div>
+  <div id="dynamic-announcement-bar"></div>
 </div>
 
   <!-- Main Content -->
@@ -398,24 +480,48 @@
 
         </div>
 
+        <!-- Hero Right Column: Illustration + 3 Core Value Promises -->
         <div class="lg:col-span-5 flex flex-col justify-center space-y-4">
           <div class="p-4 bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-3xl shadow-2xl hover-lift relative overflow-hidden">
             <img loading="lazy" decoding="async" src="images/education.png" alt="Education Services Illustration" class="w-full max-h-72 object-contain img-interactive img-float mx-auto">
           </div>
 
-          <!-- Impact Metrics Grid -->
-          <div class="grid grid-cols-3 gap-2.5 text-center">
-            <div class="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
-              <span class="block text-lg sm:text-xl font-extrabold font-mono text-[#123B32] dark:text-emerald-400">50+</span>
-              <span class="block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Institutions</span>
+          <!-- Core Value Commitments & Promises Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-left">
+            <div class="p-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs hover:border-[#123B32] transition-all">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-[#123B32] dark:text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">
+                  <i class="bi bi-shield-check"></i>
+                </span>
+                <span class="text-xs font-bold font-heading text-slate-900 dark:text-white leading-tight">Industry Ready</span>
+              </div>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug font-normal">
+                Curriculum tailored to real-world tech stacks & tools.
+              </p>
             </div>
-            <div class="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
-              <span class="block text-lg sm:text-xl font-extrabold font-mono text-[#123B32] dark:text-emerald-400">15,000+</span>
-              <span class="block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Students</span>
+            
+            <div class="p-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs hover:border-[#123B32] transition-all">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-[#123B32] dark:text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">
+                  <i class="bi bi-person-workspace"></i>
+                </span>
+                <span class="text-xs font-bold font-heading text-slate-900 dark:text-white leading-tight">Live Mentors</span>
+              </div>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug font-normal">
+                Direct guidance from practicing developers & leads.
+              </p>
             </div>
-            <div class="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
-              <span class="block text-lg sm:text-xl font-extrabold font-mono text-[#123B32] dark:text-emerald-400">100%</span>
-              <span class="block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Hands-on</span>
+
+            <div class="p-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs hover:border-[#123B32] transition-all">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-[#123B32] dark:text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">
+                  <i class="bi bi-code-slash"></i>
+                </span>
+                <span class="text-xs font-bold font-heading text-slate-900 dark:text-white leading-tight">Pure Hands-on</span>
+              </div>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug font-normal">
+                Live build sprints, practical labs & certified outcomes.
+              </p>
             </div>
           </div>
 
@@ -510,17 +616,25 @@
       </div>
     </section>
 
-    <!-- Accreditation Advisory Banner with glassmorphism-blue -->
-    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-brand-lightGreen">
+    <!-- Institutional MoU & Academic Partnership Framework -->
+    <section data-aos="fade-up" class="py-14 md:py-16 bg-[#E8EFEB]/60 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-800">
       <div class="max-w-4xl mx-auto px-6 text-center">
-        <div class="glassmorphism-blue p-6 md:p-12 rounded-2xl border border-brand-green/20 space-y-6">
-          <h3 class="text-2xl font-extrabold font-heading text-brand-darkText">Collaborating with Mahendra Engineering College</h3>
-          <p class="text-brand-secText text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
-            Our MoU agreements deliver continuous industrial exposure workshops, certified technical modules, and project support frameworks directly to academic divisions in Salem & Namakkal region.
+        <div class="p-8 md:p-12 rounded-3xl bg-white/90 dark:bg-slate-950/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-[#123B32] dark:text-emerald-300 font-extrabold text-[11px] uppercase tracking-wider border border-emerald-200 dark:border-emerald-800">
+            <i class="bi bi-mortarboard-fill"></i> Institutional Partnership & Academic Commitment
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 dark:text-white leading-tight">
+            Academic Excellence with Mahendra Engineering College & Partner Institutions
+          </h3>
+          <p class="text-slate-600 dark:text-slate-300 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed">
+            Our institutional partnerships are dedicated to empowering the next generation of engineers — delivering continuous industrial exposure workshops, certified technological modules, and faculty-student incubation frameworks directly to academic divisions.
           </p>
-          <div class="pt-2">
-            <a href="contact.html" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-brand-green hover:bg-brand-hoverGreen text-white font-semibold text-xs transition-all shadow-sm">
-              Schedule Campus Seminar
+          <div class="pt-2 flex items-center justify-center gap-3 flex-wrap">
+            <a href="contact.html" class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold text-xs transition-all shadow-md gap-2">
+              <i class="bi bi-calendar-check"></i> Schedule Campus Seminar
+            </a>
+            <a href="membership.html" class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#123B32] dark:text-emerald-400 border border-slate-200 dark:border-slate-700 font-bold text-xs transition-all shadow-xs gap-2">
+              <i class="bi bi-award"></i> Institutional Membership
             </a>
           </div>
         </div>
