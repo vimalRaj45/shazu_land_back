@@ -53,6 +53,35 @@
   <script src="js/config.js"></script>
   <link rel="icon" href="img/logo.png" type="image/png">
   <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+  <style>
+    .gallery-slider-track {
+      scrollbar-width: thin;
+      scrollbar-color: #123B32 #E8EFEB;
+    }
+    .dark .gallery-slider-track {
+      scrollbar-color: #10B981 #1E293B;
+    }
+    .gallery-slider-track::-webkit-scrollbar {
+      height: 8px;
+    }
+    .gallery-slider-track::-webkit-scrollbar-track {
+      background: #E8EFEB;
+      border-radius: 9999px;
+    }
+    .dark .gallery-slider-track::-webkit-scrollbar-track {
+      background: #1E293B;
+    }
+    .gallery-slider-track::-webkit-scrollbar-thumb {
+      background: #123B32;
+      border-radius: 9999px;
+    }
+    .dark .gallery-slider-track::-webkit-scrollbar-thumb {
+      background: #10B981;
+    }
+    .gallery-slider-track::-webkit-scrollbar-thumb:hover {
+      background: #C47D4C;
+    }
+  </style>
 </head>
 <body class="bg-brand-white text-brand-darkText antialiased">
   
@@ -375,7 +404,7 @@
     </div>
 
     <!-- Horizontal Carousel Track -->
-    <div id="dynamic-gallery-reel" class="flex gap-5 overflow-x-auto pb-4 pt-1 no-scrollbar scroll-smooth snap-x snap-mandatory">
+    <div id="dynamic-gallery-reel" class="gallery-slider-track flex gap-5 overflow-x-auto pb-5 pt-1 scroll-smooth snap-x snap-mandatory">
       <!-- Populated via dynamic-content.js -->
       <div class="shrink-0 w-72 sm:w-80 h-52 bg-slate-100 dark:bg-slate-800/60 rounded-3xl animate-pulse flex items-center justify-center text-slate-400">
         <span class="text-xs">Loading Highlights...</span>

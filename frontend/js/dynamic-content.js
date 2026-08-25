@@ -821,54 +821,80 @@
     const reel = document.getElementById('dynamic-gallery-reel');
     if (!container && !reel) return;
 
-    const allItems = window.allGalleryData || [];
+    const sampleGalleryItems = [
+      {
+        title: 'Professional Memberships Induction & Felicitation',
+        category: 'Memberships',
+        description: 'Welcoming prominent delegates, faculty researchers, and innovators into the SST professional network.',
+        image_blob: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        title: 'MoU Signing & Academic Laboratory Inception',
+        category: 'MoUs',
+        description: 'Formalizing strategic academic-industry synergy and technology lab enablement.',
+        image_blob: 'https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        title: 'International Computing Summit & Keynote Session',
+        category: 'Conferences',
+        description: 'Distinguished leadership and academic panel addressing next-gen AI and cloud architectures.',
+        image_blob: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        title: 'Annual 48-Hour Hackathon & Build Sprint',
+        category: 'Hackathons',
+        description: 'Over 50 student and developer teams competing to engineer innovative tech prototypes.',
+        image_blob: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        title: 'Hands-on Cloud & DevOps Masterclass Workshop',
+        category: 'Workshops',
+        description: 'Practical containerization, infrastructure-as-code, and live deployment sprints.',
+        image_blob: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        title: 'National Academic Delegation & Research Symposium',
+        category: 'Conferences',
+        description: 'Collaborative exchange of pioneering research papers and computing methodologies.',
+        image_blob: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=800&q=80'
+      }
+    ];
 
-    // 1. Populate Horizontal Highlights Reel
+    const allItems = (window.allGalleryData && window.allGalleryData.length > 0) ? window.allGalleryData : sampleGalleryItems;
+
+    // 1. Populate Horizontal Highlights Reel Slider
     if (reel) {
-      const reelItems = allItems.length > 0 ? allItems.slice(0, 8) : [
-        {
-          title: 'International Computing Conference & Summit',
-          category: 'Conferences',
-          description: 'Keynote sessions and global research presentations on Generative AI and systems.',
-          image_blob: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80'
-        },
-        {
-          title: 'Annual 48-Hour Hackathon & Build Sprint',
-          category: 'Hackathons',
-          description: 'Over 50 teams building cutting-edge full stack and AI prototypes.',
-          image_blob: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80'
-        },
-        {
-          title: 'Institutional MoU Signing & Lab Inception',
-          category: 'MoUs',
-          description: 'Partnership ceremonies connecting academia with high-impact industry tech.',
-          image_blob: 'https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?auto=format&fit=crop&w=800&q=80'
-        },
-        {
-          title: 'Hands-on Cloud & DevOps Masterclass',
-          category: 'Workshops',
-          description: 'Live lab architectures, containerization, and modern deployment pipelines.',
-          image_blob: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80'
-        }
-      ];
-
-      reel.innerHTML = reelItems.map(item => `
-        <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="shrink-0 w-72 sm:w-84 h-56 rounded-3xl overflow-hidden relative group cursor-pointer border border-slate-200 dark:border-slate-800 bg-slate-950 shadow-md hover:shadow-2xl transition-all duration-300 snap-start flex flex-col justify-end">
-          <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" onerror="this.src='images/software.png'">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent"></div>
-          
-          <div class="relative z-10 p-5 space-y-1.5 text-white">
-            <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-500/90 text-white font-extrabold text-[9px] uppercase tracking-wider backdrop-blur-md shadow-xs">
-              ${item.category || 'HIGHLIGHT'}
-            </span>
-            <h3 class="text-sm font-bold font-heading line-clamp-1 group-hover:text-emerald-300 transition-colors">
-              ${item.title}
-            </h3>
-            ${item.description ? `<p class="text-[11px] text-slate-300 line-clamp-2 leading-relaxed opacity-90">${item.description}</p>` : ''}
+      reel.innerHTML = allItems.map(item => `
+        <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="shrink-0 w-72 sm:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
+          <!-- Top Image -->
+          <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
+            <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            <div class="absolute top-3 left-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
+                ${item.category || 'HIGHLIGHT'}
+              </span>
+            </div>
+            <div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
+              <i class="bi bi-arrows-fullscreen"></i>
+            </div>
           </div>
 
-          <div class="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-            <i class="bi bi-arrows-fullscreen"></i>
+          <!-- Bottom Text Container (100% Readable) -->
+          <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2">
+            <div>
+              <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
+                ${item.title}
+              </h3>
+              ${item.description ? `<p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1">${item.description}</p>` : ''}
+            </div>
+            <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-[#123B32] dark:text-emerald-400">
+              <span class="inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                <span>View Full Size</span>
+                <i class="bi bi-arrow-right"></i>
+              </span>
+              <span class="text-[10px] font-mono text-slate-400">HD Photo</span>
+            </div>
           </div>
         </div>
       `).join('');
@@ -886,30 +912,46 @@
 
     if (items.length === 0) {
       container.innerHTML = `
-        <div class="col-span-full text-center p-8 bg-white/60 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-500 text-xs">
-          No photos found in this category.
+        <div class="col-span-full text-center p-12 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-500 text-xs">
+          <i class="bi bi-images text-3xl block mb-2 text-slate-400"></i>
+          No media found in this category.
         </div>
       `;
       return;
     }
 
     container.innerHTML = items.map(item => `
-      <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="group relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer aspect-4/3 flex flex-col justify-end">
-        <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" onerror="this.src='images/software.png'">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
-        
-        <div class="relative z-10 p-4 space-y-1 text-white">
-          <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-500/90 text-white font-extrabold text-[9px] uppercase tracking-wider backdrop-blur-md shadow-xs">
-            ${item.category || 'EVENT'}
-          </span>
-          <h3 class="text-sm font-bold font-heading line-clamp-1 group-hover:text-emerald-300 transition-colors">
-            ${item.title}
-          </h3>
-          ${item.description ? `<p class="text-[11px] text-slate-300 line-clamp-1 leading-relaxed opacity-90">${item.description}</p>` : ''}
+      <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between">
+        <!-- Top Image -->
+        <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
+          <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          <div class="absolute top-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
+              ${item.category || 'EVENT'}
+            </span>
+          </div>
+          <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </div>
         </div>
 
-        <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-          <i class="bi bi-arrows-fullscreen"></i>
+        <!-- Bottom Content Box with Ultra Clean Visible Typography -->
+        <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2.5 bg-white dark:bg-slate-900">
+          <div>
+            <h3 class="text-sm sm:text-base font-extrabold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-snug">
+              ${item.title}
+            </h3>
+            ${item.description ? `<p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1.5">${item.description}</p>` : ''}
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
+            <span class="inline-flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 transition-transform">
+              <span>View High-Res Photo</span>
+              <i class="bi bi-arrow-right"></i>
+            </span>
+            <span class="text-[10px] font-mono text-slate-400 uppercase">Gallery</span>
+          </div>
         </div>
       </div>
     `).join('');
