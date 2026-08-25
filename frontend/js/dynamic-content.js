@@ -442,6 +442,65 @@
     `).join('');
   }
 
+  const DEFAULT_SAMPLE_EVENTS = [
+    {
+      id: 'hackathon-national-2026',
+      title: 'National Full-Stack & AI 48-Hour Hackathon 2026',
+      category: 'Hackathon',
+      event_date: 'March 28-30, 2026',
+      location: 'SST Salem Campus & Hybrid Online',
+      registration_fee: 'Free Registration',
+      description: 'Annual hackathon sprint with 50+ collegiate and professional developer teams building high-impact Generative AI, cloud, and web solutions with live mentors and cash awards.',
+      image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80',
+      status: 'Upcoming'
+    },
+    {
+      id: 'conf-iccins-2026',
+      title: 'International Conference on Computational Intelligence & Next-Gen Systems (ICCINS)',
+      category: 'Upcoming Conference',
+      event_date: 'April 18-19, 2026',
+      location: 'Auditorium & Virtual Stream',
+      registration_fee: 'Early Bird ₹1,200',
+      description: 'Peer-reviewed international research symposium featuring global keynotes, paper presentations, and Scopus publication opportunities.',
+      image_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+      status: 'Upcoming'
+    },
+    {
+      id: 'fdp-applied-ai-2026',
+      title: '5-Day National Faculty Development Program on Applied AI & Cloud Architecture',
+      category: 'Faculty Development Program',
+      event_date: 'May 12-16, 2026',
+      location: 'Hands-on Hybrid Lab',
+      registration_fee: 'Nominal Institutional Fee',
+      description: 'Empowering academic faculty and research scholars with containerized deployments, modern microservices, and curriculum alignment.',
+      image_url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
+      status: 'Upcoming'
+    },
+    {
+      id: 'course-fullstack-cloud',
+      is_course: true,
+      title: 'Advanced Full Stack & Cloud Engineering Masterclass',
+      category: 'Courses & Training | Professional Course',
+      event_date: 'Flexible Cohort Batch (8 Weeks)',
+      location: 'Online Live & Interactive Labs',
+      registration_fee: 'Scholarship Assisted',
+      description: 'Comprehensive industry bootcamp covering modern frontend architectures, Node.js microservices, PostgreSQL, and AWS/Docker container pipelines.',
+      image_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
+      status: 'Upcoming'
+    },
+    {
+      id: 'webinar-devops-future',
+      title: 'Global Tech Colloquium: Future of Autonomous AI Agents & DevOps',
+      category: 'Webinar',
+      event_date: 'June 05, 2026',
+      location: 'Virtual Live Stream',
+      registration_fee: 'Open Access',
+      description: 'Interactive leadership keynote on orchestrating multi-agent systems, CI/CD observability, and zero-downtime microservice architecture.',
+      image_url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
+      status: 'Upcoming'
+    }
+  ];
+
   async function loadEvents() {
     const container = document.getElementById('dynamic-events-container');
     if (!container) return;
@@ -467,13 +526,16 @@
         status: c.status || 'Upcoming'
       }));
 
-      window.allEventsData = [...(evRes.events || []), ...coursesAsEvents];
+      const rawEvents = evRes.events && evRes.events.length > 0 ? evRes.events : DEFAULT_SAMPLE_EVENTS.filter(e => !e.is_course);
+      const allCourses = coursesAsEvents.length > 0 ? coursesAsEvents : DEFAULT_SAMPLE_EVENTS.filter(e => e.is_course);
+
+      window.allEventsData = [...rawEvents, ...allCourses];
       if (typeof window.handleEventTypeUrlParam === 'function') window.handleEventTypeUrlParam();
       window.applyEventFilters();
       if (typeof window.handleSharedEventParam === 'function') window.handleSharedEventParam();
     } catch (err) {
       console.warn('Could not fetch events/courses from DB:', err);
-      window.allEventsData = [];
+      window.allEventsData = [...DEFAULT_SAMPLE_EVENTS];
       if (typeof window.handleEventTypeUrlParam === 'function') window.handleEventTypeUrlParam();
       window.applyEventFilters();
     }
@@ -487,7 +549,7 @@
       const rawType = urlParams.get('type') || urlParams.get('category');
       if (!rawType) return;
 
-      const t = rawType.toLowerCase();
+      const t = rawType.toLowerCase().trim();
       let targetType = 'all';
       if (t.includes('conf') || t.includes('sympos')) targetType = 'Upcoming Conference';
       else if (t.includes('hack') || t.includes('contest')) targetType = 'Hackathon';
@@ -506,7 +568,13 @@
       const tabs = document.querySelectorAll('.event-quick-tab');
       tabs.forEach(b => {
         const onclickAttr = b.getAttribute('onclick') || '';
-        if (onclickAttr.toLowerCase().includes(targetType.toLowerCase()) || onclickAttr.toLowerCase().includes(t)) {
+        if (
+          onclickAttr.toLowerCase().includes(targetType.toLowerCase()) || 
+          (targetType === 'Upcoming Conference' && onclickAttr.toLowerCase().includes('upcoming conference')) ||
+          (targetType === 'Hackathon' && onclickAttr.toLowerCase().includes('hackathon')) ||
+          (targetType === 'Faculty Development Program' && onclickAttr.toLowerCase().includes('faculty')) ||
+          (targetType === 'Courses & Training' && onclickAttr.toLowerCase().includes('courses'))
+        ) {
           b.className = 'event-quick-tab shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-[#123B32] text-white dark:bg-emerald-600 shadow-xs cursor-pointer transition-all flex items-center gap-1.5';
         } else {
           b.className = 'event-quick-tab shrink-0 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#123B32] hover:text-white dark:hover:bg-emerald-600 transition-all cursor-pointer flex items-center gap-1.5';
@@ -529,8 +597,57 @@
     if (btnEl) {
       btnEl.className = 'event-quick-tab shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-[#123B32] text-white dark:bg-emerald-600 shadow-xs cursor-pointer transition-all flex items-center gap-1.5';
     }
+
+    // Update URL query string without reloading page
+    try {
+      const url = new URL(window.location);
+      if (type === 'all') {
+        url.searchParams.delete('type');
+        url.searchParams.delete('category');
+      } else {
+        let typeSlug = 'all';
+        if (type.includes('Conference')) typeSlug = 'conference';
+        else if (type.includes('Hackathon')) typeSlug = 'hackathon';
+        else if (type.includes('Faculty')) typeSlug = 'fdp';
+        else if (type.includes('Course')) typeSlug = 'courses';
+        else typeSlug = type.toLowerCase();
+        url.searchParams.set('type', typeSlug);
+      }
+      window.history.pushState({}, '', url);
+    } catch (err) {}
+
     window.applyEventFilters();
   };
+
+  // Listen for SPA navigation or in-page dropdown clicks
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if ((href.includes('events.html?') || href.includes('events?')) && document.getElementById('dynamic-events-container')) {
+      try {
+        const targetUrl = new URL(a.href, window.location.origin);
+        const typeParam = targetUrl.searchParams.get('type') || targetUrl.searchParams.get('category');
+        if (typeParam) {
+          e.preventDefault();
+          window.history.pushState({}, '', a.href);
+          window.handleEventTypeUrlParam();
+          window.applyEventFilters();
+          const filterHeader = document.getElementById('event-type-select');
+          if (filterHeader) {
+            filterHeader.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      } catch (err) {}
+    }
+  });
+
+  window.addEventListener('popstate', () => {
+    if (document.getElementById('dynamic-events-container')) {
+      window.handleEventTypeUrlParam();
+      window.applyEventFilters();
+    }
+  });
 
   window.applyEventFilters = function () {
     if (!window.allEventsData) return;
