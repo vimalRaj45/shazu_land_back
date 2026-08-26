@@ -92,31 +92,11 @@
       console.warn('Could not fetch dynamic announcements:', err);
     }
 
-    // Default rich fallback announcements if database has not returned any or offline
     if (!announcements || announcements.length === 0) {
-      announcements = [
-        {
-          id: 1,
-          title: "Admissions Open",
-          content: "Summer Internship, Hackathon & Research Mentorship Program 2026 – Apply Now!",
-          badge_type: "NEW",
-          link_url: "careers.html"
-        },
-        {
-          id: 2,
-          title: "Upcoming Conference",
-          content: "International Conference on Next-Gen Computing & AI Systems – Call for Papers & Symposia",
-          badge_type: "EVENT",
-          link_url: "events.html"
-        },
-        {
-          id: 3,
-          title: "Software & Digital Transformation",
-          content: "Custom Enterprise Web Applications, Cloud Platforms & AI Solutions live for industry clients",
-          badge_type: "FEATURE",
-          link_url: "software.html"
-        }
-      ];
+      window.allAnnouncementsList = [];
+      container.style.display = 'none';
+      container.innerHTML = '';
+      return;
     }
 
     window.allAnnouncementsList = announcements;
@@ -442,65 +422,6 @@
     `).join('');
   }
 
-  const DEFAULT_SAMPLE_EVENTS = [
-    {
-      id: 'hackathon-national-2026',
-      title: 'National Full-Stack & AI 48-Hour Hackathon 2026',
-      category: 'Hackathon',
-      event_date: 'March 28-30, 2026',
-      location: 'SST Salem Campus & Hybrid Online',
-      registration_fee: 'Free Registration',
-      description: 'Annual hackathon sprint with 50+ collegiate and professional developer teams building high-impact Generative AI, cloud, and web solutions with live mentors and cash awards.',
-      image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80',
-      status: 'Upcoming'
-    },
-    {
-      id: 'conf-iccins-2026',
-      title: 'International Conference on Computational Intelligence & Next-Gen Systems (ICCINS)',
-      category: 'Upcoming Conference',
-      event_date: 'April 18-19, 2026',
-      location: 'Auditorium & Virtual Stream',
-      registration_fee: 'Early Bird ₹1,200',
-      description: 'Peer-reviewed international research symposium featuring global keynotes, paper presentations, and Scopus publication opportunities.',
-      image_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
-      status: 'Upcoming'
-    },
-    {
-      id: 'fdp-applied-ai-2026',
-      title: '5-Day National Faculty Development Program on Applied AI & Cloud Architecture',
-      category: 'Faculty Development Program',
-      event_date: 'May 12-16, 2026',
-      location: 'Hands-on Hybrid Lab',
-      registration_fee: 'Nominal Institutional Fee',
-      description: 'Empowering academic faculty and research scholars with containerized deployments, modern microservices, and curriculum alignment.',
-      image_url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
-      status: 'Upcoming'
-    },
-    {
-      id: 'course-fullstack-cloud',
-      is_course: true,
-      title: 'Advanced Full Stack & Cloud Engineering Masterclass',
-      category: 'Courses & Training | Professional Course',
-      event_date: 'Flexible Cohort Batch (8 Weeks)',
-      location: 'Online Live & Interactive Labs',
-      registration_fee: 'Scholarship Assisted',
-      description: 'Comprehensive industry bootcamp covering modern frontend architectures, Node.js microservices, PostgreSQL, and AWS/Docker container pipelines.',
-      image_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
-      status: 'Upcoming'
-    },
-    {
-      id: 'webinar-devops-future',
-      title: 'Global Tech Colloquium: Future of Autonomous AI Agents & DevOps',
-      category: 'Webinar',
-      event_date: 'June 05, 2026',
-      location: 'Virtual Live Stream',
-      registration_fee: 'Open Access',
-      description: 'Interactive leadership keynote on orchestrating multi-agent systems, CI/CD observability, and zero-downtime microservice architecture.',
-      image_url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
-      status: 'Upcoming'
-    }
-  ];
-
   async function loadEvents() {
     const container = document.getElementById('dynamic-events-container');
     if (!container) return;
@@ -510,10 +431,11 @@
     try {
       const [evRes, courseRes] = await Promise.all([
         fetch(`${API_BASE}/api/public/events`).then(r => r.json()).catch(() => ({ events: [] })),
-        fetch(`${API_BASE}/api/public/courses-services`).then(r => r.json()).catch(() => ({ courses: [] }))
+        fetch(`${API_BASE}/api/public/courses-services`).then(r => r.json()).catch(() => ({ offerings: [], courses: [] }))
       ]);
 
-      const coursesAsEvents = (courseRes.courses || []).map(c => ({
+      const courseList = (courseRes && (courseRes.courses || courseRes.offerings)) || [];
+      const coursesAsEvents = courseList.map(c => ({
         id: `course-${c.id}`,
         is_course: true,
         title: c.title,
@@ -526,16 +448,14 @@
         status: c.status || 'Upcoming'
       }));
 
-      const rawEvents = evRes.events && evRes.events.length > 0 ? evRes.events : DEFAULT_SAMPLE_EVENTS.filter(e => !e.is_course);
-      const allCourses = coursesAsEvents.length > 0 ? coursesAsEvents : DEFAULT_SAMPLE_EVENTS.filter(e => e.is_course);
-
-      window.allEventsData = [...rawEvents, ...allCourses];
+      const rawEvents = (evRes && evRes.events) || [];
+      window.allEventsData = [...rawEvents, ...coursesAsEvents];
       if (typeof window.handleEventTypeUrlParam === 'function') window.handleEventTypeUrlParam();
       window.applyEventFilters();
       if (typeof window.handleSharedEventParam === 'function') window.handleSharedEventParam();
     } catch (err) {
       console.warn('Could not fetch events/courses from DB:', err);
-      window.allEventsData = [...DEFAULT_SAMPLE_EVENTS];
+      window.allEventsData = [];
       if (typeof window.handleEventTypeUrlParam === 'function') window.handleEventTypeUrlParam();
       window.applyEventFilters();
     }
@@ -938,83 +858,53 @@
     const reel = document.getElementById('dynamic-gallery-reel');
     if (!container && !reel) return;
 
-    const sampleGalleryItems = [
-      {
-        title: 'Professional Memberships Induction & Felicitation',
-        category: 'Memberships',
-        description: 'Welcoming prominent delegates, faculty researchers, and innovators into the SST professional network.',
-        image_blob: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80'
-      },
-      {
-        title: 'MoU Signing & Academic Laboratory Inception',
-        category: 'MoUs',
-        description: 'Formalizing strategic academic-industry synergy and technology lab enablement.',
-        image_blob: 'https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?auto=format&fit=crop&w=800&q=80'
-      },
-      {
-        title: 'International Computing Summit & Keynote Session',
-        category: 'Conferences',
-        description: 'Distinguished leadership and academic panel addressing next-gen AI and cloud architectures.',
-        image_blob: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80'
-      },
-      {
-        title: 'Annual 48-Hour Hackathon & Build Sprint',
-        category: 'Hackathons',
-        description: 'Over 50 student and developer teams competing to engineer innovative tech prototypes.',
-        image_blob: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80'
-      },
-      {
-        title: 'Hands-on Cloud & DevOps Masterclass Workshop',
-        category: 'Workshops',
-        description: 'Practical containerization, infrastructure-as-code, and live deployment sprints.',
-        image_blob: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80'
-      },
-      {
-        title: 'National Academic Delegation & Research Symposium',
-        category: 'Conferences',
-        description: 'Collaborative exchange of pioneering research papers and computing methodologies.',
-        image_blob: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=800&q=80'
-      }
-    ];
-
-    const allItems = (window.allGalleryData && window.allGalleryData.length > 0) ? window.allGalleryData : sampleGalleryItems;
+    const allItems = window.allGalleryData || [];
 
     // 1. Populate Horizontal Highlights Reel Slider
     if (reel) {
-      reel.innerHTML = allItems.map(item => `
-        <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="shrink-0 w-72 sm:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
-          <!-- Top Image -->
-          <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
-            <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-            <div class="absolute top-3 left-3">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
-                ${item.category || 'HIGHLIGHT'}
-              </span>
-            </div>
-            <div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
-              <i class="bi bi-arrows-fullscreen"></i>
-            </div>
+      if (allItems.length === 0) {
+        reel.innerHTML = `
+          <div class="w-full py-8 text-center text-slate-400 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+            <i class="bi bi-images text-2xl mb-1 block"></i>
+            <p class="text-xs font-semibold">No highlights uploaded yet.</p>
           </div>
+        `;
+      } else {
+        reel.innerHTML = allItems.map(item => `
+          <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="shrink-0 w-72 sm:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
+            <!-- Top Image -->
+            <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
+              <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <div class="absolute top-3 left-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
+                  ${item.category || 'HIGHLIGHT'}
+                </span>
+              </div>
+              <div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="bi bi-arrows-fullscreen"></i>
+              </div>
+            </div>
 
-          <!-- Bottom Text Container (100% Readable) -->
-          <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2">
-            <div>
-              <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
-                ${item.title}
-              </h3>
-              ${item.description ? `<p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1">${item.description}</p>` : ''}
-            </div>
-            <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-[#123B32] dark:text-emerald-400">
-              <span class="inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                <span>View Full Size</span>
-                <i class="bi bi-arrow-right"></i>
-              </span>
-              <span class="text-[10px] font-mono text-slate-400">HD Photo</span>
+            <!-- Bottom Text Container (100% Readable) -->
+            <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2">
+              <div>
+                <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
+                  ${item.title}
+                </h3>
+                ${item.description ? `<p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1">${item.description}</p>` : ''}
+              </div>
+              <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-[#123B32] dark:text-emerald-400">
+                <span class="inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                  <span>View Full Size</span>
+                  <i class="bi bi-arrow-right"></i>
+                </span>
+                <span class="text-[10px] font-mono text-slate-400">HD Photo</span>
+              </div>
             </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
     }
 
     // 2. Populate Grid

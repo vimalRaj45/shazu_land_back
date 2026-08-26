@@ -1323,7 +1323,7 @@ app.get('/api/public/careers', async () => {
 
 app.get('/api/public/courses-services', async () => {
   const { rows } = await pool.query('SELECT * FROM courses_services WHERE is_active = TRUE ORDER BY created_at DESC');
-  return { offerings: rows };
+  return { offerings: rows, courses: rows };
 });
 
 // Public Hero Slider Endpoint
