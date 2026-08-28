@@ -101,7 +101,7 @@
 
     window.allAnnouncementsList = announcements;
 
-    container.className = 'w-full relative z-30 bg-[#123B32] text-white border-b border-[#527A68]/40 py-2 px-3 sm:px-6 shadow-xs transition-all overflow-hidden';
+    container.className = 'w-full relative z-30 bg-[#123B32] text-white border-b border-[#527A68]/40 py-1.5 sm:py-2 px-2 sm:px-6 shadow-xs transition-all overflow-hidden';
     container.style.display = 'block';
 
     const buildItemsHtml = (list) => list.map(ann => {
@@ -128,20 +128,20 @@
     const trackContent = buildItemsHtml(announcements);
 
     container.innerHTML = `
-      <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-1.5 sm:gap-3 text-xs">
         <!-- Live Indicator Badge (Pinned Left) -->
-        <div class="flex items-center gap-2 shrink-0 bg-[#0d2a24] py-1 px-2.5 rounded-lg border border-[#527A68]/50 shadow-xs z-10">
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 bg-[#0d2a24] py-1 px-2 sm:px-2.5 rounded-lg border border-[#527A68]/50 shadow-xs z-10">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span class="text-[10px] font-black uppercase tracking-wider text-emerald-300 flex items-center gap-1 select-none">
-            Live Updates
+          <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-emerald-300 flex items-center gap-1 select-none whitespace-nowrap">
+            <span>Live</span><span class="hidden xs:inline">Updates</span>
           </span>
         </div>
 
         <!-- Continuous Moving Marquee Scroller -->
-        <div class="flex-1 overflow-hidden relative cursor-pointer py-0.5 marquee-mask" title="Hover to pause ticker">
+        <div class="flex-1 min-w-0 overflow-hidden relative cursor-pointer py-0.5 marquee-mask" title="Hover / tap to pause ticker">
           <div class="animate-marquee-track flex items-center whitespace-nowrap">
             <div class="flex items-center shrink-0">
               ${trackContent}
@@ -152,11 +152,12 @@
           </div>
         </div>
 
-        <!-- All Announcements Link (Pinned Right) -->
-        <div class="hidden sm:flex items-center gap-2 shrink-0 z-10 pl-2">
-          <a href="announcements.html" class="text-[11px] font-semibold text-emerald-200 hover:text-white transition-colors bg-[#0d2a24]/80 hover:bg-[#0d2a24] px-2.5 py-1 rounded-lg border border-[#527A68]/40 flex items-center gap-1 shadow-xs">
-            <span>All Notices (${announcements.length})</span>
-            <i class="bi bi-arrow-right text-[10px]"></i>
+        <!-- All Announcements Link (Pinned Right - Visible on Mobile & Desktop) -->
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0 z-10 pl-1 sm:pl-2">
+          <a href="announcements.html" class="text-[10px] sm:text-[11px] font-semibold text-emerald-200 hover:text-white transition-colors bg-[#0d2a24]/90 hover:bg-[#0d2a24] px-2 sm:px-2.5 py-1 rounded-lg border border-[#527A68]/40 flex items-center gap-1 shadow-xs whitespace-nowrap" title="View all announcements">
+            <span class="hidden sm:inline">All Notices (${announcements.length})</span>
+            <span class="sm:hidden flex items-center gap-0.5 font-bold">View All <i class="bi bi-arrow-right text-[9px]"></i></span>
+            <i class="hidden sm:inline-block bi bi-arrow-right text-[10px]"></i>
           </a>
         </div>
       </div>
