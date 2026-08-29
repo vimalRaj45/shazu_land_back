@@ -22,23 +22,32 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'vimalraj5207@gmail.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ShazuAdmin2026!';
+const HOSTINGER_API_KEY = process.env.HOSTINGER_API_KEY;
+const HOSTINGER_SENDER_EMAIL = process.env.HOSTINGER_SENDER_EMAIL || 'info@shazusofttechnologies.org';
+const HOSTINGER_SENDER_NAME = process.env.HOSTINGER_SENDER_NAME || 'Shazu Soft Technologies';
+
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
-const BREVO_SENDER = process.env.BREVO_SENDER_EMAIL || process.env.BREVO_SENDER || 'vsgrpsemail@gmail.com';
-const BREVO_SENDER_NAME = process.env.BREVO_SENDER_NAME || 'Shazu Soft Technologies';
+const BREVO_SENDER = process.env.HOSTINGER_SENDER_EMAIL || process.env.BREVO_SENDER_EMAIL || process.env.BREVO_SENDER || 'info@shazusofttechnologies.org';
+const BREVO_SENDER_NAME = process.env.HOSTINGER_SENDER_NAME || process.env.BREVO_SENDER_NAME || 'Shazu Soft Technologies';
 
 // ----------------------------------------------------
-// BREVO TRANSACTIONAL EMAIL ENGINE (API v3)
+// HOSTINGER TRANSACTIONAL EMAIL ENGINE
 // ----------------------------------------------------
-async function sendBrevoEmail({ toEmail, toName, subject, htmlContent, textContent }) {
-  if (!BREVO_API_KEY) {
-    app.log.warn('BREVO_API_KEY is not configured in .env file.');
-    return { success: false, error: 'Brevo API key missing' };
+async function sendHostingerEmail({ toEmail, toName, subject, htmlContent, textContent }) {
+  const apiKey = HOSTINGER_API_KEY || BREVO_API_KEY;
+  if (!apiKey) {
+    app.log.warn('HOSTINGER_API_KEY is not configured in .env file.');
+    return { success: false, error: 'Hostinger API key missing' };
   }
 
   const payload = JSON.stringify({
+    from: {
+      email: HOSTINGER_SENDER_EMAIL,
+      name: HOSTINGER_SENDER_NAME
+    },
     sender: {
-      name: BREVO_SENDER_NAME,
-      email: BREVO_SENDER
+      email: HOSTINGER_SENDER_EMAIL,
+      name: HOSTINGER_SENDER_NAME
     },
     to: [
       {
@@ -47,47 +56,83 @@ async function sendBrevoEmail({ toEmail, toName, subject, htmlContent, textConte
       }
     ],
     subject: subject || 'Notification from Shazu Soft Technologies',
+    html: htmlContent || `<p>${textContent || subject}</p>`,
     htmlContent: htmlContent || `<p>${textContent || subject}</p>`
   });
 
-  return new Promise((resolve) => {
-    const req = https.request('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'api-key': BREVO_API_KEY,
-        'content-type': 'application/json',
-        'content-length': Buffer.byteLength(payload)
-      },
-      timeout: 10000
-    }, (res) => {
-      let responseBody = '';
-      res.on('data', chunk => responseBody += chunk);
-      res.on('end', () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          app.log.info(`Brevo email dispatched successfully to ${toEmail}. Status: ${res.statusCode}`);
-          resolve({ success: true, statusCode: res.statusCode, body: responseBody });
-        } else {
-          app.log.warn(`Brevo email response to ${toEmail}: Status ${res.statusCode}, Body: ${responseBody}`);
-          resolve({ success: false, statusCode: res.statusCode, error: responseBody });
-        }
+  // Primary: Hostinger API Endpoint
+  if (HOSTINGER_API_KEY) {
+    try {
+      const response = await fetch('https://api.hostinger.com/v1/email/send', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'authorization': `Bearer ${HOSTINGER_API_KEY}`,
+          'x-api-key': HOSTINGER_API_KEY,
+          'content-type': 'application/json'
+        },
+        body: payload
       });
-    });
 
-    req.on('error', (err) => {
-      app.log.warn(`Brevo network unreachable / error for ${toEmail}: ${err.message}`);
-      resolve({ success: false, error: err.message });
-    });
+      if (response.ok) {
+        app.log.info(`Hostinger email dispatched successfully to ${toEmail}. Status: ${response.status}`);
+        return { success: true, statusCode: response.status };
+      }
+      const responseBody = await response.text();
+      app.log.warn(`Hostinger API response for ${toEmail}: ${response.status} - ${responseBody}`);
+    } catch (err) {
+      app.log.warn(`Hostinger API error for ${toEmail}: ${err.message}`);
+    }
+  }
 
-    req.on('timeout', () => {
-      req.destroy();
-      app.log.warn(`Brevo request timed out for ${toEmail}`);
-      resolve({ success: false, error: 'Timeout sending email via Brevo' });
-    });
+  // Fallback: Brevo API v3 if key available
+  if (BREVO_API_KEY) {
+    return new Promise((resolve) => {
+      const req = https.request('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': BREVO_API_KEY,
+          'content-type': 'application/json',
+          'content-length': Buffer.byteLength(payload)
+        },
+        timeout: 10000
+      }, (res) => {
+        let responseBody = '';
+        res.on('data', chunk => responseBody += chunk);
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            app.log.info(`Hostinger/Brevo fallback email dispatched successfully to ${toEmail}. Status: ${res.statusCode}`);
+            resolve({ success: true, statusCode: res.statusCode, body: responseBody });
+          } else {
+            app.log.warn(`Email response to ${toEmail}: Status ${res.statusCode}, Body: ${responseBody}`);
+            resolve({ success: false, statusCode: res.statusCode, error: responseBody });
+          }
+        });
+      });
 
-    req.write(payload);
-    req.end();
-  });
+      req.on('error', (err) => {
+        app.log.warn(`Email network unreachable / error for ${toEmail}: ${err.message}`);
+        resolve({ success: false, error: err.message });
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        app.log.warn(`Email request timed out for ${toEmail}`);
+        resolve({ success: false, error: 'Timeout sending email' });
+      });
+
+      req.write(payload);
+      req.end();
+    });
+  }
+
+  return { success: false, error: 'Failed to send email via Hostinger' };
+}
+
+// Wrapper to route all email dispatches through Hostinger
+async function sendBrevoEmail(params) {
+  return sendHostingerEmail(params);
 }
 
 // Google OAuth 2.0 Credentials & Authorized Administrator Emails
@@ -637,36 +682,6 @@ app.get('/api/auth/google/callback', async (request, reply) => {
 });
 
 
-
-// Brevo Email Dispatch Helper
-async function sendBrevoEmail({ toEmail, toName, subject, htmlContent }) {
-  if (!BREVO_API_KEY) return false;
-
-  try {
-    const payload = {
-      sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER },
-      to: [{ email: toEmail, name: toName || toEmail }],
-      subject: subject,
-      htmlContent: htmlContent
-    };
-
-    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'api-key': BREVO_API_KEY,
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-    return response.ok;
-  } catch (err) {
-    app.log.error('Brevo Exception:', err);
-    return false;
-  }
-}
 
 // Central Audit Logger Helper Function
 async function logAudit(actionType, entityType, entityId, details, request = null, adminUser = null, status = 'SUCCESS') {

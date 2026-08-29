@@ -1065,7 +1065,7 @@
             <div class="font-bold text-indigo-900 flex items-center gap-1.5 mb-1">
               <i class="bi bi-pencil-square text-indigo-600"></i> Level 2: Manager / Editor
             </div>
-            <p class="text-slate-600 text-[11px]">Invited operational manager. Can publish events, update CRM statuses, verify payments, and dispatch Brevo emails. Cannot remove administrators.</p>
+            <p class="text-slate-600 text-[11px]">Invited operational manager. Can publish events, update CRM statuses, verify payments, and dispatch Hostinger emails. Cannot remove administrators.</p>
           </div>
 
           <div class="p-3.5 bg-slate-100 border border-slate-200 rounded-xl">
@@ -1732,7 +1732,7 @@
           </div>
 
           <div class="flex justify-between items-center pt-3 border-t border-slate-200">
-            <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'RE: ${rec.subject || 'Inquiry Follow-up'}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Send Reply via Brevo</button>
+            <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'RE: ${rec.subject || 'Inquiry Follow-up'}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Send Reply via Hostinger</button>
             <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
           </div>
         `);
@@ -1752,7 +1752,7 @@
       showModal(`
         <h3 class="text-base font-bold font-heading text-slate-900 flex items-center gap-2">
           <i class="bi bi-envelope-paper-fill text-[#123B32]"></i>
-          <span>Dispatch Email via Brevo API</span>
+          <span>Dispatch Email via Hostinger API</span>
         </h3>
         <form onsubmit="submitDirectEmail(event)" class="space-y-3 text-xs">
           <div>
@@ -1796,7 +1796,7 @@
           body: JSON.stringify({ toEmail, toName, subject, message })
         });
         if (!ok) throw new Error(data.error || 'Failed to dispatch email');
-        showToast('Email delivered successfully via Brevo!');
+        showToast('Email delivered successfully via Hostinger!');
         closeModal();
       } catch (err) {
         showToast(err.message, 'error');
@@ -1809,7 +1809,7 @@
     }
 
     // ==========================================
-    // 📧 LIVE TEST EMAIL SENDER VIA BREVO
+    // 📧 LIVE TEST EMAIL SENDER VIA HOSTINGER
     // ==========================================
     // 🛡️ ROLE & PERMISSION HELPERS
     // ==========================================
@@ -2412,7 +2412,7 @@
           </td>
           <td class="p-3 text-right space-x-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
             <button onclick="openRowDetails('leads', ${lead.id})" title="View Details" class="p-1.5 bg-slate-100 hover:bg-[#123B32] hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-eye"></i></button>
-            <button onclick="openSendEmailModal('${lead.email}', '${lead.name}', 'RE: ${lead.subject || 'Inquiry Follow-up'}')" title="Direct Email via Brevo" class="p-1.5 bg-slate-100 hover:bg-[#123B32] hover:text-white text-[#123B32] rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-envelope-fill"></i></button>
+            <button onclick="openSendEmailModal('${lead.email}', '${lead.name}', 'RE: ${lead.subject || 'Inquiry Follow-up'}')" title="Direct Email via Hostinger" class="p-1.5 bg-slate-100 hover:bg-[#123B32] hover:text-white text-[#123B32] rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-envelope-fill"></i></button>
             <button onclick="confirmDeleteLead(${lead.id})" title="Delete Lead" class="p-1.5 bg-slate-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-trash"></i></button>
           </td>
         </tr>
@@ -3014,7 +3014,7 @@
           </div>
         </div>
         <div class="flex justify-between items-center pt-3">
-          <button onclick="openSendEmailModal('${app.email}', '${app.applicant_name}', 'Interview Update: ${app.job_title}')" class="px-4 py-2 bg-[#123B32] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5"><i class="bi bi-send"></i> Send Email via Brevo</button>
+          <button onclick="openSendEmailModal('${app.email}', '${app.applicant_name}', 'Interview Update: ${app.job_title}')" class="px-4 py-2 bg-[#123B32] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5"><i class="bi bi-send"></i> Send Email via Hostinger</button>
           <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-800 font-semibold rounded-xl text-xs">Close</button>
         </div>
       `);
@@ -3556,13 +3556,13 @@
     }
 
     // ==========================================
-    // DIRECT BREVO EMAIL DISPATCH MODAL
+    // DIRECT HOSTINGER EMAIL DISPATCH MODAL
     // ==========================================
     function openSendEmailModal(toEmail = '', toName = '', defaultSubject = 'Message from Shazu Soft Technologies') {
       showModal(`
         <h3 class="text-base font-bold font-heading text-slate-900 flex items-center gap-2">
           <i class="bi bi-send-fill text-[#123B32]"></i>
-          <span>Send Direct Brevo Email</span>
+          <span>Send Direct Hostinger Email</span>
         </h3>
         <form onsubmit="sendDirectEmail(event)" class="space-y-3.5 text-xs">
           <div class="grid grid-cols-2 gap-3">
@@ -3605,7 +3605,7 @@
           body: JSON.stringify({ toEmail, toName, subject, message })
         });
         if (!ok) throw new Error(data.error || 'Failed to send email');
-        showToast(`Email dispatched via Brevo to ${toEmail}`);
+        showToast(`Email dispatched via Hostinger to ${toEmail}`);
         closeModal();
       } catch (err) {
         showToast(err.message, 'error');
