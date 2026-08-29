@@ -26,16 +26,11 @@ const HOSTINGER_API_KEY = process.env.HOSTINGER_API_KEY;
 const HOSTINGER_SENDER_EMAIL = process.env.HOSTINGER_SENDER_EMAIL || 'info@shazusofttechnologies.org';
 const HOSTINGER_SENDER_NAME = process.env.HOSTINGER_SENDER_NAME || 'Shazu Soft Technologies';
 
-const BREVO_API_KEY = process.env.BREVO_API_KEY;
-const BREVO_SENDER = process.env.HOSTINGER_SENDER_EMAIL || process.env.BREVO_SENDER_EMAIL || process.env.BREVO_SENDER || 'info@shazusofttechnologies.org';
-const BREVO_SENDER_NAME = process.env.HOSTINGER_SENDER_NAME || process.env.BREVO_SENDER_NAME || 'Shazu Soft Technologies';
-
 // ----------------------------------------------------
 // HOSTINGER TRANSACTIONAL EMAIL ENGINE
 // ----------------------------------------------------
 async function sendHostingerEmail({ toEmail, toName, subject, htmlContent, textContent }) {
-  const apiKey = HOSTINGER_API_KEY || BREVO_API_KEY;
-  if (!apiKey) {
+  if (!HOSTINGER_API_KEY) {
     app.log.warn('HOSTINGER_API_KEY is not configured in .env file.');
     return { success: false, error: 'Hostinger API key missing' };
   }
@@ -60,77 +55,35 @@ async function sendHostingerEmail({ toEmail, toName, subject, htmlContent, textC
     htmlContent: htmlContent || `<p>${textContent || subject}</p>`
   });
 
-  // Primary: Hostinger API Endpoint
-  if (HOSTINGER_API_KEY) {
-    try {
-      const response = await fetch('https://api.hostinger.com/v1/email/send', {
-        method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'authorization': `Bearer ${HOSTINGER_API_KEY}`,
-          'x-api-key': HOSTINGER_API_KEY,
-          'content-type': 'application/json'
-        },
-        body: payload
-      });
-
-      if (response.ok) {
-        app.log.info(`Hostinger email dispatched successfully to ${toEmail}. Status: ${response.status}`);
-        return { success: true, statusCode: response.status };
-      }
-      const responseBody = await response.text();
-      app.log.warn(`Hostinger API response for ${toEmail}: ${response.status} - ${responseBody}`);
-    } catch (err) {
-      app.log.warn(`Hostinger API error for ${toEmail}: ${err.message}`);
-    }
-  }
-
-  // Fallback: Brevo API v3 if key available
-  if (BREVO_API_KEY) {
-    return new Promise((resolve) => {
-      const req = https.request('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'api-key': BREVO_API_KEY,
-          'content-type': 'application/json',
-          'content-length': Buffer.byteLength(payload)
-        },
-        timeout: 10000
-      }, (res) => {
-        let responseBody = '';
-        res.on('data', chunk => responseBody += chunk);
-        res.on('end', () => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            app.log.info(`Hostinger/Brevo fallback email dispatched successfully to ${toEmail}. Status: ${res.statusCode}`);
-            resolve({ success: true, statusCode: res.statusCode, body: responseBody });
-          } else {
-            app.log.warn(`Email response to ${toEmail}: Status ${res.statusCode}, Body: ${responseBody}`);
-            resolve({ success: false, statusCode: res.statusCode, error: responseBody });
-          }
-        });
-      });
-
-      req.on('error', (err) => {
-        app.log.warn(`Email network unreachable / error for ${toEmail}: ${err.message}`);
-        resolve({ success: false, error: err.message });
-      });
-
-      req.on('timeout', () => {
-        req.destroy();
-        app.log.warn(`Email request timed out for ${toEmail}`);
-        resolve({ success: false, error: 'Timeout sending email' });
-      });
-
-      req.write(payload);
-      req.end();
+  try {
+    const response = await fetch('https://api.hostinger.com/v1/email/send', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'authorization': `Bearer ${HOSTINGER_API_KEY}`,
+        'x-api-key': HOSTINGER_API_KEY,
+        'content-type': 'application/json'
+      },
+      body: payload
     });
-  }
 
-  return { success: false, error: 'Failed to send email via Hostinger' };
+    if (response.ok) {
+      app.log.info(`Hostinger email dispatched successfully to ${toEmail}. Status: ${response.status}`);
+      return { success: true, statusCode: response.status };
+    }
+    const responseBody = await response.text();
+    app.log.warn(`Hostinger API response for ${toEmail}: ${response.status} - ${responseBody}`);
+    return { success: false, statusCode: response.status, error: responseBody };
+  } catch (err) {
+    app.log.warn(`Hostinger API error for ${toEmail}: ${err.message}`);
+    return { success: false, error: err.message };
+  }
 }
 
-// Wrapper to route all email dispatches through Hostinger
+// Global Email Dispatcher
+async function sendEmail(params) {
+  return sendHostingerEmail(params);
+}
 async function sendBrevoEmail(params) {
   return sendHostingerEmail(params);
 }
@@ -1204,8 +1157,12 @@ app.post('/api/auth/send-otp', async (request, reply) => {
       [lowerEmail, otpCode, expiresAt]
     );
 
-    // Dispatch Brevo OTP Email
-    const otpHtml = `
+    // Dispatch Hostinger OTP Email
+    await sendHostingerEmail({
+      toEmail: lowerEmail,
+      toName: admin.name || 'Admin',
+      subject: `Your Admin Verification Code: ${otpCode} - SST`,
+      htmlContent: `
       <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
         <div style="background-color: #123B32; padding: 24px 32px; text-align: center;">
           <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px;">SHAZU SOFT TECHNOLOGIES</h2>
@@ -1226,13 +1183,7 @@ app.post('/api/auth/send-otp', async (request, reply) => {
           © 2026 Shazu Soft Technologies. All rights reserved.
         </div>
       </div>
-    `;
-
-    await sendBrevoEmail({
-      toEmail: lowerEmail,
-      toName: admin.name || 'Admin',
-      subject: `Your Admin Verification Code: ${otpCode} - SST`,
-      htmlContent: otpHtml
+    `
     });
 
     return reply.status(200).send({ success: true, message: 'A 6-digit verification code has been dispatched to your email.' });
@@ -1509,9 +1460,12 @@ app.post('/api/public/events/register', async (request, reply) => {
     registered_at: new Date()
   };
 
-  // Dispatch Official Branded Pass via Brevo
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(tokenNo)}`;
-  const passHtml = `
+  // Dispatch Official Branded Pass via Hostinger
+  sendHostingerEmail({
+    toEmail: trimmedEmail,
+    toName: trimmedName,
+    subject: isFree ? `Event Pass Confirmed [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft` : `Registration Received [Ref Pending]: ${cleanEventTitle} - Shazu Soft`,
+    htmlContent: `
     <!DOCTYPE html>
     <html>
     <head><meta charset="utf-8"></head>
@@ -1533,7 +1487,7 @@ app.post('/api/public/events/register', async (request, reply) => {
               <span style="font-size: 11px; text-transform: uppercase; color: #123B32; font-weight: bold; letter-spacing: 1px;">Official Entry &amp; Attendance QR Code Pass:</span>
               
               <div style="margin: 14px 0;">
-                <img src="${qrCodeUrl}" alt="Attendance QR Code Pass" style="width: 180px; height: 180px; display: inline-block; border: 1px solid #cbd5e1; border-radius: 12px; padding: 8px; background: #ffffff;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(tokenNo)}" alt="Attendance QR Code Pass" style="width: 180px; height: 180px; display: inline-block; border: 1px solid #cbd5e1; border-radius: 12px; padding: 8px; background: #ffffff;">
               </div>
 
               <div style="font-size: 22px; font-family: monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin-bottom: 4px;">${tokenNo}</div>
@@ -1567,13 +1521,7 @@ app.post('/api/public/events/register', async (request, reply) => {
       </div>
     </body>
     </html>
-  `;
-
-  sendBrevoEmail({
-    toEmail: trimmedEmail,
-    toName: trimmedName,
-    subject: isFree ? `Event Pass Confirmed [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft` : `Registration Received [Ref Pending]: ${cleanEventTitle} - Shazu Soft`,
-    htmlContent: passHtml
+  `
   });
 
   if (!isFree) {
@@ -1661,7 +1609,7 @@ app.post('/api/public/contact', async (request, reply) => {
       <p style="font-size: 13px; color: #64748b;">Our Salem operations team will reach out shortly using your reference token.</p>
     </div>
   `;
-  sendBrevoEmail({ toEmail: trimmedEmail, toName: trimmedName, subject: `Inquiry Received [Ref: ${initialToken}] - SST`, htmlContent: clientHtml });
+  sendHostingerEmail({ toEmail: trimmedEmail, toName: trimmedName, subject: `Inquiry Received [Ref: ${initialToken}] - SST`, htmlContent: clientHtml });
 
   return { message: 'Inquiry submitted successfully!', inquiry };
 });
@@ -1767,7 +1715,7 @@ app.post('/api/public/careers/apply', async (request, reply) => {
       </div>
     </div>
   `;
-  sendBrevoEmail({ toEmail: trimmedEmail, toName: trimmedName, subject: `Application Received [Ref: ${tokenNo}]: ${cleanJobTitle} - Shazu Soft Technologies`, htmlContent: candidateHtml });
+  sendHostingerEmail({ toEmail: trimmedEmail, toName: trimmedName, subject: `Application Received [Ref: ${tokenNo}]: ${cleanJobTitle} - Shazu Soft Technologies`, htmlContent: candidateHtml });
 
   return { message: 'Application submitted successfully!', token_no: tokenNo, application };
 });
@@ -1887,7 +1835,7 @@ app.post('/api/public/membership/apply', async (request, reply) => {
       <p style="font-size: 13px; color: #64748b;">You can track your membership status anytime using your reference token.</p>
     </div>
   `;
-  sendBrevoEmail({ toEmail: trimmedEmail, toName: trimmedName, subject: `Membership Application Received [Ref: ${tokenNo}] - SST`, htmlContent: memberHtml });
+  sendHostingerEmail({ toEmail: trimmedEmail, toName: trimmedName, subject: `Membership Application Received [Ref: ${tokenNo}] - SST`, htmlContent: memberHtml });
 
   return { message: 'Membership application submitted successfully!', token_no: tokenNo, membership };
 });
@@ -2144,7 +2092,7 @@ app.put('/api/admin/event-registrations/:id/payment', { preValidation: [app.auth
         <p style="font-size: 13px; color: #64748b;">Warm regards,<br><strong>SST Event Operations Desk</strong></p>
       </div>
     `;
-    sendBrevoEmail({ toEmail: reg.email, toName: reg.name, subject: `🎟️ OFFICIAL PASS APPROVED [Ref: ${tokenNo}]: ${reg.event_title}`, htmlContent: verifiedHtml });
+    sendHostingerEmail({ toEmail: reg.email, toName: reg.name, subject: `🎟️ OFFICIAL PASS APPROVED [Ref: ${tokenNo}]: ${reg.event_title}`, htmlContent: verifiedHtml });
   }
 
   return { registration: reg };
@@ -2207,7 +2155,7 @@ app.put('/api/admin/applications/:id/status', { preValidation: [app.authenticate
     </div>
   `;
 
-  sendBrevoEmail({ toEmail: appRecord.email, toName: appRecord.applicant_name, subject, htmlContent: candidateHtml });
+  sendHostingerEmail({ toEmail: appRecord.email, toName: appRecord.applicant_name, subject, htmlContent: candidateHtml });
 
   return { application: appRecord };
 });
@@ -2262,8 +2210,12 @@ app.post('/api/admin/users', { preValidation: [requireRole(['super_admin'])] }, 
   );
   const newUser = insertRes.rows[0];
 
-  // Send onboarding email notification via Brevo
-  const welcomeHtml = `
+  // Send onboarding email notification via Hostinger
+  sendHostingerEmail({
+    toEmail: lowerEmail,
+    toName: newUser.name,
+    subject: 'Welcome to SST Management Team - Admin Access Provisioned',
+    htmlContent: `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
       <div style="background-color: #123B32; padding: 24px 32px; text-align: center;">
         <h2 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 700;">SHAZU SOFT TECHNOLOGIES</h2>
@@ -2284,13 +2236,7 @@ app.post('/api/admin/users', { preValidation: [requireRole(['super_admin'])] }, 
         © 2026 Shazu Soft Technologies. All rights reserved.
       </div>
     </div>
-  `;
-
-  sendBrevoEmail({
-    toEmail: lowerEmail,
-    toName: newUser.name,
-    subject: 'Welcome to SST Management Team - Admin Access Provisioned',
-    htmlContent: welcomeHtml
+  `
   });
 
   return { user: newUser, message: 'Admin user added successfully and notification email dispatched.' };
@@ -2529,7 +2475,7 @@ app.put('/api/admin/memberships/:id/status', { preValidation: [app.authenticate]
         <p style="font-size: 13px; color: #64748b;">Warm regards,<br><strong>SST Executive Council</strong></p>
       </div>
     `;
-    sendBrevoEmail({ toEmail: mem.email, toName: mem.name, subject: `🎉 APPROVED! SST Membership Dossier: ${mem.token_no}`, htmlContent: verifiedHtml });
+    sendHostingerEmail({ toEmail: mem.email, toName: mem.name, subject: `🎉 APPROVED! SST Membership Dossier: ${mem.token_no}`, htmlContent: verifiedHtml });
   }
 
   return { membership: mem };
@@ -3186,7 +3132,7 @@ app.post('/api/admin/email/send', { preValidation: [app.authenticate] }, async (
     </div>
   `;
 
-  const result = await sendBrevoEmail({
+  const result = await sendHostingerEmail({
     toEmail,
     toName: toName || toEmail,
     subject,
@@ -3197,7 +3143,7 @@ app.post('/api/admin/email/send', { preValidation: [app.authenticate] }, async (
     await logAudit('SEND_EMAIL', 'COMMUNICATION', toEmail, `Sent email with subject: ${subject}`, request);
     return { success: true, message: `Email dispatched successfully to ${toEmail}` };
   } else {
-    return reply.status(500).send({ error: `Brevo email dispatch failed: ${result.error || 'Unknown error'}` });
+    return reply.status(500).send({ error: `Hostinger email dispatch failed: ${result.error || 'Unknown error'}` });
   }
 });
 
