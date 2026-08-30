@@ -1621,6 +1621,8 @@ app.post('/api/public/careers/apply', async (request, reply) => {
   const trimmedName = (applicant_name || '').trim();
   const trimmedEmail = (email || '').trim().toLowerCase();
   const trimmedPhone = (phone || '').trim();
+  const trimmedResume = (resume_url || '').trim();
+  const trimmedMessage = (message || '').trim();
   const cleanJobTitle = (job_title || 'General Application').trim();
   let parsedJobId = job_id ? parseInt(job_id, 10) || null : null;
   if (parsedJobId) {
@@ -1640,8 +1642,16 @@ app.post('/api/public/careers/apply', async (request, reply) => {
     return reply.status(400).send({ error: 'Please enter a valid email address (e.g., name@domain.com).' });
   }
 
-  if (trimmedPhone && !isValidPhoneStr(trimmedPhone)) {
+  if (!trimmedPhone || !isValidPhoneStr(trimmedPhone)) {
     return reply.status(400).send({ error: 'Please enter a valid contact phone number.' });
+  }
+
+  if (!trimmedResume) {
+    return reply.status(400).send({ error: 'Please upload your resume / portfolio document.' });
+  }
+
+  if (!trimmedMessage || trimmedMessage.length < 5) {
+    return reply.status(400).send({ error: 'Please enter a cover note / brief intro (minimum 5 characters).' });
   }
 
   // Duplicate Check: Same email & job position

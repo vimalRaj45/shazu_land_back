@@ -265,6 +265,7 @@ async function runBackendTests() {
       applicant_name: 'Jane Quantum',
       email: 'jane.quantum@example.com',
       phone: '9123456789',
+      resume_url: 'https://example.com/resume.pdf',
       message: 'Automated job application duplicate test.'
     };
     const res1 = await request('POST', '/api/public/careers/apply', {}, payload);
