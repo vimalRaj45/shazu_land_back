@@ -9,6 +9,7 @@
     "dev": "nodemon server.js",
     "build": "echo 'Build successful'",
     "test:backend": "node backend/tests/backend-test-suite.js",
+    "test:email": "node backend/test-send-email.js",
     "test:frontend": "node tests/frontend-playwright.test.js",
     "test": "node tests/run-all-tests.js"
   },
@@ -21,6 +22,7 @@
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
+    "hostinger-mail-api-sdk": "^1.19.0",
     "pg": "^8.13.3"
   },
   "devDependencies": {

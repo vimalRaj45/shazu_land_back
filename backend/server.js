@@ -22,61 +22,57 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'vimalraj5207@gmail.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ShazuAdmin2026!';
+const { Configuration, AccountApi, SendApi } = require('hostinger-mail-api-sdk');
+
 const HOSTINGER_API_KEY = process.env.HOSTINGER_API_KEY;
 const HOSTINGER_SENDER_EMAIL = process.env.HOSTINGER_SENDER_EMAIL || 'info@shazusofttechnologies.org';
 const HOSTINGER_SENDER_NAME = process.env.HOSTINGER_SENDER_NAME || 'Shazu Soft Technologies';
 
+// Initialize Hostinger Mail SDK Services
+const hostingerMailConfig = new Configuration({
+  apiKey: HOSTINGER_API_KEY,
+  accessToken: HOSTINGER_API_KEY
+});
+const hostingerSendApi = new SendApi(hostingerMailConfig);
+const hostingerAccountApi = new AccountApi(hostingerMailConfig);
+
+let cachedMailboxResourceId = 'AC27733647b7b2b04cefeca882d854';
+
 // ----------------------------------------------------
-// HOSTINGER TRANSACTIONAL EMAIL ENGINE
+// HOSTINGER TRANSACTIONAL EMAIL ENGINE (SDK DRIVEN)
 // ----------------------------------------------------
 async function sendHostingerEmail({ toEmail, toName, subject, htmlContent, textContent }) {
   if (!HOSTINGER_API_KEY) {
-    app.log.warn('HOSTINGER_API_KEY is not configured in .env file.');
+    if (app && app.log) app.log.warn('HOSTINGER_API_KEY is not configured in .env file.');
     return { success: false, error: 'Hostinger API key missing' };
   }
 
-  const payload = JSON.stringify({
-    from: {
-      email: HOSTINGER_SENDER_EMAIL,
-      name: HOSTINGER_SENDER_NAME
-    },
-    sender: {
-      email: HOSTINGER_SENDER_EMAIL,
-      name: HOSTINGER_SENDER_NAME
-    },
-    to: [
-      {
-        email: toEmail,
-        name: toName || toEmail
+  // Retrieve mailboxResourceId if not already cached
+  if (!cachedMailboxResourceId) {
+    try {
+      const accRes = await hostingerAccountApi.getCurrentAccount();
+      const accData = accRes.data ? accRes.data.data || accRes.data : accRes;
+      if (accData && accData.mailboxes && accData.mailboxes.length > 0) {
+        cachedMailboxResourceId = accData.mailboxes[0].resourceId || cachedMailboxResourceId;
       }
-    ],
+    } catch (_) {}
+  }
+
+  const sendRequest = {
+    to: [toEmail],
     subject: subject || 'Notification from Shazu Soft Technologies',
     html: htmlContent || `<p>${textContent || subject}</p>`,
-    htmlContent: htmlContent || `<p>${textContent || subject}</p>`
-  });
+    text: textContent || subject
+  };
 
   try {
-    const response = await fetch('https://api.hostinger.com/v1/email/send', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'authorization': `Bearer ${HOSTINGER_API_KEY}`,
-        'x-api-key': HOSTINGER_API_KEY,
-        'content-type': 'application/json'
-      },
-      body: payload
-    });
-
-    if (response.ok) {
-      app.log.info(`Hostinger email dispatched successfully to ${toEmail}. Status: ${response.status}`);
-      return { success: true, statusCode: response.status };
-    }
-    const responseBody = await response.text();
-    app.log.warn(`Hostinger API response for ${toEmail}: ${response.status} - ${responseBody}`);
-    return { success: false, statusCode: response.status, error: responseBody };
+    const response = await hostingerSendApi.sendEmail(cachedMailboxResourceId, sendRequest);
+    if (app && app.log) app.log.info(`Hostinger SDK email dispatched successfully to ${toEmail}.`);
+    return { success: true, statusCode: response ? response.status || 200 : 200 };
   } catch (err) {
-    app.log.warn(`Hostinger API error for ${toEmail}: ${err.message}`);
-    return { success: false, error: err.message };
+    const errorMsg = err.response && err.response.data ? JSON.stringify(err.response.data) : err.message;
+    if (app && app.log) app.log.warn(`Hostinger SDK API error for ${toEmail}: ${errorMsg}`);
+    return { success: false, error: errorMsg };
   }
 }
 
@@ -887,12 +883,16 @@ async function initDatabase() {
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
       ALTER TABLE applications ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);
       ALTER TABLE applications ADD COLUMN IF NOT EXISTS admin_notes TEXT;
+      ALTER TABLE applications ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE applications ADD COLUMN IF NOT EXISTS submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
       ALTER TABLE applications ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
       ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);
       ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS admin_notes TEXT;
+      ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
       ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
       ALTER TABLE memberships ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);
       ALTER TABLE memberships ADD COLUMN IF NOT EXISTS admin_notes TEXT;
+      ALTER TABLE memberships ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
       ALTER TABLE memberships ADD COLUMN IF NOT EXISTS association_name VARCHAR(255);
       ALTER TABLE memberships ADD COLUMN IF NOT EXISTS membership_type VARCHAR(50);
       ALTER TABLE memberships ADD COLUMN IF NOT EXISTS name VARCHAR(255);
@@ -1648,13 +1648,13 @@ app.post('/api/public/careers/apply', async (request, reply) => {
   let existingApp;
   if (parsedJobId) {
     existingApp = await pool.query(
-      `SELECT token_no, status, created_at FROM applications 
+      `SELECT token_no, status FROM applications 
        WHERE LOWER(email) = $1 AND job_id = $2 ORDER BY id DESC LIMIT 1`,
       [trimmedEmail, parsedJobId]
     );
   } else {
     existingApp = await pool.query(
-      `SELECT token_no, status, created_at FROM applications 
+      `SELECT token_no, status FROM applications 
        WHERE LOWER(email) = $1 AND LOWER(job_title) = LOWER($2) ORDER BY id DESC LIMIT 1`,
       [trimmedEmail, cleanJobTitle]
     );
@@ -1764,7 +1764,7 @@ app.post('/api/public/membership/apply', async (request, reply) => {
 
   // Duplicate Check: Same email & membership type
   const existingMem = await pool.query(
-    `SELECT token_no, status, created_at FROM memberships 
+    `SELECT token_no, status FROM memberships 
      WHERE LOWER(email) = $1 AND LOWER(membership_type) = LOWER($2) ORDER BY id DESC LIMIT 1`,
     [trimmedEmail, cleanMemType]
   );
