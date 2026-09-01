@@ -10,7 +10,7 @@ window.toggleMobileDrawer = function(e) {
   }
   const mobileMenu = document.getElementById('mobile-menu');
   const mobileBackdrop = document.getElementById('mobile-backdrop');
-  const menuBtn = document.getElementById('mobile-menu-btn');
+  const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn');
 
   if (mobileMenu && mobileBackdrop) {
     const isActive = mobileMenu.classList.contains('active');
@@ -34,7 +34,7 @@ window.closeMobileDrawer = function(e) {
   }
   const mobileMenu = document.getElementById('mobile-menu');
   const mobileBackdrop = document.getElementById('mobile-backdrop');
-  const menuBtn = document.getElementById('mobile-menu-btn');
+  const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn');
   if (mobileMenu) mobileMenu.classList.remove('active');
   if (mobileBackdrop) mobileBackdrop.classList.remove('active');
   if (menuBtn) menuBtn.classList.remove('open');
@@ -122,7 +122,7 @@ function syncActiveNavLinks() {
 
 // 1. Mobile Drawer Listeners
 function initMobileDrawer() {
-  const menuBtn = document.getElementById('mobile-menu-btn');
+  const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn');
   const closeBtn = document.getElementById('mobile-close-btn');
   const mobileBackdrop = document.getElementById('mobile-backdrop');
   const mobileMenu = document.getElementById('mobile-menu');

@@ -823,9 +823,20 @@
   window.allGalleryData = [];
   window.activeGalleryCategory = 'all';
 
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   async function loadGalleryShowcase() {
     const container = document.getElementById('dynamic-gallery-container');
-    if (!container) return;
+    const reel = document.getElementById('dynamic-gallery-reel');
+    if (!container && !reel) return;
 
     try {
       const res = await fetch(`${API_BASE}/api/public/gallery`).then(r => r.json()).catch(() => ({ gallery: [] }));
@@ -871,40 +882,48 @@
           </div>
         `;
       } else {
-        reel.innerHTML = allItems.map(item => `
-          <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="shrink-0 w-72 sm:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
-            <!-- Top Image -->
-            <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
-              <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div class="absolute top-3 left-3">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
-                  ${item.category || 'HIGHLIGHT'}
-                </span>
-              </div>
-              <div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
-                <i class="bi bi-arrows-fullscreen"></i>
-              </div>
-            </div>
+        reel.innerHTML = allItems.map((item, idx) => {
+          const safeTitle = escapeHtml(item.title || 'Event Highlight');
+          const safeCategory = escapeHtml(item.category || 'HIGHLIGHT');
+          const safeDesc = escapeHtml(item.description || '');
+          const itemId = item.id != null ? item.id : idx;
+          const imgSrc = item.image_blob || 'images/software.png';
 
-            <!-- Bottom Text Container (100% Readable) -->
-            <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2">
-              <div>
-                <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
-                  ${item.title}
-                </h3>
-                ${item.description ? `<p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1">${item.description}</p>` : ''}
+          return `
+            <div onclick="window.openGalleryLightboxById('${itemId}')" class="shrink-0 w-72 sm:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
+              <!-- Top Image -->
+              <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
+                <img src="${imgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div class="absolute top-3 left-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
+                    ${safeCategory}
+                  </span>
+                </div>
+                <div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
+                  <i class="bi bi-arrows-fullscreen"></i>
+                </div>
               </div>
-              <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-[#123B32] dark:text-emerald-400">
-                <span class="inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                  <span>View Full Size</span>
-                  <i class="bi bi-arrow-right"></i>
-                </span>
-                <span class="text-[10px] font-mono text-slate-400">HD Photo</span>
+
+              <!-- Bottom Text Container (100% Readable) -->
+              <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2">
+                <div>
+                  <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
+                    ${safeTitle}
+                  </h3>
+                  ${safeDesc ? `<p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1" title="${safeDesc}">${safeDesc}</p>` : ''}
+                </div>
+                <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-[#123B32] dark:text-emerald-400">
+                  <span class="inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span>View Full Details & Photo</span>
+                    <i class="bi bi-arrow-right"></i>
+                  </span>
+                  <span class="text-[10px] font-mono text-slate-400">HD Photo</span>
+                </div>
               </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
     }
 
@@ -928,80 +947,152 @@
       return;
     }
 
-    container.innerHTML = items.map(item => `
-      <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between">
-        <!-- Top Image -->
-        <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
-          <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-          <div class="absolute top-3 left-3">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
-              ${item.category || 'EVENT'}
-            </span>
-          </div>
-          <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-            <i class="bi bi-arrows-fullscreen"></i>
-          </div>
-        </div>
+    container.innerHTML = items.map((item, idx) => {
+      const safeTitle = escapeHtml(item.title || 'Gallery Photo');
+      const safeCategory = escapeHtml(item.category || 'EVENT');
+      const safeDesc = escapeHtml(item.description || '');
+      const itemId = item.id != null ? item.id : idx;
+      const imgSrc = item.image_blob || 'images/software.png';
 
-        <!-- Bottom Content Box with Ultra Clean Visible Typography -->
-        <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2.5 bg-white dark:bg-slate-900">
-          <div>
-            <h3 class="text-sm sm:text-base font-extrabold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-snug">
-              ${item.title}
-            </h3>
-            ${item.description ? `<p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1.5">${item.description}</p>` : ''}
+      return `
+        <div onclick="window.openGalleryLightboxById('${itemId}')" class="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between">
+          <!-- Top Image -->
+          <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
+            <img src="${imgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            <div class="absolute top-3 left-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
+                ${safeCategory}
+              </span>
+            </div>
+            <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+              <i class="bi bi-arrows-fullscreen"></i>
+            </div>
           </div>
 
-          <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
-            <span class="inline-flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 transition-transform">
-              <span>View High-Res Photo</span>
-              <i class="bi bi-arrow-right"></i>
-            </span>
-            <span class="text-[10px] font-mono text-slate-400 uppercase">Gallery</span>
+          <!-- Bottom Content Box with Ultra Clean Visible Typography -->
+          <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2.5 bg-white dark:bg-slate-900">
+            <div>
+              <h3 class="text-sm sm:text-base font-extrabold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-snug">
+                ${safeTitle}
+              </h3>
+              ${safeDesc ? `<p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1.5" title="${safeDesc}">${safeDesc}</p>` : ''}
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
+              <span class="inline-flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 transition-transform">
+                <span>View Full Details & Photo</span>
+                <i class="bi bi-arrow-right"></i>
+              </span>
+              <span class="text-[10px] font-mono text-slate-400 uppercase">Gallery</span>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
+  }
+
+  window.openGalleryLightboxById = function(itemId) {
+    const item = (window.allGalleryData || []).find((i, idx) => String(i.id) === String(itemId) || String(idx) === String(itemId));
+    if (item) {
+      window.renderGalleryLightboxModal(item);
+    }
   };
 
-  window.openGalleryLightbox = function(encodedImg, encodedTitle, encodedCat, encodedDesc) {
-    const img = decodeURIComponent(encodedImg);
-    const title = decodeURIComponent(encodedTitle);
-    const cat = decodeURIComponent(encodedCat);
-    const desc = decodeURIComponent(encodedDesc);
+  window.openGalleryLightbox = function(arg1, arg2, arg3, arg4) {
+    // If called with only one argument, treat as ID or item object
+    if (arg2 === undefined) {
+      if (typeof arg1 === 'object' && arg1 !== null) {
+        window.renderGalleryLightboxModal(arg1);
+      } else {
+        window.openGalleryLightboxById(arg1);
+      }
+      return;
+    }
+    // Backward compatibility for (encodedImg, encodedTitle, encodedCat, encodedDesc)
+    try {
+      const img = arg1 ? (arg1.includes('%') ? decodeURIComponent(arg1) : arg1) : '';
+      const title = arg2 ? (arg2.includes('%') ? decodeURIComponent(arg2) : arg2) : '';
+      const cat = arg3 ? (arg3.includes('%') ? decodeURIComponent(arg3) : arg3) : '';
+      const desc = arg4 ? (arg4.includes('%') ? decodeURIComponent(arg4) : arg4) : '';
+      window.renderGalleryLightboxModal({ image_blob: img, title, category: cat, description: desc });
+    } catch (e) {
+      window.renderGalleryLightboxModal({ image_blob: arg1, title: arg2, category: arg3, description: arg4 });
+    }
+  };
 
+  window.renderGalleryLightboxModal = function(item) {
     const oldModal = document.getElementById('gallery-lightbox-modal');
     if (oldModal) oldModal.remove();
 
+    const imgSrc = item.image_blob || 'images/software.png';
+    const safeTitle = escapeHtml(item.title || 'Photo Detail');
+    const safeCat = escapeHtml(item.category || 'EVENT');
+    const rawDesc = item.description || '';
+    const safeDesc = escapeHtml(rawDesc);
+    const dateFormatted = item.created_at ? new Date(item.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+
     const modalHtml = `
-      <div id="gallery-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in" onclick="if(event.target === this) window.closeGalleryLightbox()">
-        <div class="relative max-w-4xl w-full bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl space-y-0 text-white">
+      <div id="gallery-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-fade-in" onclick="if(event.target === this) window.closeGalleryLightbox()" role="dialog" aria-modal="true">
+        <div class="relative max-w-4xl w-full bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] text-white">
           
-          <button onclick="window.closeGalleryLightbox()" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-white/20 text-white flex items-center justify-center text-lg transition-colors cursor-pointer" aria-label="Close Preview">
+          <!-- Close Button -->
+          <button onclick="window.closeGalleryLightbox()" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/70 hover:bg-white/20 text-white flex items-center justify-center text-lg transition-all cursor-pointer border border-white/20" aria-label="Close Preview" title="Close (Esc)">
             <i class="bi bi-x-lg"></i>
           </button>
 
-          <div class="w-full max-h-[70vh] bg-black flex items-center justify-center overflow-hidden">
-            <img src="${img}" alt="${title}" class="max-w-full max-h-[70vh] object-contain">
+          <!-- Top Image View Area -->
+          <div class="w-full bg-black flex items-center justify-center overflow-hidden min-h-[260px] max-h-[56vh] relative">
+            <img src="${imgSrc}" alt="${safeTitle}" class="max-w-full max-h-[56vh] w-auto h-auto object-contain select-none">
           </div>
 
-          <div class="p-6 bg-slate-900 border-t border-slate-800 space-y-2">
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-mono font-bold text-[10px] uppercase">${cat || 'EVENT'}</span>
+          <!-- Bottom Full Description & Metadata Area (Scrollable if content is long) -->
+          <div class="p-5 sm:p-6 bg-slate-900 border-t border-slate-800 space-y-3 overflow-y-auto max-h-[36vh]">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-mono font-bold text-[10px] uppercase tracking-wider">${safeCat}</span>
+                ${dateFormatted ? `<span class="text-xs text-slate-400 flex items-center gap-1"><i class="bi bi-calendar-event"></i> ${dateFormatted}</span>` : ''}
+              </div>
+              <a href="${imgSrc}" download="shazu-gallery-photo.jpg" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 transition-colors">
+                <i class="bi bi-download"></i>
+                <span>Download / Full Resolution</span>
+              </a>
             </div>
-            <h2 class="text-lg font-bold font-heading text-white">${title}</h2>
-            ${desc ? `<p class="text-xs text-slate-300 leading-relaxed">${desc}</p>` : ''}
+
+            <h2 class="text-lg sm:text-xl font-bold font-heading text-white leading-snug">${safeTitle}</h2>
+            
+            ${safeDesc ? `
+              <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
+                <h4 class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-1.5 flex items-center gap-1">
+                  <i class="bi bi-card-text"></i> Full Description & Details
+                </h4>
+                <p class="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-line">${safeDesc}</p>
+              </div>
+            ` : `
+              <p class="text-xs text-slate-400 italic">No additional description provided for this photo.</p>
+            `}
           </div>
         </div>
       </div>
     `;
+
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+
+    // Handle Escape key
+    const escHandler = function(e) {
+      if (e.key === 'Escape') {
+        window.closeGalleryLightbox();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
   };
 
   window.closeGalleryLightbox = function() {
     const modal = document.getElementById('gallery-lightbox-modal');
     if (modal) modal.remove();
+    document.body.style.overflow = '';
   };
 
   // 6. Global Modal Helpers for Job Details, Apply & Event Register

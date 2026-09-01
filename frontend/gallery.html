@@ -332,8 +332,10 @@
           </a>
 
           <!-- Mobile Hamburger Toggle Button -->
-          <button id="mobile-hamburger-btn" class="lg:hidden p-2 rounded-lg text-[#26322E] dark:text-[#E2E8F0] hover:bg-[#E8EFEB] dark:hover:bg-slate-800 transition-colors focus:outline-hidden cursor-pointer" aria-label="Toggle Mobile Navigation Drawer">
-            <i class="bi bi-list text-2xl"></i>
+          <button id="mobile-menu-btn" class="lg:hidden p-2 text-[#0F172A] hover:text-[#123B32] focus:outline-none cursor-pointer relative z-40 flex flex-col justify-center items-center w-10 h-10 space-y-1.5" aria-label="Toggle Navigation Menu">
+            <span class="w-6 h-0.5 bg-[#0F172A] dark:bg-white rounded-full transition-all duration-300"></span>
+            <span class="w-6 h-0.5 bg-[#0F172A] dark:bg-white rounded-full transition-all duration-300"></span>
+            <span class="w-6 h-0.5 bg-[#0F172A] dark:bg-white rounded-full transition-all duration-300"></span>
           </button>
         </div>
       </div>
@@ -540,17 +542,60 @@
     </div>
   </footer>
 
+  <!-- AI Chatbot Box Widget -->
+  <div id="chatbot-widget" class="hidden fixed bottom-20 right-6 w-[350px] md:w-[380px] h-[500px] z-50 bg-white border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 font-heading">
+    <!-- Chat Header -->
+    <div class="bg-slate-900 text-white p-4 flex items-center justify-between border-b border-slate-800">
+      <div class="flex items-center gap-2.5">
+        <img loading="lazy" decoding="async" src="img/logo.png" alt="SST Logo" class="h-10 w-auto">
+        <div>
+          <h4 class="font-extrabold text-sm leading-none">SST AI Assistant</h4>
+          <span class="text-[10px] text-green-400 font-bold flex items-center gap-1 mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> Online
+          </span>
+        </div>
+      </div>
+      <button id="chatbot-close-btn" class="text-slate-400 hover:text-white text-xl focus:outline-none cursor-pointer">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+
+    <!-- Chat Messages Scroll Container -->
+    <div id="chatbot-messages" class="flex-1 min-h-0 p-4 overflow-y-auto bg-slate-50 dark:bg-[#0f172a] space-y-3.5 text-xs text-brand-darkText dark:text-[#f8fafc]">
+      <!-- Bot Intro Message -->
+      <div class="flex items-start gap-2 max-w-[88%]">
+        <div class="w-7 h-7 rounded-lg bg-[#E8EFEB] dark:bg-emerald-950/60 border border-brand-border dark:border-[#334155] flex items-center justify-center flex-shrink-0 text-[#123B32] dark:text-[#527A68]">
+          <i class="bi bi-robot"></i>
+        </div>
+        <div class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] px-3.5 py-2.5 rounded-2xl rounded-tl-none shadow-sm leading-relaxed text-left">
+          Hello! Welcome to Shazu Soft Technologies. I'm your AI assistant. How can I help you today with our software, education, or research services?
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing Indicator (hidden by default) -->
+    <div id="chatbot-typing" class="hidden px-4 py-2 bg-slate-50 text-[11px] text-brand-secText italic flex items-center gap-1.5">
+      <span class="flex gap-0.5">
+        <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce"></span>
+        <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
+        <span class="w-1 h-1 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
+      </span>
+      SST AI is typing...
+    </div>
+
+    <!-- Chat Input Area -->
+    <form id="chatbot-form" class="p-3 border-t border-brand-border bg-white flex gap-2">
+      <input type="text" id="chatbot-input" placeholder="Type your message..." autocomplete="off" class="flex-1 border border-brand-border px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:border-brand-green text-brand-darkText">
+      <button type="submit" class="w-9 h-9 rounded-xl bg-brand-green hover:bg-brand-hoverGreen text-white flex items-center justify-center shadow-md transition-all duration-150 cursor-pointer">
+        <i class="bi bi-send"></i>
+      </button>
+    </form>
+  </div>
+
   <!-- Scripts -->
-  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-  <script>
-    AOS.init({
-      duration: 700,
-      once: true,
-      easing: 'ease-out-cubic'
-    });
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-  </script>
-  <script src="js/mobile-nav.js"></script>
-  <script src="js/dynamic-content.js"></script>
+  <script defer src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script defer src="js/main.js"></script>
+  <script defer src="js/chatbot.js"></script>
+  <script defer src="js/dynamic-content.js"></script>
 </body>
 </html>
