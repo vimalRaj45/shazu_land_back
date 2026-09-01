@@ -876,9 +876,9 @@
     if (reel) {
       if (allItems.length === 0) {
         reel.innerHTML = `
-          <div class="w-full py-8 text-center text-slate-400 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
-            <i class="bi bi-images text-2xl mb-1 block"></i>
-            <p class="text-xs font-semibold">No highlights uploaded yet.</p>
+          <div class="w-full py-10 text-center text-slate-400 bg-white/60 dark:bg-slate-900/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+            <i class="bi bi-images text-3xl mb-2 block text-emerald-700/60 dark:text-emerald-400"></i>
+            <p class="text-xs font-semibold text-slate-600 dark:text-slate-400">No moments uploaded yet.</p>
           </div>
         `;
       } else {
@@ -890,31 +890,31 @@
           const imgSrc = item.image_blob || 'images/software.png';
 
           return `
-            <div onclick="window.openGalleryLightboxById('${itemId}')" class="shrink-0 w-72 sm:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
-              <!-- Top Image -->
-              <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
-                <img src="${imgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            <div onclick="window.openGalleryLightboxById('${itemId}')" class="shrink-0 w-72 sm:w-80 md:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
+              <!-- Top Image Frame -->
+              <div class="relative w-full aspect-[4/3] overflow-hidden bg-slate-950 flex items-center justify-center">
+                <img src="${imgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='images/software.png'">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
                 <div class="absolute top-3 left-3">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] uppercase tracking-wider shadow-md">
                     ${safeCategory}
                   </span>
                 </div>
-                <div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                   <i class="bi bi-arrows-fullscreen"></i>
                 </div>
               </div>
 
-              <!-- Bottom Text Container (100% Readable) -->
-              <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2">
+              <!-- Bottom Text Details -->
+              <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-3 bg-white dark:bg-slate-900">
                 <div>
-                  <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
+                  <h3 class="text-sm sm:text-base font-extrabold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
                     ${safeTitle}
                   </h3>
-                  ${safeDesc ? `<p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1" title="${safeDesc}">${safeDesc}</p>` : ''}
+                  ${safeDesc ? `<p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1.5" title="${safeDesc}">${safeDesc}</p>` : ''}
                 </div>
-                <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-[#123B32] dark:text-emerald-400">
-                  <span class="inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
+                  <span class="inline-flex items-center gap-1.5 group-hover:translate-x-1 transition-transform">
                     <span>View Full Details & Photo</span>
                     <i class="bi bi-arrow-right"></i>
                   </span>
@@ -940,7 +940,7 @@
     if (items.length === 0) {
       container.innerHTML = `
         <div class="col-span-full text-center p-12 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-500 text-xs">
-          <i class="bi bi-images text-3xl block mb-2 text-slate-400"></i>
+          <i class="bi bi-images text-3xl block mb-2 text-emerald-700/60 dark:text-emerald-400"></i>
           No media found in this category.
         </div>
       `;
@@ -955,23 +955,23 @@
       const imgSrc = item.image_blob || 'images/software.png';
 
       return `
-        <div onclick="window.openGalleryLightboxById('${itemId}')" class="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between">
-          <!-- Top Image -->
-          <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
-            <img src="${imgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        <div onclick="window.openGalleryLightboxById('${itemId}')" class="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col justify-between">
+          <!-- Top Image Frame -->
+          <div class="relative w-full aspect-[4/3] overflow-hidden bg-slate-950 flex items-center justify-center">
+            <img src="${imgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='images/software.png'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
             <div class="absolute top-3 left-3">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
+              <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] uppercase tracking-wider shadow-md">
                 ${safeCategory}
               </span>
             </div>
-            <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
               <i class="bi bi-arrows-fullscreen"></i>
             </div>
           </div>
 
-          <!-- Bottom Content Box with Ultra Clean Visible Typography -->
-          <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2.5 bg-white dark:bg-slate-900">
+          <!-- Bottom Content Box -->
+          <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-3 bg-white dark:bg-slate-900">
             <div>
               <h3 class="text-sm sm:text-base font-extrabold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-snug">
                 ${safeTitle}
@@ -979,8 +979,8 @@
               ${safeDesc ? `<p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1.5" title="${safeDesc}">${safeDesc}</p>` : ''}
             </div>
 
-            <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
-              <span class="inline-flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 transition-transform">
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
+              <span class="inline-flex items-center gap-1.5 text-xs group-hover:translate-x-1 transition-transform">
                 <span>View Full Details & Photo</span>
                 <i class="bi bi-arrow-right"></i>
               </span>
@@ -1000,7 +1000,6 @@
   };
 
   window.openGalleryLightbox = function(arg1, arg2, arg3, arg4) {
-    // If called with only one argument, treat as ID or item object
     if (arg2 === undefined) {
       if (typeof arg1 === 'object' && arg1 !== null) {
         window.renderGalleryLightboxModal(arg1);
@@ -1009,7 +1008,6 @@
       }
       return;
     }
-    // Backward compatibility for (encodedImg, encodedTitle, encodedCat, encodedDesc)
     try {
       const img = arg1 ? (arg1.includes('%') ? decodeURIComponent(arg1) : arg1) : '';
       const title = arg2 ? (arg2.includes('%') ? decodeURIComponent(arg2) : arg2) : '';
@@ -1026,51 +1024,76 @@
     if (oldModal) oldModal.remove();
 
     const imgSrc = item.image_blob || 'images/software.png';
-    const safeTitle = escapeHtml(item.title || 'Photo Detail');
+    const safeTitle = escapeHtml(item.title || 'Event Photograph');
     const safeCat = escapeHtml(item.category || 'EVENT');
     const rawDesc = item.description || '';
     const safeDesc = escapeHtml(rawDesc);
     const dateFormatted = item.created_at ? new Date(item.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
 
     const modalHtml = `
-      <div id="gallery-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-fade-in" onclick="if(event.target === this) window.closeGalleryLightbox()" role="dialog" aria-modal="true">
-        <div class="relative max-w-4xl w-full bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] text-white">
+      <div id="gallery-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in" onclick="if(event.target === this) window.closeGalleryLightbox()" role="dialog" aria-modal="true">
+        <div class="relative max-w-5xl w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] text-slate-900 dark:text-white">
           
-          <!-- Close Button -->
-          <button onclick="window.closeGalleryLightbox()" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/70 hover:bg-white/20 text-white flex items-center justify-center text-lg transition-all cursor-pointer border border-white/20" aria-label="Close Preview" title="Close (Esc)">
+          <!-- Close 'X' Button -->
+          <button onclick="window.closeGalleryLightbox()" class="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center text-sm transition-all cursor-pointer shadow-md border border-white/20" aria-label="Close Preview" title="Close (Esc)">
             <i class="bi bi-x-lg"></i>
           </button>
 
-          <!-- Top Image View Area -->
-          <div class="w-full bg-black flex items-center justify-center overflow-hidden min-h-[260px] max-h-[56vh] relative">
-            <img src="${imgSrc}" alt="${safeTitle}" class="max-w-full max-h-[56vh] w-auto h-auto object-contain select-none">
+          <!-- Left Column / Photo Viewer Canvas (Responsive Height on Mobile & Desktop) -->
+          <div class="w-full md:w-[58%] bg-slate-950 flex items-center justify-center p-4 sm:p-6 min-h-[280px] max-h-[46vh] md:max-h-[85vh] relative select-none">
+            <img src="${imgSrc}" alt="${safeTitle}" class="max-w-full max-h-[44vh] md:max-h-[78vh] w-auto h-auto object-contain rounded-xl shadow-2xl">
+            <div class="absolute bottom-3 left-3">
+              <span class="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[10px] font-bold">HD ORIGINAL</span>
+            </div>
           </div>
 
-          <!-- Bottom Full Description & Metadata Area (Scrollable if content is long) -->
-          <div class="p-5 sm:p-6 bg-slate-900 border-t border-slate-800 space-y-3 overflow-y-auto max-h-[36vh]">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-mono font-bold text-[10px] uppercase tracking-wider">${safeCat}</span>
-                ${dateFormatted ? `<span class="text-xs text-slate-400 flex items-center gap-1"><i class="bi bi-calendar-event"></i> ${dateFormatted}</span>` : ''}
-              </div>
-              <a href="${imgSrc}" download="shazu-gallery-photo.jpg" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 transition-colors">
-                <i class="bi bi-download"></i>
-                <span>Download / Full Resolution</span>
-              </a>
-            </div>
-
-            <h2 class="text-lg sm:text-xl font-bold font-heading text-white leading-snug">${safeTitle}</h2>
+          <!-- Right Column / Information & Full Description Details (Scrollable & Responsive) -->
+          <div class="w-full md:w-[42%] p-5 sm:p-7 bg-[#FDFCFA] dark:bg-slate-900 flex flex-col justify-between overflow-y-auto max-h-[44vh] md:max-h-[85vh] border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 space-y-4">
             
-            ${safeDesc ? `
-              <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
-                <h4 class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-1.5 flex items-center gap-1">
+            <div class="space-y-3">
+              <!-- Category & Date Header Badges -->
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] uppercase tracking-wider shadow-xs">
+                  ${safeCat}
+                </span>
+                ${dateFormatted ? `
+                  <span class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
+                    <i class="bi bi-calendar3 text-[#123B32] dark:text-emerald-400"></i> ${dateFormatted}
+                  </span>
+                ` : ''}
+              </div>
+
+              <!-- Title -->
+              <h2 class="text-lg sm:text-xl md:text-2xl font-black font-heading text-slate-900 dark:text-white leading-tight">
+                ${safeTitle}
+              </h2>
+
+              <!-- Full Description Content Box -->
+              <div class="bg-white dark:bg-slate-950/70 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-1.5">
+                <h4 class="text-[11px] font-bold uppercase tracking-wider text-[#123B32] dark:text-emerald-400 flex items-center gap-1.5">
                   <i class="bi bi-card-text"></i> Full Description & Details
                 </h4>
-                <p class="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-line">${safeDesc}</p>
+                ${safeDesc ? `
+                  <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line max-h-52 overflow-y-auto pr-1">
+                    ${safeDesc}
+                  </p>
+                ` : `
+                  <p class="text-xs text-slate-400 italic">No extended notes available for this photograph.</p>
+                `}
               </div>
-            ` : `
-              <p class="text-xs text-slate-400 italic">No additional description provided for this photo.</p>
-            `}
+            </div>
+
+            <!-- Footer Action Buttons -->
+            <div class="pt-2 flex items-center gap-2.5">
+              <a href="${imgSrc}" download="${safeTitle.replace(/[^a-zA-Z0-9]/g, '_')}.jpg" target="_blank" rel="noopener noreferrer" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-bold shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <i class="bi bi-download text-sm"></i>
+                <span>Download Photo</span>
+              </a>
+              <button type="button" onclick="window.closeGalleryLightbox()" class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer">
+                Close
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
