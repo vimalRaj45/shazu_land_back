@@ -689,23 +689,31 @@
       const eventImg = ev.image_url || defaultImg;
       const categoryLabel = ev.category ? ev.category.split('|')[0].trim().toUpperCase() : 'EVENT';
       const hasLongDesc = ev.description && ev.description.length > 110;
+      const statusLower = (ev.status || '').toLowerCase().trim();
+      const isPast = statusLower === 'past' || statusLower === 'completed' || statusLower === 'closed' || statusLower === 'concluded';
 
       return `
         <div id="event-card-${ev.id}" data-event-id="${ev.id}" class="event-carousel-card bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
           
           <!-- Event Cover Image with Top Badges, Date Badge & View Poster Pill Button -->
           <div class="h-48 sm:h-52 w-full relative overflow-hidden bg-slate-900 group/img cursor-pointer" onclick="window.openEventPosterModal('${ev.id}')">
-            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500">
+            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500 ${isPast ? 'grayscale-25' : ''}">
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none"></div>
             
-            <!-- Top Badges: Category & Price -->
+            <!-- Top Badges: Category & Price / Status -->
             <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10 pointer-events-none">
               <span class="h-7 px-3 inline-flex items-center gap-1.5 bg-black/70 backdrop-blur-md text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider border border-white/20 shadow-sm shrink-0">
                 <i class="bi bi-tag-fill text-[9px] text-emerald-400"></i>${categoryLabel}
               </span>
-              <span class="h-7 px-3 inline-flex items-center ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full shadow-sm font-mono border border-white/20 shrink-0">
-                ${fee}
-              </span>
+              ${isPast ? `
+                <span class="h-7 px-3 inline-flex items-center bg-slate-700/90 text-slate-200 font-bold text-[10.5px] rounded-full shadow-sm font-mono border border-white/20 shrink-0">
+                  <i class="bi bi-check2-circle mr-1 text-emerald-400"></i> Concluded
+                </span>
+              ` : `
+                <span class="h-7 px-3 inline-flex items-center ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full shadow-sm font-mono border border-white/20 shrink-0">
+                  ${fee}
+                </span>
+              `}
             </div>
             
             <!-- Bottom Row: Date Badge (Left) & View Poster Small Pill Button (Right) -->
@@ -717,8 +725,8 @@
               </span>
 
               <!-- View Poster Pill Button -->
-              <button type="button" onclick="event.stopPropagation(); window.openEventPosterModal('${ev.id}')" class="h-7 px-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 hover:bg-white text-[#123B32] dark:bg-slate-900/90 dark:hover:bg-slate-900 dark:text-emerald-300 font-bold text-[10.5px] shadow-md backdrop-blur-md border border-white/40 dark:border-slate-700 hover:scale-105 transition-all cursor-pointer" title="View Full Event Poster / Flyer">
-                <i class="bi bi-image text-xs text-[#123B32] dark:text-emerald-400"></i>
+              <button type="button" onclick="event.stopPropagation(); window.openEventPosterModal('${ev.id}')" class="h-7 px-3 inline-flex items-center gap-1.5 rounded-lg bg-black/80 hover:bg-[#123B32] dark:bg-black/80 dark:hover:bg-emerald-700 text-white font-bold text-[11px] shadow-lg backdrop-blur-md border border-white/20 hover:border-emerald-400/60 transition-all duration-200 hover:scale-105 cursor-pointer group/btn" title="Click to view high-resolution event poster">
+                <i class="bi bi-image text-xs text-amber-300 group-hover/btn:text-white transition-colors"></i>
                 <span>View Poster</span>
               </button>
             </div>
@@ -751,13 +759,20 @@
               </div>
             </div>
 
-            <!-- Action Buttons: Register CTA & Accessible Share Button -->
+            <!-- Action Buttons: Register CTA (or Concluded Notice) & Accessible Share Button -->
             <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-              <button onclick="openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer">
-                <i class="bi bi-ticket-perforated text-sm"></i>
-                <span>Register For Event</span>
-                <i class="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-              </button>
+              ${isPast ? `
+                <button type="button" disabled class="flex-1 py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700/80" title="Registration Closed - Event Concluded">
+                  <i class="bi bi-lock-fill text-xs"></i>
+                  <span>Registration Closed</span>
+                </button>
+              ` : `
+                <button onclick="openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer">
+                  <i class="bi bi-ticket-perforated text-sm"></i>
+                  <span>Register For Event</span>
+                  <i class="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </button>
+              `}
               <button type="button" onclick="openShareModal('${ev.id}')" class="w-10 h-10 bg-slate-100 hover:bg-[#E8EFEB] dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#123B32] dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 rounded-xl transition-all duration-200 flex items-center justify-center shadow-xs cursor-pointer shrink-0 group/share" title="Share Event" aria-label="Share Event">
                 <i class="bi bi-share-fill text-xs group-hover/share:scale-110 transition-transform pointer-events-none"></i>
               </button>
@@ -806,6 +821,8 @@
     const safeDesc = escapeHtml(ev.description || 'Join us for this comprehensive technical session and professional networking event.');
     const safeLocation = escapeHtml(ev.location || 'Salem, Tamil Nadu');
     const safeDate = escapeHtml(ev.event_date || 'TBA');
+    const statusLower = (ev.status || '').toLowerCase().trim();
+    const isPast = statusLower === 'past' || statusLower === 'completed' || statusLower === 'closed' || statusLower === 'concluded';
 
     const oldModal = document.getElementById('event-poster-modal');
     if (oldModal) oldModal.remove();
@@ -821,7 +838,7 @@
 
           <!-- Left Column / Event Poster Viewer (Responsive) -->
           <div class="w-full md:w-[58%] bg-slate-950 flex items-center justify-center p-4 sm:p-6 min-h-[280px] max-h-[46vh] md:max-h-[85vh] relative select-none">
-            <img src="${eventImg}" alt="${safeTitle}" class="max-w-full max-h-[44vh] md:max-h-[78vh] w-auto h-auto object-contain rounded-xl shadow-2xl">
+            <img src="${eventImg}" alt="${safeTitle}" class="max-w-full max-h-[44vh] md:max-h-[78vh] w-auto h-auto object-contain rounded-xl shadow-2xl ${isPast ? 'grayscale-25' : ''}">
             <div class="absolute bottom-3 left-3">
               <span class="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[10px] font-bold">OFFICIAL POSTER</span>
             </div>
@@ -836,9 +853,15 @@
                 <span class="px-3 py-1 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] uppercase tracking-wider shadow-xs">
                   ${categoryLabel}
                 </span>
-                <span class="px-3 py-1 rounded-full ${isPaid ? 'bg-amber-600 text-white' : 'bg-emerald-600 text-white'} font-mono font-bold text-xs shadow-xs">
-                  ${fee}
-                </span>
+                ${isPast ? `
+                  <span class="px-3 py-1 rounded-full bg-slate-700 text-slate-200 font-mono font-bold text-xs shadow-xs">
+                    <i class="bi bi-check2-circle mr-1 text-emerald-400"></i> Concluded
+                  </span>
+                ` : `
+                  <span class="px-3 py-1 rounded-full ${isPaid ? 'bg-amber-600 text-white' : 'bg-emerald-600 text-white'} font-mono font-bold text-xs shadow-xs">
+                    ${fee}
+                  </span>
+                `}
               </div>
 
               <!-- Title -->
@@ -871,11 +894,18 @@
 
             <!-- Footer Action Buttons -->
             <div class="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
-              <button onclick="window.closeEventPosterModal(); openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="w-full sm:flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
-                <i class="bi bi-ticket-perforated text-sm"></i>
-                <span>Register For Event</span>
-                <i class="bi bi-arrow-right text-xs"></i>
-              </button>
+              ${isPast ? `
+                <button type="button" disabled class="w-full sm:flex-1 py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-not-allowed border border-slate-200 dark:border-slate-700 shadow-2xs">
+                  <i class="bi bi-lock-fill text-xs"></i>
+                  <span>Registration Closed (Event Concluded)</span>
+                </button>
+              ` : `
+                <button onclick="window.closeEventPosterModal(); openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="w-full sm:flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="bi bi-ticket-perforated text-sm"></i>
+                  <span>Register For Event</span>
+                  <i class="bi bi-arrow-right text-xs"></i>
+                </button>
+              `}
               <a href="${eventImg}" download="${safeTitle.replace(/[^a-zA-Z0-9]/g, '_')}_poster.jpg" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                 <i class="bi bi-download"></i>
                 <span>Download</span>
@@ -1575,6 +1605,13 @@ ${job.description || 'No description provided.'}
     const allEvs = window.allEventsData || [];
     const eventObj = allEvs.find(e => String(e.id) === String(eventId) || e.title === title) || {};
     
+    // Check if event is past/completed
+    const statusLower = (eventObj.status || '').toLowerCase().trim();
+    if (statusLower === 'past' || statusLower === 'completed' || statusLower === 'closed' || statusLower === 'concluded') {
+      showPublicModalNotice('Registration Closed', `Registration for "${title || 'this event'}" is closed as this event has already concluded.`, true);
+      return;
+    }
+
     // Auto-generate UPI QR string from UPI ID and numeric fee
     const upiId = (eventObj.upi_id || 'shazusofttechnologies@upi').trim();
     const numAmount = (fee.match(/\d+/) || ['499'])[0];

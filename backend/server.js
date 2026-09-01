@@ -1367,15 +1367,38 @@ app.post('/api/public/events/register', async (request, reply) => {
     return reply.status(400).send({ error: 'Please enter a valid Transaction / UTR Reference ID for payment verification.' });
   }
 
-  // Validate event_id foreign key existence
+  // Validate event_id foreign key existence & active status
   let parsedEventId = event_id ? parseInt(event_id, 10) || null : null;
   if (parsedEventId) {
     try {
-      const evCheck = await pool.query('SELECT id FROM events WHERE id = $1', [parsedEventId]);
-      if (!evCheck.rows || evCheck.rows.length === 0) parsedEventId = null;
+      const evCheck = await pool.query('SELECT id, status, title FROM events WHERE id = $1', [parsedEventId]);
+      if (!evCheck.rows || evCheck.rows.length === 0) {
+        parsedEventId = null;
+      } else {
+        const evRow = evCheck.rows[0];
+        const evStatus = (evRow.status || '').toLowerCase().trim();
+        if (evStatus === 'past' || evStatus === 'completed' || evStatus === 'closed' || evStatus === 'concluded') {
+          return reply.status(400).send({ 
+            error: `Registration for "${evRow.title || cleanEventTitle}" is closed because this event has already concluded.` 
+          });
+        }
+      }
     } catch (_) {
       parsedEventId = null;
     }
+  } else if (cleanEventTitle) {
+    try {
+      const evTitleCheck = await pool.query('SELECT id, status, title FROM events WHERE LOWER(title) = LOWER($1)', [cleanEventTitle]);
+      if (evTitleCheck.rows && evTitleCheck.rows.length > 0) {
+        const evRow = evTitleCheck.rows[0];
+        const evStatus = (evRow.status || '').toLowerCase().trim();
+        if (evStatus === 'past' || evStatus === 'completed' || evStatus === 'closed' || evStatus === 'concluded') {
+          return reply.status(400).send({ 
+            error: `Registration for "${evRow.title || cleanEventTitle}" is closed because this event has already concluded.` 
+          });
+        }
+      }
+    } catch (_) {}
   }
 
   // Duplicate Check: Email + Event (by ID or Title)
