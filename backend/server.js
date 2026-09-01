@@ -1367,19 +1367,44 @@ app.post('/api/public/events/register', async (request, reply) => {
     return reply.status(400).send({ error: 'Please enter a valid Transaction / UTR Reference ID for payment verification.' });
   }
 
+  // Helper: Check if event date or status has passed
+  function isBackendEventDatePassed(status, rawDate) {
+    const s = (status || '').toLowerCase().trim();
+    if (s === 'past' || s === 'completed' || s === 'closed' || s === 'concluded') return true;
+    if (!rawDate) return false;
+    try {
+      const isoMatch = String(rawDate).match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (isoMatch) {
+        const eventEnd = new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10), 23, 59, 59, 999);
+        if (!isNaN(eventEnd.getTime()) && eventEnd.getTime() < Date.now()) return true;
+      }
+      const dmyMatch = String(rawDate).match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+      if (dmyMatch) {
+        const eventEnd = new Date(parseInt(dmyMatch[3], 10), parseInt(dmyMatch[2], 10) - 1, parseInt(dmyMatch[1], 10), 23, 59, 59, 999);
+        if (!isNaN(eventEnd.getTime()) && eventEnd.getTime() < Date.now()) return true;
+      }
+      const parsed = Date.parse(rawDate);
+      if (!isNaN(parsed)) {
+        const eventEnd = new Date(parsed);
+        eventEnd.setHours(23, 59, 59, 999);
+        if (eventEnd.getTime() < Date.now()) return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
   // Validate event_id foreign key existence & active status
   let parsedEventId = event_id ? parseInt(event_id, 10) || null : null;
   if (parsedEventId) {
     try {
-      const evCheck = await pool.query('SELECT id, status, title FROM events WHERE id = $1', [parsedEventId]);
+      const evCheck = await pool.query('SELECT id, status, title, event_date FROM events WHERE id = $1', [parsedEventId]);
       if (!evCheck.rows || evCheck.rows.length === 0) {
         parsedEventId = null;
       } else {
         const evRow = evCheck.rows[0];
-        const evStatus = (evRow.status || '').toLowerCase().trim();
-        if (evStatus === 'past' || evStatus === 'completed' || evStatus === 'closed' || evStatus === 'concluded') {
+        if (isBackendEventDatePassed(evRow.status, evRow.event_date)) {
           return reply.status(400).send({ 
-            error: `Registration for "${evRow.title || cleanEventTitle}" is closed because this event has already concluded.` 
+            error: `Registration for "${evRow.title || cleanEventTitle}" is closed because this event date has already passed.` 
           });
         }
       }
@@ -1388,13 +1413,12 @@ app.post('/api/public/events/register', async (request, reply) => {
     }
   } else if (cleanEventTitle) {
     try {
-      const evTitleCheck = await pool.query('SELECT id, status, title FROM events WHERE LOWER(title) = LOWER($1)', [cleanEventTitle]);
+      const evTitleCheck = await pool.query('SELECT id, status, title, event_date FROM events WHERE LOWER(title) = LOWER($1)', [cleanEventTitle]);
       if (evTitleCheck.rows && evTitleCheck.rows.length > 0) {
         const evRow = evTitleCheck.rows[0];
-        const evStatus = (evRow.status || '').toLowerCase().trim();
-        if (evStatus === 'past' || evStatus === 'completed' || evStatus === 'closed' || evStatus === 'concluded') {
+        if (isBackendEventDatePassed(evRow.status, evRow.event_date)) {
           return reply.status(400).send({ 
-            error: `Registration for "${evRow.title || cleanEventTitle}" is closed because this event has already concluded.` 
+            error: `Registration for "${evRow.title || cleanEventTitle}" is closed because this event date has already passed.` 
           });
         }
       }

@@ -661,6 +661,56 @@
     }
   };
 
+  // Helper: Determine if an event is concluded by status OR if its scheduled date has passed
+  window.isEventPassed = function(ev) {
+    if (!ev) return false;
+    const statusLower = (ev.status || '').toLowerCase().trim();
+    if (statusLower === 'past' || statusLower === 'completed' || statusLower === 'closed' || statusLower === 'concluded') {
+      return true;
+    }
+
+    const rawDate = (ev.event_date || '').trim();
+    if (!rawDate) return false;
+
+    try {
+      // 1. Match YYYY-MM-DD or YYYY/MM/DD
+      const isoMatch = rawDate.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (isoMatch) {
+        const year = parseInt(isoMatch[1], 10);
+        const month = parseInt(isoMatch[2], 10) - 1;
+        const day = parseInt(isoMatch[3], 10);
+        const eventEnd = new Date(year, month, day, 23, 59, 59, 999);
+        if (!isNaN(eventEnd.getTime()) && eventEnd.getTime() < Date.now()) {
+          return true;
+        }
+      }
+
+      // 2. Match DD-MM-YYYY or DD/MM/YYYY
+      const dmyMatch = rawDate.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+      if (dmyMatch) {
+        const day = parseInt(dmyMatch[1], 10);
+        const month = parseInt(dmyMatch[2], 10) - 1;
+        const year = parseInt(dmyMatch[3], 10);
+        const eventEnd = new Date(year, month, day, 23, 59, 59, 999);
+        if (!isNaN(eventEnd.getTime()) && eventEnd.getTime() < Date.now()) {
+          return true;
+        }
+      }
+
+      // 3. Fallback Date.parse for strings like "29 August, 2026", "August 31, 2026"
+      const parsed = Date.parse(rawDate);
+      if (!isNaN(parsed)) {
+        const eventEnd = new Date(parsed);
+        eventEnd.setHours(23, 59, 59, 999);
+        if (eventEnd.getTime() < Date.now()) {
+          return true;
+        }
+      }
+    } catch (_) {}
+
+    return false;
+  };
+
   window.renderEventsList = function (eventsList) {
     const container = document.getElementById('dynamic-events-container');
     if (!container) return;
@@ -689,8 +739,7 @@
       const eventImg = ev.image_url || defaultImg;
       const categoryLabel = ev.category ? ev.category.split('|')[0].trim().toUpperCase() : 'EVENT';
       const hasLongDesc = ev.description && ev.description.length > 110;
-      const statusLower = (ev.status || '').toLowerCase().trim();
-      const isPast = statusLower === 'past' || statusLower === 'completed' || statusLower === 'closed' || statusLower === 'concluded';
+      const isPast = window.isEventPassed(ev);
 
       return `
         <div id="event-card-${ev.id}" data-event-id="${ev.id}" class="event-carousel-card bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
@@ -762,7 +811,7 @@
             <!-- Action Buttons: Register CTA (or Concluded Notice) & Accessible Share Button -->
             <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
               ${isPast ? `
-                <button type="button" disabled class="flex-1 py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700/80" title="Registration Closed - Event Concluded">
+                <button type="button" disabled class="flex-1 py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700/80 pointer-events-none opacity-85 select-none" title="Registration Closed - Event Date Passed">
                   <i class="bi bi-lock-fill text-xs"></i>
                   <span>Registration Closed</span>
                 </button>
@@ -821,8 +870,7 @@
     const safeDesc = escapeHtml(ev.description || 'Join us for this comprehensive technical session and professional networking event.');
     const safeLocation = escapeHtml(ev.location || 'Salem, Tamil Nadu');
     const safeDate = escapeHtml(ev.event_date || 'TBA');
-    const statusLower = (ev.status || '').toLowerCase().trim();
-    const isPast = statusLower === 'past' || statusLower === 'completed' || statusLower === 'closed' || statusLower === 'concluded';
+    const isPast = window.isEventPassed(ev);
 
     const oldModal = document.getElementById('event-poster-modal');
     if (oldModal) oldModal.remove();
@@ -1605,10 +1653,9 @@ ${job.description || 'No description provided.'}
     const allEvs = window.allEventsData || [];
     const eventObj = allEvs.find(e => String(e.id) === String(eventId) || e.title === title) || {};
     
-    // Check if event is past/completed
-    const statusLower = (eventObj.status || '').toLowerCase().trim();
-    if (statusLower === 'past' || statusLower === 'completed' || statusLower === 'closed' || statusLower === 'concluded') {
-      showPublicModalNotice('Registration Closed', `Registration for "${title || 'this event'}" is closed as this event has already concluded.`, true);
+    // Check if event is past/completed by status or event date
+    if (window.isEventPassed(eventObj)) {
+      showPublicModalNotice('Registration Closed', `Registration for "${title || 'this event'}" is closed as this event has already concluded or its scheduled date has passed.`, true);
       return;
     }
 
