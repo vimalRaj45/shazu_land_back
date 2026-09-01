@@ -693,27 +693,34 @@
       return `
         <div id="event-card-${ev.id}" data-event-id="${ev.id}" class="event-carousel-card bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
           
-          <!-- Event Cover Image with Top Badges & Bottom-Left Date Badge -->
-          <div class="h-44 w-full relative overflow-hidden bg-slate-100 dark:bg-slate-800">
-            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+          <!-- Event Cover Image with Top Badges, Date Badge & View Poster Pill Button -->
+          <div class="h-48 sm:h-52 w-full relative overflow-hidden bg-slate-900 group/img cursor-pointer" onclick="window.openEventPosterModal('${ev.id}')">
+            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none"></div>
             
-            <!-- Top Badges: Aligned Category & Price Badges (Single Share Icon kept at CTA) -->
-            <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
+            <!-- Top Badges: Category & Price -->
+            <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10 pointer-events-none">
               <span class="h-7 px-3 inline-flex items-center gap-1.5 bg-black/70 backdrop-blur-md text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider border border-white/20 shadow-sm shrink-0">
                 <i class="bi bi-tag-fill text-[9px] text-emerald-400"></i>${categoryLabel}
               </span>
-              <span class="h-7 px-3 inline-flex items-center bg-emerald-600 ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full shadow-sm font-mono border border-white/20 shrink-0">
+              <span class="h-7 px-3 inline-flex items-center ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full shadow-sm font-mono border border-white/20 shrink-0">
                 ${fee}
               </span>
             </div>
             
-            <!-- Date Badge: Fully Positioned on Image Bottom-Left with Clean Padding -->
-            <div class="absolute bottom-3 left-3 z-10">
+            <!-- Bottom Row: Date Badge (Left) & View Poster Small Pill Button (Right) -->
+            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
+              <!-- Date Badge -->
               <span class="h-7 px-2.5 inline-flex items-center gap-1.5 rounded-lg bg-black/80 backdrop-blur-md text-white font-mono text-[11px] font-bold border border-white/15 shadow-sm">
                 <i class="bi bi-calendar3 text-amber-300 text-xs"></i>
                 <span>${ev.event_date || 'TBA'}</span>
               </span>
+
+              <!-- View Poster Pill Button -->
+              <button type="button" onclick="event.stopPropagation(); window.openEventPosterModal('${ev.id}')" class="h-7 px-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 hover:bg-white text-[#123B32] dark:bg-slate-900/90 dark:hover:bg-slate-900 dark:text-emerald-300 font-bold text-[10.5px] shadow-md backdrop-blur-md border border-white/40 dark:border-slate-700 hover:scale-105 transition-all cursor-pointer" title="View Full Event Poster / Flyer">
+                <i class="bi bi-image text-xs text-[#123B32] dark:text-emerald-400"></i>
+                <span>View Poster</span>
+              </button>
             </div>
           </div>
 
@@ -781,6 +788,122 @@
         `;
       }
     }
+  };
+
+  // Open Event Poster Exhibition Lightbox Modal
+  window.openEventPosterModal = function (eventId) {
+    const ev = (window.allEventsData || []).find(e => String(e.id) === String(eventId));
+    if (!ev) return;
+
+    const defaultImg = ev.category && ev.category.toLowerCase().includes('hackathon') ? 
+      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80' : 
+      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80';
+    const eventImg = ev.image_url || defaultImg;
+    const categoryLabel = ev.category ? ev.category.split('|')[0].trim().toUpperCase() : 'EVENT';
+    const fee = ev.registration_fee || 'Free';
+    const isPaid = fee !== 'Free' && fee !== '0' && fee !== '' && !String(fee).toLowerCase().includes('free');
+    const safeTitle = escapeHtml(ev.title || 'Event Details');
+    const safeDesc = escapeHtml(ev.description || 'Join us for this comprehensive technical session and professional networking event.');
+    const safeLocation = escapeHtml(ev.location || 'Salem, Tamil Nadu');
+    const safeDate = escapeHtml(ev.event_date || 'TBA');
+
+    const oldModal = document.getElementById('event-poster-modal');
+    if (oldModal) oldModal.remove();
+
+    const modalHtml = `
+      <div id="event-poster-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in" onclick="if(event.target === this) window.closeEventPosterModal()" role="dialog" aria-modal="true">
+        <div class="relative max-w-5xl w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] text-slate-900 dark:text-white">
+          
+          <!-- Close 'X' Button -->
+          <button onclick="window.closeEventPosterModal()" class="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center text-sm transition-all cursor-pointer shadow-md border border-white/20" aria-label="Close Preview" title="Close (Esc)">
+            <i class="bi bi-x-lg"></i>
+          </button>
+
+          <!-- Left Column / Event Poster Viewer (Responsive) -->
+          <div class="w-full md:w-[58%] bg-slate-950 flex items-center justify-center p-4 sm:p-6 min-h-[280px] max-h-[46vh] md:max-h-[85vh] relative select-none">
+            <img src="${eventImg}" alt="${safeTitle}" class="max-w-full max-h-[44vh] md:max-h-[78vh] w-auto h-auto object-contain rounded-xl shadow-2xl">
+            <div class="absolute bottom-3 left-3">
+              <span class="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[10px] font-bold">OFFICIAL POSTER</span>
+            </div>
+          </div>
+
+          <!-- Right Column / Information & Registration Actions -->
+          <div class="w-full md:w-[42%] p-5 sm:p-7 bg-[#FDFCFA] dark:bg-slate-900 flex flex-col justify-between overflow-y-auto max-h-[44vh] md:max-h-[85vh] border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 space-y-4">
+            
+            <div class="space-y-3">
+              <!-- Category & Price Badges -->
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="px-3 py-1 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] uppercase tracking-wider shadow-xs">
+                  ${categoryLabel}
+                </span>
+                <span class="px-3 py-1 rounded-full ${isPaid ? 'bg-amber-600 text-white' : 'bg-emerald-600 text-white'} font-mono font-bold text-xs shadow-xs">
+                  ${fee}
+                </span>
+              </div>
+
+              <!-- Title -->
+              <h2 class="text-lg sm:text-xl md:text-2xl font-black font-heading text-slate-900 dark:text-white leading-tight">
+                ${safeTitle}
+              </h2>
+
+              <!-- Date & Location -->
+              <div class="space-y-1.5 pt-1">
+                <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
+                  <i class="bi bi-calendar3 text-[#123B32] dark:text-emerald-400"></i>
+                  <span>${safeDate}</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
+                  <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400"></i>
+                  <span>${safeLocation}</span>
+                </div>
+              </div>
+
+              <!-- Description Box -->
+              <div class="bg-white dark:bg-slate-950/70 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-1.5">
+                <h4 class="text-[11px] font-bold uppercase tracking-wider text-[#123B32] dark:text-emerald-400 flex items-center gap-1.5">
+                  <i class="bi bi-info-circle-fill"></i> Event Overview & Details
+                </h4>
+                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line max-h-48 overflow-y-auto pr-1">
+                  ${safeDesc}
+                </p>
+              </div>
+            </div>
+
+            <!-- Footer Action Buttons -->
+            <div class="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
+              <button onclick="window.closeEventPosterModal(); openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="w-full sm:flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <i class="bi bi-ticket-perforated text-sm"></i>
+                <span>Register For Event</span>
+                <i class="bi bi-arrow-right text-xs"></i>
+              </button>
+              <a href="${eventImg}" download="${safeTitle.replace(/[^a-zA-Z0-9]/g, '_')}_poster.jpg" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="bi bi-download"></i>
+                <span>Download</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+
+    // Handle Escape key
+    const escHandler = function(e) {
+      if (e.key === 'Escape') {
+        window.closeEventPosterModal();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+  };
+
+  window.closeEventPosterModal = function() {
+    const modal = document.getElementById('event-poster-modal');
+    if (modal) modal.remove();
+    document.body.style.overflow = '';
   };
 
   // Base64 File Converter with 10 MB Limit Restriction
