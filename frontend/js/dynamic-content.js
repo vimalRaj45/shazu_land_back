@@ -744,59 +744,61 @@
       return `
         <div id="event-card-${ev.id}" data-event-id="${ev.id}" class="event-carousel-card bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
           
-          <!-- Event Cover Image with Top Badges, Date Badge & View Poster Pill Button -->
-          <div class="h-48 sm:h-52 w-full relative overflow-hidden bg-slate-900 group/img cursor-pointer" onclick="window.openEventPosterModal('${ev.id}')">
-            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500 ${isPast ? 'grayscale-25' : ''}">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none"></div>
-            
-            <!-- Top Badges: Category & Price / Status -->
-            <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10 pointer-events-none">
-              <span class="h-7 px-3 inline-flex items-center gap-1.5 bg-black/70 backdrop-blur-md text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider border border-white/20 shadow-sm shrink-0">
-                <i class="bi bi-tag-fill text-[9px] text-emerald-400"></i>${categoryLabel}
+          <!-- Top Card Meta Strip (Category & Status/Price) -->
+          <div class="px-4 py-2.5 bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2 z-10">
+            <span class="h-6 px-2.5 inline-flex items-center gap-1.5 bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] rounded-full uppercase tracking-wider shadow-xs shrink-0">
+              <i class="bi bi-tag-fill text-[9px] text-emerald-300"></i>${categoryLabel}
+            </span>
+            ${isPast ? `
+              <span class="h-6 px-2.5 inline-flex items-center bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[10.5px] rounded-full font-mono shadow-xs shrink-0">
+                <i class="bi bi-check2-circle mr-1 text-emerald-500"></i> Concluded
               </span>
-              ${isPast ? `
-                <span class="h-7 px-3 inline-flex items-center bg-slate-700/90 text-slate-200 font-bold text-[10.5px] rounded-full shadow-sm font-mono border border-white/20 shrink-0">
-                  <i class="bi bi-check2-circle mr-1 text-emerald-400"></i> Concluded
-                </span>
-              ` : `
-                <span class="h-7 px-3 inline-flex items-center ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full shadow-sm font-mono border border-white/20 shrink-0">
-                  ${fee}
-                </span>
-              `}
-            </div>
-            
-            <!-- Bottom Row: Date Badge (Left) & View Poster Small Pill Button (Right) -->
-            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
-              <!-- Date Badge -->
-              <span class="h-7 px-2.5 inline-flex items-center gap-1.5 rounded-lg bg-black/80 backdrop-blur-md text-white font-mono text-[11px] font-bold border border-white/15 shadow-sm">
-                <i class="bi bi-calendar3 text-amber-300 text-xs"></i>
-                <span>${ev.event_date || 'TBA'}</span>
+            ` : `
+              <span class="h-6 px-2.5 inline-flex items-center ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full font-mono shadow-xs shrink-0">
+                ${fee}
               </span>
+            `}
+          </div>
 
-              <!-- View Poster Pill Button -->
-              <button type="button" onclick="event.stopPropagation(); window.openEventPosterModal('${ev.id}')" class="h-7 px-3 inline-flex items-center gap-1.5 rounded-lg bg-black/80 hover:bg-[#123B32] dark:bg-black/80 dark:hover:bg-emerald-700 text-white font-bold text-[11px] shadow-lg backdrop-blur-md border border-white/20 hover:border-emerald-400/60 transition-all duration-200 hover:scale-105 cursor-pointer group/btn" title="Click to view high-resolution event poster">
-                <i class="bi bi-image text-xs text-amber-300 group-hover/btn:text-white transition-colors"></i>
-                <span>View Poster</span>
-              </button>
-            </div>
+          <!-- Event Poster Canvas - Perfect Fit Full Image Orientation with Ambient Backdrop Glow -->
+          <div class="h-64 sm:h-72 w-full relative overflow-hidden bg-slate-950 flex items-center justify-center group/img cursor-pointer select-none" onclick="window.openEventPosterModal('${ev.id}')" title="Click to view full event poster">
+            <!-- Ambient blurred backdrop ensuring any letterboxing is glowing and aesthetic -->
+            <img src="${eventImg}" aria-hidden="true" alt="" class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-125 pointer-events-none">
+            <div class="absolute inset-0 bg-slate-950/25 pointer-events-none"></div>
+
+            <!-- Full Uncropped Event Poster with Perfect Fit Orientation -->
+            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain mx-auto p-1.5 transition-transform duration-300 group-hover/img:scale-[1.02] ${isPast ? 'grayscale-25' : ''}">
+
+            <!-- Sleek Fullscreen Poster Pill Button -->
+            <button type="button" onclick="event.stopPropagation(); window.openEventPosterModal('${ev.id}')" class="absolute bottom-2.5 right-2.5 z-10 h-7 px-3 inline-flex items-center gap-1.5 rounded-lg bg-black/75 hover:bg-[#123B32] dark:bg-black/75 dark:hover:bg-emerald-700 text-white font-bold text-[11px] shadow-lg backdrop-blur-md border border-white/20 hover:border-emerald-400/60 transition-all duration-200 hover:scale-105 cursor-pointer group/btn" title="Click to view full poster">
+              <i class="bi bi-arrows-angle-expand text-[10px] text-amber-300 group-hover/btn:text-white transition-colors"></i>
+              <span>View Poster</span>
+            </button>
           </div>
 
           <!-- Card Content Body -->
-          <div class="p-5 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
-            <div class="space-y-2.5">
+          <div class="p-5 sm:p-6 space-y-3.5 flex-1 flex flex-col justify-between">
+            <div class="space-y-2">
               <!-- Title -->
               <h3 class="text-base sm:text-lg font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors leading-snug">
                 ${ev.title}
               </h3>
 
-              <!-- Venue Details -->
-              <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400 text-xs shrink-0"></i>
-                <span class="truncate">${ev.location || 'Salem, Tamil Nadu'}</span>
+              <!-- Event Date & Venue Details -->
+              <div class="flex flex-wrap items-center gap-y-1 gap-x-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium pt-0.5">
+                <span class="inline-flex items-center gap-1.5 text-[#123B32] dark:text-emerald-400 font-bold font-mono">
+                  <i class="bi bi-calendar3 text-xs text-amber-500 dark:text-amber-400"></i>
+                  <span>${ev.event_date || 'TBA'}</span>
+                </span>
+                <span class="text-slate-300 dark:text-slate-700">•</span>
+                <span class="inline-flex items-center gap-1.5 truncate max-w-[200px]">
+                  <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400 text-xs shrink-0"></i>
+                  <span class="truncate">${ev.location || 'Salem, Tamil Nadu'}</span>
+                </span>
               </div>
 
               <!-- Description with Read More Toggle -->
-              <div class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              <div class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed pt-1">
                 <p id="event-desc-${ev.id}" class="line-clamp-2 transition-all">
                   ${ev.description || 'Join us for this comprehensive technical session and professional networking event.'}
                 </p>
@@ -885,10 +887,15 @@
           </button>
 
           <!-- Left Column / Event Poster Viewer (Responsive) -->
-          <div class="w-full md:w-[58%] bg-slate-950 flex items-center justify-center p-4 sm:p-6 min-h-[280px] max-h-[46vh] md:max-h-[85vh] relative select-none">
-            <img src="${eventImg}" alt="${safeTitle}" class="max-w-full max-h-[44vh] md:max-h-[78vh] w-auto h-auto object-contain rounded-xl shadow-2xl ${isPast ? 'grayscale-25' : ''}">
-            <div class="absolute bottom-3 left-3">
-              <span class="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[10px] font-bold">OFFICIAL POSTER</span>
+          <div class="w-full md:w-[58%] bg-slate-950 flex items-center justify-center p-4 sm:p-6 min-h-[300px] max-h-[50vh] md:max-h-[85vh] relative select-none overflow-hidden">
+            <img src="${eventImg}" aria-hidden="true" alt="" class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-125 pointer-events-none">
+            <img src="${eventImg}" alt="${safeTitle}" class="relative z-1 max-w-full max-h-[46vh] md:max-h-[80vh] w-auto h-auto object-contain rounded-xl shadow-2xl ${isPast ? 'grayscale-25' : ''}">
+            <div class="absolute bottom-3 left-3 z-10 flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[10px] font-bold border border-white/10">OFFICIAL POSTER</span>
+              <a href="${eventImg}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-md bg-black/60 hover:bg-black/80 backdrop-blur-md text-white font-mono text-[10px] font-bold border border-white/10 transition-colors inline-flex items-center gap-1 cursor-pointer" title="Open high-resolution poster in new tab">
+                <i class="bi bi-box-arrow-up-right text-[9px]"></i>
+                <span>Open Full Size</span>
+              </a>
             </div>
           </div>
 
