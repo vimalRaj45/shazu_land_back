@@ -1557,7 +1557,7 @@ app.post('/api/public/events/register', async (request, reply) => {
             <div><strong>Fee:</strong> ${fee} ${cleanTxnId ? `(UTR: ${cleanTxnId})` : ''}</div>
           </div>
 
-          ${eventWhatsappLink ? `
+          ${(isFree && eventWhatsappLink) ? `
             <div style="background-color: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
               <div style="font-size: 15px; font-weight: bold; color: #15803d; margin-bottom: 6px;">
                 💬 Official Event WhatsApp Group
@@ -1569,7 +1569,16 @@ app.post('/api/public/events/register', async (request, reply) => {
                 👉 Click Here to Join WhatsApp Group
               </a>
             </div>
-          ` : ''}
+          ` : (!isFree ? `
+            <div style="background-color: #f8fafc; border: 1.5px dashed #94a3b8; border-radius: 12px; padding: 14px 18px; text-align: center; margin: 18px 0;">
+              <span style="font-size: 12px; color: #334155; font-weight: 600; display: block; margin-bottom: 3px;">
+                💬 Official Event WhatsApp Community Group
+              </span>
+              <span style="font-size: 11.5px; color: #64748b; line-height: 1.4; display: block;">
+                Your exclusive WhatsApp Group invitation link will be dispatched to this email immediately once your payment receipt is verified by SST Administration.
+              </span>
+            </div>
+          ` : '')}
 
           <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
             Keep this reference token for event entry and tracking. You can verify your pass status anytime on our website status portal.
@@ -1593,13 +1602,13 @@ app.post('/api/public/events/register', async (request, reply) => {
       reference_token: tokenNo,
       transaction_id: cleanTxnId,
       payment_screenshot: cleanScreenshot,
-      whatsapp_group_link: eventWhatsappLink,
-      notice: 'Payment Verification Pending. Your official entry pass and QR token will be verified by the admin.',
+      whatsapp_group_link: null,
+      notice: 'Payment Verification Pending. Once payment is verified by admin, your official pass and WhatsApp Community Group link will be dispatched to your email.',
       registration: {
         ...registration,
         token_no: tokenNo,
         payment_screenshot: cleanScreenshot,
-        whatsapp_group_link: eventWhatsappLink
+        whatsapp_group_link: null
       }
     };
   }
@@ -1987,6 +1996,20 @@ app.get('/api/public/track/:token', async (request, reply) => {
       if (isApproved) statusColor = 'emerald';
       else if (isRejected) statusColor = 'rose';
 
+      let eventWhatsappLink = '';
+      if (isApproved) {
+        try {
+          if (reg.event_id) {
+            const ev = await pool.query('SELECT whatsapp_group_link FROM events WHERE id = $1', [reg.event_id]);
+            if (ev.rows && ev.rows[0]) eventWhatsappLink = ev.rows[0].whatsapp_group_link || '';
+          }
+          if (!eventWhatsappLink && reg.event_title) {
+            const ev2 = await pool.query('SELECT whatsapp_group_link FROM events WHERE LOWER(title) = LOWER($1) LIMIT 1', [reg.event_title]);
+            if (ev2.rows && ev2.rows[0]) eventWhatsappLink = ev2.rows[0].whatsapp_group_link || '';
+          }
+        } catch (_) {}
+      }
+
       return {
         found: true,
         token_no: reg.token_no,
@@ -1998,6 +2021,7 @@ app.get('/api/public/track/:token', async (request, reply) => {
         status: reg.payment_status || 'Pending Verification',
         status_color: statusColor,
         admin_notes: reg.admin_notes || '',
+        whatsapp_group_link: eventWhatsappLink,
         created_at: reg.registered_at || reg.created_at,
         updated_at: reg.updated_at || reg.registered_at || reg.created_at,
         details: {
