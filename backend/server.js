@@ -751,6 +751,7 @@ async function initDatabase() {
         registration_fee VARCHAR(100) DEFAULT 'Free',
         registration_link VARCHAR(500),
         status VARCHAR(50) DEFAULT 'Upcoming',
+        whatsapp_group_link TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
@@ -867,6 +868,7 @@ async function initDatabase() {
     await client.query(`ALTER TABLE events ADD COLUMN IF NOT EXISTS image_url TEXT;`);
     await client.query(`ALTER TABLE events ADD COLUMN IF NOT EXISTS upi_id TEXT;`);
     await client.query(`ALTER TABLE events ADD COLUMN IF NOT EXISTS payment_qr TEXT;`);
+    await client.query(`ALTER TABLE events ADD COLUMN IF NOT EXISTS whatsapp_group_link TEXT;`);
     await client.query(`ALTER TABLE careers ADD COLUMN IF NOT EXISTS image_url TEXT;`);
     await client.query(`ALTER TABLE courses_services ADD COLUMN IF NOT EXISTS image_url TEXT;`);
     await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS attendee_category VARCHAR(100) DEFAULT 'College / University Student (UG / PG)';`);
@@ -1366,8 +1368,8 @@ app.post('/api/public/events/register', async (request, reply) => {
     return reply.status(400).send({ error: 'You must agree to the event terms and declaration before submitting.' });
   }
 
-  if (!isFree && cleanTxnId.length < 4) {
-    return reply.status(400).send({ error: 'Please enter a valid Transaction / UTR Reference ID for payment verification.' });
+  if (!isFree && (!cleanScreenshot || cleanScreenshot.length < 50)) {
+    return reply.status(400).send({ error: 'Payment screenshot is mandatory for paid events. Please upload your payment receipt.' });
   }
 
   // Helper: Check if event date or status has passed
@@ -1396,15 +1398,17 @@ app.post('/api/public/events/register', async (request, reply) => {
     return false;
   }
 
+  let eventWhatsappLink = '';
   // Validate event_id foreign key existence & active status
   let parsedEventId = event_id ? parseInt(event_id, 10) || null : null;
   if (parsedEventId) {
     try {
-      const evCheck = await pool.query('SELECT id, status, title, event_date FROM events WHERE id = $1', [parsedEventId]);
+      const evCheck = await pool.query('SELECT id, status, title, event_date, whatsapp_group_link FROM events WHERE id = $1', [parsedEventId]);
       if (!evCheck.rows || evCheck.rows.length === 0) {
         parsedEventId = null;
       } else {
         const evRow = evCheck.rows[0];
+        eventWhatsappLink = evRow.whatsapp_group_link || '';
         if (isBackendEventDatePassed(evRow.status, evRow.event_date)) {
           return reply.status(400).send({ 
             error: `Registration for "${evRow.title || cleanEventTitle}" is closed because this event date has already passed.` 
@@ -1416,9 +1420,10 @@ app.post('/api/public/events/register', async (request, reply) => {
     }
   } else if (cleanEventTitle) {
     try {
-      const evTitleCheck = await pool.query('SELECT id, status, title, event_date FROM events WHERE LOWER(title) = LOWER($1)', [cleanEventTitle]);
+      const evTitleCheck = await pool.query('SELECT id, status, title, event_date, whatsapp_group_link FROM events WHERE LOWER(title) = LOWER($1)', [cleanEventTitle]);
       if (evTitleCheck.rows && evTitleCheck.rows.length > 0) {
         const evRow = evTitleCheck.rows[0];
+        eventWhatsappLink = evRow.whatsapp_group_link || '';
         if (isBackendEventDatePassed(evRow.status, evRow.event_date)) {
           return reply.status(400).send({ 
             error: `Registration for "${evRow.title || cleanEventTitle}" is closed because this event date has already passed.` 
@@ -1552,6 +1557,20 @@ app.post('/api/public/events/register', async (request, reply) => {
             <div><strong>Fee:</strong> ${fee} ${cleanTxnId ? `(UTR: ${cleanTxnId})` : ''}</div>
           </div>
 
+          ${eventWhatsappLink ? `
+            <div style="background-color: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
+              <div style="font-size: 15px; font-weight: bold; color: #15803d; margin-bottom: 6px;">
+                💬 Official Event WhatsApp Group
+              </div>
+              <p style="font-size: 12px; color: #166534; margin: 0 0 14px 0; line-height: 1.5;">
+                Join the official WhatsApp group for live event schedule announcements, delegate updates, and direct coordination.
+              </p>
+              <a href="${eventWhatsappLink}" target="_blank" style="display: inline-block; background-color: #25D366; color: #ffffff; font-weight: bold; font-size: 13px; text-decoration: none; padding: 11px 24px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                👉 Click Here to Join WhatsApp Group
+              </a>
+            </div>
+          ` : ''}
+
           <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
             Keep this reference token for event entry and tracking. You can verify your pass status anytime on our website status portal.
           </p>
@@ -1574,16 +1593,18 @@ app.post('/api/public/events/register', async (request, reply) => {
       reference_token: tokenNo,
       transaction_id: cleanTxnId,
       payment_screenshot: cleanScreenshot,
+      whatsapp_group_link: eventWhatsappLink,
       notice: 'Payment Verification Pending. Your official entry pass and QR token will be verified by the admin.',
       registration: {
         ...registration,
         token_no: tokenNo,
-        payment_screenshot: cleanScreenshot
+        payment_screenshot: cleanScreenshot,
+        whatsapp_group_link: eventWhatsappLink
       }
     };
   }
 
-  return { message: 'Registration submitted successfully!', token_no: tokenNo, payment_screenshot: cleanScreenshot, registration };
+  return { message: 'Registration submitted successfully!', token_no: tokenNo, payment_screenshot: cleanScreenshot, whatsapp_group_link: eventWhatsappLink, registration };
 });
 
 // Upload / Update Payment Proof Screenshot after registration
@@ -2171,6 +2192,18 @@ app.put('/api/admin/event-registrations/:id/payment', { preValidation: [app.auth
   reg = result.rows[0];
 
   if (payment_status === 'Verified' || payment_status === 'Approved' || payment_status === 'Verified / Confirmed') {
+    let eventWhatsappLink = '';
+    try {
+      if (reg.event_id) {
+        const evQuery = await pool.query('SELECT whatsapp_group_link FROM events WHERE id = $1', [reg.event_id]);
+        if (evQuery.rows && evQuery.rows[0]) eventWhatsappLink = evQuery.rows[0].whatsapp_group_link || '';
+      }
+      if (!eventWhatsappLink && reg.event_title) {
+        const evQuery2 = await pool.query('SELECT whatsapp_group_link FROM events WHERE LOWER(title) = LOWER($1) LIMIT 1', [reg.event_title]);
+        if (evQuery2.rows && evQuery2.rows[0]) eventWhatsappLink = evQuery2.rows[0].whatsapp_group_link || '';
+      }
+    } catch (_) {}
+
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(tokenNo)}`;
     const verifiedHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #123B32; border-radius: 16px; padding: 28px; color: #0f172a; background: #ffffff;">
@@ -2191,6 +2224,20 @@ app.put('/api/admin/event-registrations/:id/payment', { preValidation: [app.auth
           <div style="font-size: 22px; font-family: monospace; font-weight: bold; color: #15803d; letter-spacing: 2px; margin-bottom: 6px;">${tokenNo}</div>
           <span style="font-size: 12px; color: #166534; font-weight: bold;">✓ Official Presenter / Attendee Pass Active for Venue Gate Check-In</span>
         </div>
+
+        ${eventWhatsappLink ? `
+          <div style="background-color: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
+            <div style="font-size: 15px; font-weight: bold; color: #15803d; margin-bottom: 6px;">
+              💬 Official Event WhatsApp Group
+            </div>
+            <p style="font-size: 12px; color: #166534; margin: 0 0 14px 0; line-height: 1.5;">
+              Join the official WhatsApp group for live event schedule announcements, delegate updates, and networking.
+            </p>
+            <a href="${eventWhatsappLink}" target="_blank" style="display: inline-block; background-color: #25D366; color: #ffffff; font-weight: bold; font-size: 13px; text-decoration: none; padding: 11px 24px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+              👉 Click Here to Join WhatsApp Group
+            </a>
+          </div>
+        ` : ''}
 
         ${admin_notes ? `<div style="background-color: #f8fafc; border-left: 4px solid #123B32; padding: 12px 16px; margin: 16px 0;"><span style="font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase;">ADMIN REMARKS / PASS INSTRUCTIONS:</span><p style="margin: 4px 0 0 0; font-size: 13px; color: #1e293b;">${admin_notes}</p></div>` : ''}
 
@@ -2668,23 +2715,23 @@ app.get('/api/admin/events', { preValidation: [app.authenticate] }, async () => 
 });
 
 app.post('/api/admin/events', { preValidation: [app.authenticate] }, async (request) => {
-  const { title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr } = request.body || {};
+  const { title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr, whatsapp_group_link } = request.body || {};
   const result = await pool.query(
-    `INSERT INTO events (title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
-    [title, category || 'General', description || '', event_date || '', location || '', registration_fee || 'Free', registration_link || '', image_url || '', status || 'Upcoming', upi_id || '', payment_qr || '']
+    `INSERT INTO events (title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr, whatsapp_group_link)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+    [title, category || 'General', description || '', event_date || '', location || '', registration_fee || 'Free', registration_link || '', image_url || '', status || 'Upcoming', upi_id || '', payment_qr || '', whatsapp_group_link || '']
   );
   return { event: result.rows[0] };
 });
 
 app.put('/api/admin/events/:id', { preValidation: [app.authenticate] }, async (request) => {
   const { id } = request.params;
-  const { title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr } = request.body || {};
+  const { title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr, whatsapp_group_link } = request.body || {};
   const result = await pool.query(
     `UPDATE events
-     SET title=$1, category=$2, description=$3, event_date=$4, location=$5, registration_fee=$6, registration_link=$7, image_url=$8, status=$9, upi_id=$10, payment_qr=$11
-     WHERE id=$12 RETURNING *`,
-    [title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr, id]
+     SET title=$1, category=$2, description=$3, event_date=$4, location=$5, registration_fee=$6, registration_link=$7, image_url=$8, status=$9, upi_id=$10, payment_qr=$11, whatsapp_group_link=$12
+     WHERE id=$13 RETURNING *`,
+    [title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr, whatsapp_group_link || '', id]
   );
   return { event: result.rows[0] };
 });
