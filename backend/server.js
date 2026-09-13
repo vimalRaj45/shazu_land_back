@@ -814,6 +814,7 @@ async function initDatabase() {
         payment_status VARCHAR(50) DEFAULT 'Pending Verification',
         admin_notes TEXT,
         declaration_agreed BOOLEAN DEFAULT TRUE,
+        payment_screenshot TEXT,
         registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -868,17 +869,17 @@ async function initDatabase() {
     await client.query(`ALTER TABLE events ADD COLUMN IF NOT EXISTS payment_qr TEXT;`);
     await client.query(`ALTER TABLE careers ADD COLUMN IF NOT EXISTS image_url TEXT;`);
     await client.query(`ALTER TABLE courses_services ADD COLUMN IF NOT EXISTS image_url TEXT;`);
-
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS attendee_category VARCHAR(100) DEFAULT 'College / University Student (UG / PG)';`);
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS gender VARCHAR(50);`);
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS department_degree VARCHAR(255);`);
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS designation_year VARCHAR(100);`);
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS roll_no_employee_id VARCHAR(100);`);
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS city_state VARCHAR(255);`);
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS declaration_agreed BOOLEAN DEFAULT TRUE;`);
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);`);
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS payment_screenshot TEXT;`);
+    await client.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS attendance_status VARCHAR(50) DEFAULT 'Absent';`);
     await client.query(`
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS attendee_category VARCHAR(100) DEFAULT 'College / University Student (UG / PG)';
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS gender VARCHAR(50);
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS department_degree VARCHAR(255);
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS designation_year VARCHAR(100);
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS roll_no_employee_id VARCHAR(100);
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS city_state VARCHAR(255);
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS declaration_agreed BOOLEAN DEFAULT TRUE;
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);
-      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS attendance_status VARCHAR(50) DEFAULT 'Absent';
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS checked_in_at TIMESTAMP;
       ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
       ALTER TABLE applications ADD COLUMN IF NOT EXISTS token_no VARCHAR(100);
@@ -1334,7 +1335,8 @@ app.post('/api/public/events/register', async (request, reply) => {
     registration_fee,
     payment_method,
     transaction_id,
-    declaration_agreed
+    declaration_agreed,
+    payment_screenshot
   } = request.body || {};
 
   const trimmedName = (name || '').trim();
@@ -1344,6 +1346,7 @@ app.post('/api/public/events/register', async (request, reply) => {
   const fee = (registration_fee || 'Free').trim();
   const isFree = fee.toLowerCase().includes('free') || fee === '0' || fee === '';
   const cleanTxnId = (transaction_id || '').trim();
+  const cleanScreenshot = (payment_screenshot || '').trim();
   const validDeclaration = declaration_agreed === true || declaration_agreed === 'true' || declaration_agreed === 'on';
 
   // Comprehensive Input Validations
@@ -1461,8 +1464,8 @@ app.post('/api/public/events/register', async (request, reply) => {
       event_id, event_title, attendee_category, name, email, phone, gender,
       organization, department_degree, designation_year, roll_no_employee_id,
       city_state, registration_fee, payment_method, transaction_id, token_no,
-      payment_status, declaration_agreed
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *`,
+      payment_status, declaration_agreed, payment_screenshot
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) RETURNING *`,
     [
       parsedEventId,
       cleanEventTitle,
@@ -1481,7 +1484,8 @@ app.post('/api/public/events/register', async (request, reply) => {
       cleanTxnId,
       tokenNo,
       initialPaymentStatus,
-      validDeclaration
+      validDeclaration,
+      cleanScreenshot
     ]
   );
 
@@ -1504,6 +1508,7 @@ app.post('/api/public/events/register', async (request, reply) => {
     token_no: tokenNo,
     payment_status: initialPaymentStatus,
     declaration_agreed: validDeclaration,
+    payment_screenshot: cleanScreenshot,
     registered_at: new Date()
   };
 
@@ -1511,7 +1516,7 @@ app.post('/api/public/events/register', async (request, reply) => {
   sendHostingerEmail({
     toEmail: trimmedEmail,
     toName: trimmedName,
-    subject: isFree ? `Event Pass Confirmed [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft` : `Registration Received [Ref Pending]: ${cleanEventTitle} - Shazu Soft`,
+    subject: isFree ? `Event Pass Confirmed [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft` : `Registration Received [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft`,
     htmlContent: `
     <!DOCTYPE html>
     <html>
@@ -1519,16 +1524,6 @@ app.post('/api/public/events/register', async (request, reply) => {
     <body style="font-family: Arial, sans-serif; background-color: #f8fafc; padding: 24px; color: #0f172a;">
       <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1.5px solid #123B32;">
         <div style="background-color: #123B32; padding: 24px; text-align: center; color: #ffffff;">
-          <h2 style="margin: 0; font-size: 22px;">SHAZU SOFT TECHNOLOGIES</h2>
-          <p style="color: #C47D4C; margin: 4px 0 0 0; font-size: 12px; font-weight: bold; text-transform: uppercase;">Official Event &amp; Contest Registration Pass</p>
-        </div>
-        <div style="padding: 28px;">
-          <h3 style="color: #123B32; margin-top: 0;">${isFree ? '✓ Registration & Entry Pass Confirmed!' : '⏳ Registration Received - Payment Verification Pending'}</h3>
-          <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-            Dear <strong>${trimmedName}</strong>,<br>
-            ${isFree ? `Your registration for <strong>${cleanEventTitle}</strong> is confirmed. Please present your official entry pass QR code below at the event check-in desk.` : `Your registration for <strong>${cleanEventTitle}</strong> has been recorded. Our team is verifying your payment (UTR: ${cleanTxnId || 'N/A'}). Once verified, your official entry pass QR code will be dispatched.`}
-          </p>
-
           ${isFree ? `
             <div style="background-color: #f0fdf4; border: 2px solid #123B32; border-radius: 16px; padding: 20px; text-align: center; margin: 20px 0;">
               <span style="font-size: 11px; text-transform: uppercase; color: #123B32; font-weight: bold; letter-spacing: 1px;">Official Entry &amp; Attendance QR Code Pass:</span>
@@ -1575,17 +1570,70 @@ app.post('/api/public/events/register', async (request, reply) => {
     return {
       message: 'Registration submitted successfully! Payment verification is pending.',
       is_pending_payment: true,
-      token_no: 'Pending Admin Verification',
+      token_no: tokenNo,
+      reference_token: tokenNo,
       transaction_id: cleanTxnId,
-      notice: 'Payment Verification Pending. Your entry pass & QR code token will be dispatched to your registered email once payment (UTR) is verified by the admin.',
+      payment_screenshot: cleanScreenshot,
+      notice: 'Payment Verification Pending. Your official entry pass and QR token will be verified by the admin.',
       registration: {
         ...registration,
-        token_no: 'Pending Admin Verification'
+        token_no: tokenNo,
+        payment_screenshot: cleanScreenshot
       }
     };
   }
 
-  return { message: 'Registration submitted successfully!', token_no: tokenNo, registration };
+  return { message: 'Registration submitted successfully!', token_no: tokenNo, payment_screenshot: cleanScreenshot, registration };
+});
+
+// Upload / Update Payment Proof Screenshot after registration
+app.post('/api/public/events/upload-payment-proof', async (request, reply) => {
+  const { token_no, payment_screenshot, transaction_id } = request.body || {};
+  const cleanToken = (token_no || '').trim();
+  const cleanScreenshot = (payment_screenshot || '').trim();
+  const cleanTxn = (transaction_id || '').trim();
+
+  if (!cleanToken) {
+    return reply.status(400).send({ error: 'Registration reference token number is required.' });
+  }
+
+  if (!cleanScreenshot) {
+    return reply.status(400).send({ error: 'Please select a valid payment receipt screenshot to upload.' });
+  }
+
+  try {
+    const check = await pool.query(
+      `SELECT id, token_no, name, email, event_title, payment_status, transaction_id 
+       FROM event_registrations 
+       WHERE LOWER(token_no) = LOWER($1) LIMIT 1`,
+      [cleanToken]
+    );
+
+    if (!check.rows || check.rows.length === 0) {
+      return reply.status(404).send({ error: `Registration with reference token "${cleanToken}" was not found.` });
+    }
+
+    const reg = check.rows[0];
+
+    await pool.query(
+      `UPDATE event_registrations 
+       SET payment_screenshot = $1,
+           transaction_id = CASE WHEN $2 != '' THEN $2 ELSE transaction_id END,
+           updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $3`,
+      [cleanScreenshot, cleanTxn, reg.id]
+    );
+
+    return {
+      success: true,
+      message: 'Payment screenshot attached successfully! Our administration team will verify your receipt.',
+      token_no: reg.token_no,
+      payment_screenshot: cleanScreenshot
+    };
+  } catch (err) {
+    request.log.error(err, 'Failed to upload payment proof');
+    return reply.status(500).send({ error: 'Failed to upload payment proof. Please try again.' });
+  }
 });
 
 // Contact Form Submission
@@ -1941,7 +1989,8 @@ app.get('/api/public/track/:token', async (request, reply) => {
           gender: reg.gender || '',
           registration_fee: reg.registration_fee || 'Free',
           payment_method: reg.payment_method || 'UPI QR',
-          transaction_id: reg.transaction_id || ''
+          transaction_id: reg.transaction_id || '',
+          payment_screenshot: reg.payment_screenshot || ''
         },
         timeline: [
           { stage: 'Registration Submitted', date: reg.registered_at || reg.created_at, completed: true },
