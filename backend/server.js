@@ -1461,7 +1461,7 @@ app.post('/api/public/events/register', async (request, reply) => {
   }
 
   const tokenNo = generateTokenNo('SST-PASS');
-  const initialPaymentStatus = isFree ? 'Verified' : 'Pending Verification';
+  const initialPaymentStatus = 'Pending Verification';
   const category = attendee_category || 'College / University Student (UG / PG)';
 
   const result = await pool.query(
@@ -1517,11 +1517,11 @@ app.post('/api/public/events/register', async (request, reply) => {
     registered_at: new Date()
   };
 
-  // Dispatch Official Branded Pass via Hostinger
+  // Dispatch Registration Received Confirmation via Hostinger (WhatsApp link & pass dispatched ONLY after verification)
   sendHostingerEmail({
     toEmail: trimmedEmail,
     toName: trimmedName,
-    subject: isFree ? `Event Pass Confirmed [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft` : `Registration Received [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft`,
+    subject: `Registration Received [Ref: ${tokenNo}]: ${cleanEventTitle} - Shazu Soft`,
     htmlContent: `
     <!DOCTYPE html>
     <html>
@@ -1529,24 +1529,19 @@ app.post('/api/public/events/register', async (request, reply) => {
     <body style="font-family: Arial, sans-serif; background-color: #f8fafc; padding: 24px; color: #0f172a;">
       <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1.5px solid #123B32;">
         <div style="background-color: #123B32; padding: 24px; text-align: center; color: #ffffff;">
-          ${isFree ? `
-            <div style="background-color: #f0fdf4; border: 2px solid #123B32; border-radius: 16px; padding: 20px; text-align: center; margin: 20px 0;">
-              <span style="font-size: 11px; text-transform: uppercase; color: #123B32; font-weight: bold; letter-spacing: 1px;">Official Entry &amp; Attendance QR Code Pass:</span>
-              
-              <div style="margin: 14px 0;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(tokenNo)}" alt="Attendance QR Code Pass" style="width: 180px; height: 180px; display: inline-block; border: 1px solid #cbd5e1; border-radius: 12px; padding: 8px; background: #ffffff;">
-              </div>
+          <h2 style="color: #ffffff; margin: 0 0 4px 0; font-size: 20px;">SHAZU SOFT TECHNOLOGIES</h2>
+          <span style="display: inline-block; background-color: #fef3c7; color: #92400e; padding: 4px 16px; border-radius: 99px; font-size: 11px; font-weight: bold; margin-top: 8px;">⏳ REGISTRATION RECEIVED — VERIFICATION PENDING</span>
+        </div>
+        <div style="padding: 24px;">
+          <p>Dear <strong>${trimmedName}</strong>,</p>
+          <p>Thank you for registering for <strong>"${cleanEventTitle}"</strong>. Your registration dossier has been received and is currently awaiting administrative verification.</p>
 
-              <div style="font-size: 22px; font-family: monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin-bottom: 4px;">${tokenNo}</div>
-              <span style="font-size: 12px; font-weight: bold; color: #166534; background: #dcfce7; padding: 4px 12px; border-radius: 9999px; display: inline-block;">✓ Official Pass Active (Free Entry)</span>
-            </div>
-          ` : `
-            <div style="background-color: #fffbeb; border: 1.5px dashed #d97706; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
-              <span style="font-size: 11px; text-transform: uppercase; color: #92400e; font-weight: bold;">Payment Verification Status:</span>
-              <div style="font-size: 18px; font-weight: bold; color: #b45309; margin: 6px 0;">Pending Verification (UTR: ${cleanTxnId || 'N/A'})</div>
-              <span style="font-size: 12px; color: #78350f;">Official Pass QR Code will be dispatched to your email upon payment verification.</span>
-            </div>
-          `}
+          <div style="background-color: #fffbeb; border: 1.5px dashed #d97706; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #92400e; font-weight: bold; letter-spacing: 1px;">YOUR REFERENCE TOKEN NUMBER:</span>
+            <div style="font-size: 22px; font-family: monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin: 6px 0;">${tokenNo}</div>
+            <span style="font-size: 12px; color: #78350f;">Status: <strong>Pending Administrative Verification ${cleanTxnId ? `(UTR: ${cleanTxnId})` : ''}</strong></span>
+            <div style="font-size: 11.5px; color: #92400e; margin-top: 4px;">Your Official Attendance QR Pass will be dispatched once verified.</div>
+          </div>
 
           <div style="background-color: #f8fafc; border-radius: 10px; padding: 14px 18px; font-size: 12px; color: #334155; margin-bottom: 20px;">
             <div style="margin-bottom: 6px;"><strong>Attendee Category:</strong> ${category}</div>
@@ -1557,31 +1552,17 @@ app.post('/api/public/events/register', async (request, reply) => {
             <div><strong>Fee:</strong> ${fee} ${cleanTxnId ? `(UTR: ${cleanTxnId})` : ''}</div>
           </div>
 
-          ${(isFree && eventWhatsappLink) ? `
-            <div style="background-color: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
-              <div style="font-size: 15px; font-weight: bold; color: #15803d; margin-bottom: 6px;">
-                💬 Official Event WhatsApp Group
-              </div>
-              <p style="font-size: 12px; color: #166534; margin: 0 0 14px 0; line-height: 1.5;">
-                Join the official WhatsApp group for live event schedule announcements, delegate updates, and direct coordination.
-              </p>
-              <a href="${eventWhatsappLink}" target="_blank" style="display: inline-block; background-color: #25D366; color: #ffffff; font-weight: bold; font-size: 13px; text-decoration: none; padding: 11px 24px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                👉 Click Here to Join WhatsApp Group
-              </a>
-            </div>
-          ` : (!isFree ? `
-            <div style="background-color: #f8fafc; border: 1.5px dashed #94a3b8; border-radius: 12px; padding: 14px 18px; text-align: center; margin: 18px 0;">
-              <span style="font-size: 12px; color: #334155; font-weight: 600; display: block; margin-bottom: 3px;">
-                💬 Official Event WhatsApp Community Group
-              </span>
-              <span style="font-size: 11.5px; color: #64748b; line-height: 1.4; display: block;">
-                Your exclusive WhatsApp Group invitation link will be dispatched to this email immediately once your payment receipt is verified by SST Administration.
-              </span>
-            </div>
-          ` : '')}
+          <div style="background-color: #f8fafc; border: 1.5px dashed #94a3b8; border-radius: 12px; padding: 14px 18px; text-align: center; margin: 18px 0;">
+            <span style="font-size: 12px; color: #334155; font-weight: 600; display: block; margin-bottom: 3px;">
+              💬 Official Event WhatsApp Community Group
+            </span>
+            <span style="font-size: 11.5px; color: #64748b; line-height: 1.4; display: block;">
+              Your exclusive WhatsApp Group invitation link will be dispatched to this email immediately once your registration is verified &amp; approved by SST Administration.
+            </span>
+          </div>
 
           <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
-            Keep this reference token for event entry and tracking. You can verify your pass status anytime on our website status portal.
+            Keep your reference token (<strong>${tokenNo}</strong>) safe. You can verify and track your pass approval status anytime on our website tracking portal.
           </p>
           <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;">
           <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">
@@ -1594,26 +1575,24 @@ app.post('/api/public/events/register', async (request, reply) => {
   `
   });
 
-  if (!isFree) {
-    return {
-      message: 'Registration submitted successfully! Payment verification is pending.',
-      is_pending_payment: true,
+  return {
+    message: isFree 
+      ? 'Registration submitted successfully! Pass verification is pending.' 
+      : 'Registration submitted successfully! Payment verification is pending.',
+    is_pending_payment: !isFree,
+    token_no: tokenNo,
+    reference_token: tokenNo,
+    transaction_id: cleanTxnId,
+    payment_screenshot: cleanScreenshot,
+    whatsapp_group_link: null,
+    notice: 'Registration Verification Pending. Once verified by admin, your official pass and WhatsApp Community Group link will be dispatched to your email.',
+    registration: {
+      ...registration,
       token_no: tokenNo,
-      reference_token: tokenNo,
-      transaction_id: cleanTxnId,
       payment_screenshot: cleanScreenshot,
-      whatsapp_group_link: null,
-      notice: 'Payment Verification Pending. Once payment is verified by admin, your official pass and WhatsApp Community Group link will be dispatched to your email.',
-      registration: {
-        ...registration,
-        token_no: tokenNo,
-        payment_screenshot: cleanScreenshot,
-        whatsapp_group_link: null
-      }
-    };
-  }
-
-  return { message: 'Registration submitted successfully!', token_no: tokenNo, payment_screenshot: cleanScreenshot, whatsapp_group_link: eventWhatsappLink, registration };
+      whatsapp_group_link: null
+    }
+  };
 });
 
 // Upload / Update Payment Proof Screenshot after registration

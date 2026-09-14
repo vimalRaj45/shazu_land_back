@@ -1722,7 +1722,7 @@ ${job.description || 'No description provided.'}
                 </div>
                 <div class="space-y-2 text-center sm:text-left flex-1 min-w-0">
                   <span class="block font-black text-xs sm:text-sm text-[#0F172A] dark:text-white">Scan &amp; Pay using any UPI App (GPay, PhonePe, Paytm)</span>
-                  <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">UPI ID: <code class="font-mono font-bold text-[#123B32] dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 select-all">${upiId}</code></p>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">Payment VPA: <code class="font-mono font-bold text-[#123B32] dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 select-all">${upiId}</code></p>
                   <span class="block text-[11px] text-slate-500 dark:text-slate-400 leading-tight">After making payment, enter your 12-digit UPI UTR reference number in the field below to confirm your pass.</span>
                 </div>
               </div>
@@ -1805,15 +1805,37 @@ ${job.description || 'No description provided.'}
               </div>
             </div>
 
-            <!-- 4. PAYMENT REFERENCE (FOR PAID EVENTS) -->
+            <!-- 4. PAYMENT REFERENCE & SCREENSHOT (FOR PAID EVENTS) -->
             ${isPaid ? `
-              <div class="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-2">
-                <label class="block font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                  <i class="bi bi-receipt"></i>
-                  <span>12-Digit UPI Transaction / UTR Reference No *</span>
-                </label>
-                <input type="text" id="pub-reg-utr" required placeholder="e.g. 423589102456" class="w-full p-3 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs font-bold text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] font-mono tracking-wider">
-                <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">Enter the 12-digit UTR found on your payment confirmation screen (GPay, PhonePe, Paytm).</span>
+              <div class="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-3">
+                <div class="space-y-1.5">
+                  <label class="block font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center justify-between">
+                    <span class="flex items-center gap-1.5"><i class="bi bi-receipt"></i> 12-Digit UPI Transaction / UTR Reference No</span>
+                    <span class="text-[10px] text-slate-500 font-normal">Optional</span>
+                  </label>
+                  <input type="text" id="pub-reg-utr" placeholder="e.g. 423589102456 (Optional if screenshot attached)" class="w-full p-3 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs font-bold text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] font-mono tracking-wider">
+                  <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">Optional: Enter 12-digit UTR if shown on your payment confirmation screen.</span>
+                </div>
+
+                <!-- Payment Screenshot Upload (Mandatory for Paid Events) -->
+                <div class="pt-2 border-t border-amber-200/80 dark:border-amber-800/80 space-y-2">
+                  <label class="block font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center justify-between">
+                    <span class="flex items-center gap-1.5"><i class="bi bi-image text-amber-600"></i> Payment Screenshot / Receipt (Proof) <span class="text-red-500">*</span></span>
+                    <span class="text-[10px] text-amber-800 dark:text-amber-300 font-bold bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded">Mandatory &bull; Max 5MB</span>
+                  </label>
+                  <input type="file" id="pub-reg-screenshot" accept="image/*" required onchange="window.handlePaymentProofPreview(event)" class="w-full p-2 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs cursor-pointer focus:outline-none focus:border-[#123B32]">
+                  <input type="hidden" id="pub-reg-screenshot-base64" value="">
+                  <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">Attach screenshot of payment confirmation screen showing UTR / Reference number (Mandatory).</span>
+                  
+                  <div id="pub-reg-screenshot-preview-box" class="hidden pt-1 flex items-center gap-3">
+                    <img id="pub-reg-screenshot-preview-img" src="" alt="Payment Screenshot Preview" class="w-14 h-14 object-contain bg-slate-900 rounded-xl border border-amber-300 dark:border-amber-700 shadow-2xs p-0.5">
+                    <div class="text-[11px] text-slate-600 dark:text-slate-300 flex-1 min-w-0">
+                      <span class="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1"><i class="bi bi-check-circle-fill"></i> Screenshot Attached</span>
+                      <span class="text-slate-400 text-[10px] block truncate">Payment receipt will be submitted with your pass.</span>
+                    </div>
+                    <button type="button" onclick="window.removePaymentProofPreview()" class="text-red-500 hover:text-red-700 text-xs px-2.5 py-1 rounded-lg border border-red-200 dark:border-red-800 shrink-0" title="Remove Screenshot">Remove</button>
+                  </div>
+                </div>
               </div>
             ` : ''}
 
@@ -1830,7 +1852,7 @@ ${job.description || 'No description provided.'}
               ${isPaid ? `
                 <button type="submit" id="pub-reg-submit-btn" class="w-full py-3.5 px-6 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-lg hover:shadow-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
                   <i class="bi bi-shield-check text-base"></i>
-                  <span>I've Paid — Submit UTR &amp; Complete Registration</span>
+                  <span>I've Paid — Submit Receipt &amp; Complete Registration</span>
                   <i class="bi bi-arrow-right text-xs"></i>
                 </button>
               ` : `
@@ -1852,6 +1874,230 @@ ${job.description || 'No description provided.'}
     const backdrop = document.getElementById('public-modal-backdrop');
     if (backdrop) backdrop.remove();
     document.body.style.overflow = '';
+  };
+
+  // Payment Proof Preview Handlers (In-Form Upload)
+  window.handlePaymentProofPreview = function (event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showPublicModalNotice('File Too Large', 'Payment screenshot must be less than 5MB.', true);
+      event.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const base64 = e.target.result;
+      const hiddenInput = document.getElementById('pub-reg-screenshot-base64');
+      const previewBox = document.getElementById('pub-reg-screenshot-preview-box');
+      const previewImg = document.getElementById('pub-reg-screenshot-preview-img');
+      if (hiddenInput) hiddenInput.value = base64;
+      if (previewImg) previewImg.src = base64;
+      if (previewBox) previewBox.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.removePaymentProofPreview = function () {
+    const fileInput = document.getElementById('pub-reg-screenshot');
+    const hiddenInput = document.getElementById('pub-reg-screenshot-base64');
+    const previewBox = document.getElementById('pub-reg-screenshot-preview-box');
+    const previewImg = document.getElementById('pub-reg-screenshot-preview-img');
+    if (fileInput) fileInput.value = '';
+    if (hiddenInput) hiddenInput.value = '';
+    if (previewImg) previewImg.src = '';
+    if (previewBox) previewBox.classList.add('hidden');
+  };
+
+  // Post-Registration Payment Proof Upload Modal
+  window.showPostRegPaymentModal = function (regData) {
+    document.querySelectorAll('#public-notice-backdrop').forEach(el => el.remove());
+    const tokenNo = regData.token_no || '';
+    const title = regData.title || 'Event Registration';
+    const fee = regData.fee || 'Free';
+    const isFree = regData.is_free !== undefined ? regData.is_free : (fee.toLowerCase().includes('free') || fee === '0' || fee === '');
+    const utr = regData.transaction_id || '';
+    let screenshot = regData.payment_screenshot || '';
+
+    const modalHtml = `
+      <div id="public-notice-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-200 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-lg rounded-3xl p-5 sm:p-7 shadow-2xl space-y-4 text-slate-900 dark:text-white max-h-[92vh] overflow-y-auto no-scrollbar relative my-auto">
+          
+          <!-- Header -->
+          <div class="text-center space-y-1.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-2xl shadow-xs">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
+            <h3 class="text-base sm:text-lg font-black font-heading text-slate-900 dark:text-white">Registration Received! ⏳</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Registration verification pending admin approval</p>
+          </div>
+
+          <!-- Event & Token Dossier Card -->
+          <div class="bg-slate-50 dark:bg-slate-850 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-slate-400 font-mono text-[10px] uppercase font-bold">Event</span>
+              <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 font-bold font-mono text-[10.5px]">${fee}</span>
+            </div>
+            <div class="font-bold text-slate-900 dark:text-white text-sm truncate">${title}</div>
+            
+            <div class="pt-2 border-t border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <span class="text-[10px] text-slate-400 block font-mono">Reference Token:</span>
+                <span class="font-mono font-bold text-sm text-[#123B32] dark:text-emerald-400 select-all">${tokenNo}</span>
+              </div>
+              ${utr ? `
+                <div>
+                  <span class="text-[10px] text-slate-400 block font-mono">Submitted UTR:</span>
+                  <span class="font-mono font-semibold text-xs text-slate-700 dark:text-slate-300">${utr}</span>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Official WhatsApp Group Notice (Only accessible after admin verification) -->
+          <div class="p-3.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-2xl flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-[#25D366] flex items-center justify-center text-lg shrink-0">
+              <i class="bi bi-whatsapp"></i>
+            </div>
+            <div class="text-xs space-y-0.5 min-w-0">
+              <span class="font-bold text-slate-800 dark:text-slate-200 block text-[11.5px] flex items-center gap-1.5">
+                Official WhatsApp Community Group
+                <span class="px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[10px] rounded font-mono font-semibold">Verification Required</span>
+              </span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">
+                Your WhatsApp Community Group link will be dispatched to your email and unlocked on the status tracking portal once your registration is officially verified by administration.
+              </span>
+            </div>
+          </div>
+
+          ${!isFree ? `
+            <!-- Payment Screenshot Section for Paid Events -->
+            <div id="post-reg-proof-container" class="space-y-3">
+              <div id="post-reg-attached-box" class="${screenshot ? '' : 'hidden'} p-3.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl flex items-center gap-3">
+                <img id="post-reg-attached-img" src="${screenshot}" alt="Payment Screenshot" class="w-16 h-16 object-contain bg-slate-950 rounded-xl border border-emerald-300 shadow-sm p-0.5 cursor-pointer shrink-0" onclick="window.open(this.src, '_blank')" title="Click to view full image">
+                <div class="text-xs flex-1 min-w-0">
+                  <span class="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-emerald-600"></i> Payment Screenshot Attached</span>
+                  <span class="text-slate-500 dark:text-slate-400 text-[11px] block truncate mt-0.5">Admin will verify your receipt and email your official pass &amp; WhatsApp Group link once verified.</span>
+                  <button type="button" onclick="document.getElementById('post-reg-upload-box').classList.toggle('hidden')" class="mt-1 text-[11px] text-[#123B32] dark:text-emerald-400 font-bold hover:underline cursor-pointer">Re-upload / Change Screenshot</button>
+                </div>
+              </div>
+
+              <!-- Upload Box (Shown if no screenshot or user clicks re-upload) -->
+              <div id="post-reg-upload-box" class="${screenshot ? 'hidden' : ''} p-4 bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-2.5 text-xs">
+                <div class="space-y-0.5">
+                  <label class="block font-bold text-xs text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
+                    <i class="bi bi-cloud-arrow-up-fill text-amber-600"></i>
+                    <span>Upload Payment Screenshot / Receipt</span>
+                  </label>
+                  <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-tight">
+                    Please attach your GPay / PhonePe / Paytm payment screen to confirm your registration pass.
+                  </p>
+                </div>
+
+                <input type="file" id="post-reg-file-input" accept="image/*" onchange="window.handlePostRegFileSelect(event)" class="w-full p-2 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs cursor-pointer">
+                <input type="hidden" id="post-reg-base64" value="">
+
+                <div id="post-reg-preview-bar" class="hidden flex items-center gap-2 pt-1">
+                  <img id="post-reg-thumbnail" src="" alt="Thumbnail" class="w-12 h-12 object-contain bg-slate-950 rounded-lg border border-amber-300 p-0.5 shrink-0">
+                  <div class="flex-1 min-w-0">
+                    <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200 block truncate">Ready to submit</span>
+                    <span class="text-[10px] text-slate-400 block">Click below to upload</span>
+                  </div>
+                  <button type="button" id="post-reg-btn-submit" onclick="window.submitPostRegProof('${tokenNo}')" class="px-3.5 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer shrink-0 flex items-center gap-1.5">
+                    <i class="bi bi-upload"></i>
+                    <span>Upload</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ` : `
+            <!-- Free Event Confirmation Badge -->
+            <div class="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl flex items-center gap-3 text-xs">
+              <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <span class="font-bold text-emerald-800 dark:text-emerald-300 block">Free Registration Received</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 block truncate">Admin will verify your attendee profile and email your official pass &amp; WhatsApp Group link once approved.</span>
+              </div>
+            </div>
+          `}
+
+          <!-- Bottom Action Buttons -->
+          <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <a href="track.html?token=${encodeURIComponent(tokenNo)}" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#1A4B40] text-white font-bold text-xs rounded-xl shadow-md transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="bi bi-search text-xs"></i>
+              <span>Track Pass Status</span>
+            </a>
+            <button type="button" onclick="document.querySelectorAll('#public-notice-backdrop').forEach(el => el.remove())" class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-all cursor-pointer">
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+
+  window.handlePostRegFileSelect = function(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Payment screenshot size must be less than 5MB.');
+      event.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64 = e.target.result;
+      document.getElementById('post-reg-base64').value = base64;
+      document.getElementById('post-reg-thumbnail').src = base64;
+      document.getElementById('post-reg-preview-bar').classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.submitPostRegProof = async function(tokenNo) {
+    const base64 = document.getElementById('post-reg-base64')?.value || '';
+    if (!base64) {
+      alert('Please choose an image file first.');
+      return;
+    }
+    const btn = document.getElementById('post-reg-btn-submit');
+    const origText = btn ? btn.innerHTML : 'Upload';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin mr-1">⏳</span> Uploading...`;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/public/events/upload-payment-proof`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token_no: tokenNo, payment_screenshot: base64 })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+
+      // Update UI to show attached screenshot
+      const attachedBox = document.getElementById('post-reg-attached-box');
+      const attachedImg = document.getElementById('post-reg-attached-img');
+      const uploadBox = document.getElementById('post-reg-upload-box');
+      if (attachedImg) attachedImg.src = base64;
+      if (attachedBox) attachedBox.classList.remove('hidden');
+      if (uploadBox) uploadBox.classList.add('hidden');
+
+      if (window.toast) {
+        window.toast.custom('✔ Payment Screenshot Uploaded Successfully!', { icon: '🎉', duration: 4000 });
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to upload payment proof');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
   };
 
   // Global Escape Key Listener for Modals
@@ -2139,22 +2385,39 @@ ${job.description || 'No description provided.'}
       const sharedEventId = urlParams.get('event') || urlParams.get('eventId') || urlParams.get('id');
       if (!sharedEventId) return;
 
-      setTimeout(() => {
+      const triggerOpenSharedEvent = () => {
+        const allEvs = window.allEventsData || [];
+        if (!allEvs.length) return false;
+
+        const evObj = allEvs.find(e => String(e.id) === String(sharedEventId));
+        if (!evObj) return false;
+
+        // If active filter hides this card, reset filters so background list has the event
+        const cardBefore = document.getElementById(`event-card-${sharedEventId}`) || 
+                           document.querySelector(`[data-event-id="${sharedEventId}"]`);
+        if (!cardBefore && typeof window.resetAllEventFilters === 'function') {
+          window.resetAllEventFilters();
+        }
+
+        // Align background viewport to the card
         const card = document.getElementById(`event-card-${sharedEventId}`) || 
                      document.querySelector(`[data-event-id="${sharedEventId}"]`);
         if (card) {
           card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          card.classList.add('ring-4', 'ring-[#123B32]', 'dark:ring-emerald-400', 'transition-all', 'duration-500', 'shadow-2xl');
-          setTimeout(() => {
-            card.classList.remove('ring-4', 'ring-[#123B32]', 'dark:ring-emerald-400');
-          }, 4500);
-
-          const evObj = (window.allEventsData || []).find(e => String(e.id) === String(sharedEventId));
-          if (evObj && window.toast) {
-            window.toast.custom(`✨ Highlighting: ${evObj.title}`, { icon: '🎯', duration: 4000 });
-          }
         }
-      }, 400);
+
+        // Open the shared event fully in the Event Poster Lightbox Modal (NOT just highlight)
+        if (typeof window.openEventPosterModal === 'function') {
+          window.openEventPosterModal(sharedEventId);
+        }
+        return true;
+      };
+
+      // Try immediately; if event data is still loading, retry after brief delay
+      if (!triggerOpenSharedEvent()) {
+        setTimeout(triggerOpenSharedEvent, 250);
+        setTimeout(triggerOpenSharedEvent, 650);
+      }
     } catch (err) {
       console.warn('Deep link resolution note:', err);
     }
@@ -2197,8 +2460,11 @@ ${job.description || 'No description provided.'}
       return;
     }
 
-    if (!isFree && utr.length < 4) {
-      showPublicModalNotice('Transaction UTR Required', 'Please enter a valid UPI / Bank Transaction UTR Number for payment verification.', true);
+    const screenshotBase64 = document.getElementById('pub-reg-screenshot-base64')?.value || '';
+    if (!isFree && (!screenshotBase64 || screenshotBase64.length < 50)) {
+      showPublicModalNotice('Payment Screenshot Required', 'Please upload / attach your payment screenshot or receipt (GPay, PhonePe, Paytm) before submitting.', true);
+      const fileInput = document.getElementById('pub-reg-screenshot');
+      if (fileInput) fileInput.focus();
       return;
     }
 
@@ -2228,7 +2494,8 @@ ${job.description || 'No description provided.'}
       registration_fee: fee,
       payment_method: 'UPI QR',
       transaction_id: utr,
-      declaration_agreed: declEl ? declEl.checked : true
+      declaration_agreed: declEl ? declEl.checked : true,
+      payment_screenshot: document.getElementById('pub-reg-screenshot-base64')?.value || ''
     };
 
     try {
@@ -2245,18 +2512,17 @@ ${job.description || 'No description provided.'}
         throw err;
       }
       closePublicModal();
-      if (data.is_pending_payment) {
-        showPublicModalNotice(
-          'Payment Verification Pending ⏳',
-          'Thank you for registering! Your registration has been received. Because this is a paid event, your official entry pass token and attendance QR code will be dispatched to your registered email once payment (UTR) is verified by Admin.',
-          false,
-          null
-        );
-      } else {
-        const token = data.token_no || (data.registration && data.registration.token_no);
-        if (token) localStorage.setItem('sst_last_token', token);
-        showPublicModalNotice('Registration Confirmed!', 'Thank you for registering! Your event pass dossier has been recorded and emailed to you. We will contact you shortly.', false, token);
-      }
+      const token = data.token_no || (data.registration && data.registration.token_no) || '';
+      if (token && token.startsWith('SST-')) localStorage.setItem('sst_last_token', token);
+      showPostRegPaymentModal({
+        token_no: token,
+        title: title,
+        fee: fee,
+        transaction_id: utr,
+        payment_screenshot: data.payment_screenshot || body.payment_screenshot || '',
+        whatsapp_group_link: null,
+        is_free: isFree
+      });
     } catch (err) {
       if (submitBtn) {
         submitBtn.disabled = false;

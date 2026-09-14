@@ -2480,6 +2480,13 @@
           </td>
           <td class="p-3 font-mono text-slate-700">
             ${r.transaction_id ? `<span class="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-[#123B32]">${r.transaction_id}</span>` : '<span class="text-slate-400 text-xs">N/A (Free)</span>'}
+            ${r.payment_screenshot ? `
+              <div class="pt-1">
+                <button type="button" onclick="event.stopPropagation(); openPaymentScreenshotModal(${r.id})" class="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded text-[10px] font-bold inline-flex items-center gap-1 shadow-2xs cursor-pointer transition-all hover:scale-105" title="Click to view full payment receipt screenshot in modal">
+                  <i class="bi bi-receipt text-xs"></i> <span>Receipt Attached</span>
+                </button>
+              </div>
+            ` : ''}
           </td>
           <td class="p-3" onclick="event.stopPropagation()">
             <select onchange="updateRegistrationPaymentStatus(${r.id}, this.value)" class="bg-white text-slate-800 border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-semibold cursor-pointer shadow-2xs">
@@ -2505,7 +2512,7 @@
           body: JSON.stringify({ payment_status })
         });
         if (!ok) throw new Error(data.error || 'Payment status update failed');
-        showToast(payment_status === 'Verified' ? 'Payment Verified! Official Entry Pass emailed.' : `Status updated to ${payment_status}`);
+        showToast(payment_status === 'Verified' ? 'Registration Verified! Official Pass & WhatsApp link emailed.' : `Status updated to ${payment_status}`);
         loadRegistrations();
       } catch (err) {
         showToast(err.message, 'error');
@@ -2523,6 +2530,115 @@
         }
       });
     }
+
+    function safeOpenImage(src) {
+      if (!src) return;
+      const win = window.open('');
+      if (win) {
+        win.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Payment Screenshot Preview</title>
+              <style>
+                body { margin: 0; background: #0B0F19; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+                img { max-width: 96vw; max-height: 96vh; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border-radius: 8px; }
+              </style>
+            </head>
+            <body>
+              <img src="${src}" alt="Payment Screenshot">
+            </body>
+          </html>
+        `);
+        win.document.close();
+      } else {
+        window.open(src, '_blank');
+      }
+    }
+    window.safeOpenImage = safeOpenImage;
+
+    function openPaymentScreenshotModal(regId) {
+      const reg = (tableData.registrations || []).find(r => r.id === regId);
+      if (!reg || !reg.payment_screenshot) {
+        showToast('No payment screenshot attached for this registration', 'error');
+        return;
+      }
+
+      const isVerified = reg.payment_status === 'Verified' || reg.payment_status === 'Approved';
+      const statusBadge = isVerified 
+        ? '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-xs rounded-full inline-flex items-center gap-1"><i class="bi bi-check-circle-fill text-emerald-600"></i> Verified</span>'
+        : (reg.payment_status === 'Rejected'
+            ? '<span class="px-2.5 py-1 bg-red-100 text-red-800 font-bold text-xs rounded-full inline-flex items-center gap-1"><i class="bi bi-x-circle-fill text-red-600"></i> Rejected</span>'
+            : '<span class="px-2.5 py-1 bg-amber-100 text-amber-900 font-bold text-xs rounded-full inline-flex items-center gap-1"><i class="bi bi-hourglass-split text-amber-600"></i> Pending Verification</span>');
+
+      const container = document.getElementById('modal-container');
+      if (container) {
+        container.className = 'bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 w-full max-w-2xl shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto no-scrollbar';
+      }
+
+      showModal(`
+        <div class="space-y-4">
+          <!-- Header -->
+          <div class="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-2">
+                <span class="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-base">
+                  <i class="bi bi-receipt"></i>
+                </span>
+                <h3 class="text-base font-bold font-heading text-slate-900">Payment Screenshot / Receipt</h3>
+              </div>
+              <p class="text-xs text-slate-500">Attendee: <strong class="text-slate-900">${reg.name}</strong> • ${reg.email}</p>
+            </div>
+            ${statusBadge}
+          </div>
+
+          <!-- Event & Transaction Metadata Strip -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs">
+            <div>
+              <span class="text-[10px] text-slate-400 uppercase font-mono block">Event</span>
+              <span class="font-bold text-slate-900 truncate block" title="${reg.event_title}">${reg.event_title}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 uppercase font-mono block">Fee</span>
+              <span class="font-bold text-amber-800 block">${reg.registration_fee || 'Free'}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 uppercase font-mono block">Transaction ID / UTR</span>
+              <span class="font-mono font-bold text-[#123B32] block truncate">${reg.transaction_id || 'N/A (Screenshot only)'}</span>
+            </div>
+          </div>
+
+          <!-- Full Resolution Image Display Canvas -->
+          <div class="relative bg-slate-950 rounded-2xl overflow-hidden border border-slate-300 p-2 flex items-center justify-center group shadow-inner min-h-[260px] max-h-[62vh]">
+            <img id="modal-screenshot-view-img" src="${reg.payment_screenshot}" alt="Payment Proof Screenshot" class="w-auto h-auto max-w-full max-h-[58vh] object-contain rounded-xl shadow-lg transition-transform duration-200">
+            <div class="absolute bottom-3 right-3 flex items-center gap-2">
+              <button type="button" onclick="safeOpenImage('${reg.payment_screenshot}')" class="px-3 py-1.5 bg-black/75 hover:bg-black text-white text-xs font-bold rounded-lg backdrop-blur-sm border border-white/20 shadow-md flex items-center gap-1.5 transition-all cursor-pointer">
+                <i class="bi bi-box-arrow-up-right text-[11px]"></i>
+                <span>Open Full Size</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs cursor-pointer">Close</button>
+            <div class="flex items-center gap-2">
+              ${!isVerified ? `
+                <button type="button" onclick="updateRegistrationPaymentStatus(${reg.id}, 'Rejected'); closeModal();" class="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl font-bold text-xs cursor-pointer transition-colors flex items-center gap-1">
+                  <i class="bi bi-x-circle"></i> <span>Reject</span>
+                </button>
+                <button type="button" onclick="updateRegistrationPaymentStatus(${reg.id}, 'Verified'); closeModal();" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-xs shadow-md cursor-pointer transition-colors flex items-center gap-1.5">
+                  <i class="bi bi-check-circle-fill"></i> <span>Verify &amp; Issue Pass</span>
+                </button>
+              ` : `
+                <span class="text-xs text-emerald-700 font-bold flex items-center gap-1"><i class="bi bi-check-circle-fill"></i> Pass Already Issued</span>
+              `}
+            </div>
+          </div>
+        </div>
+      `);
+    }
+    window.openPaymentScreenshotModal = openPaymentScreenshotModal;
 
     // ==========================================
     // TAB 4: EVENTS CRUD
@@ -2551,7 +2667,10 @@
             <div class="flex items-center gap-3">
               ${ev.image_url ? `<img src="${ev.image_url}" alt="Poster" class="w-12 h-12 object-contain bg-slate-900 rounded-lg border border-slate-200 shrink-0 p-0.5 shadow-2xs">` : `<div class="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-xs shrink-0"><i class="bi bi-image"></i></div>`}
               <div class="min-w-0">
-                <span class="block font-bold text-slate-900 truncate max-w-xs">${ev.title}</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="block font-bold text-slate-900 truncate max-w-xs">${ev.title}</span>
+                  ${ev.whatsapp_group_link ? `<a href="${ev.whatsapp_group_link}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp Group Configured: ${ev.whatsapp_group_link}" class="text-emerald-600 hover:text-emerald-700 inline-flex items-center"><i class="bi bi-whatsapp text-xs"></i></a>` : ''}
+                </div>
                 <span class="block text-[11px] text-slate-500 truncate max-w-xs">${ev.description}</span>
               </div>
             </div>
@@ -2681,6 +2800,16 @@
             </div>
           </div>
 
+          <!-- WHATSAPP GROUP LINK FIELD -->
+          <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-2xl space-y-1.5">
+            <label class="block text-slate-700 font-bold text-xs flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><i class="bi bi-whatsapp text-emerald-600 text-sm"></i> Official WhatsApp Group Link</span>
+              <span class="text-[10px] text-emerald-700 font-medium bg-emerald-100 px-2 py-0.5 rounded-full">Sent via Email to Attendees</span>
+            </label>
+            <input type="url" id="ev-whatsapp-link" value="${ev.whatsapp_group_link || ''}" placeholder="https://chat.whatsapp.com/..." class="w-full p-2.5 bg-white border border-emerald-300 rounded-xl text-slate-900 text-xs focus:outline-none focus:border-[#123B32]">
+            <span class="text-[10.5px] text-slate-500 block leading-tight">Attendees who register for this event will receive this WhatsApp Group link via email so they can join the community.</span>
+          </div>
+
           <div>
             <label class="block text-slate-600 font-semibold mb-1">Description</label>
             <textarea id="ev-desc" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 h-16 focus:outline-none focus:border-[#123B32]">${ev.description || ''}</textarea>
@@ -2766,6 +2895,7 @@
         registration_fee: fee,
         upi_id: upi,
         payment_qr: payment_qr,
+        whatsapp_group_link: (document.getElementById('ev-whatsapp-link')?.value || '').trim(),
         image_url: document.getElementById('ev-image-url')?.value || '',
         description: document.getElementById('ev-desc').value,
         status: document.getElementById('ev-status').value
@@ -3784,9 +3914,26 @@
             </div>
           </div>
 
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-            <span class="block text-slate-500 font-bold mb-1">Transaction ID / Payment UTR:</span>
-            <span class="font-mono font-bold text-sm text-[#123B32]">${item.transaction_id || 'N/A (Free Event / Walk-in)'}</span>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500 font-bold">Transaction ID / Payment UTR:</span>
+              <span class="font-mono font-bold text-sm text-[#123B32]">${item.transaction_id || 'N/A (Free Event / Walk-in)'}</span>
+            </div>
+            ${item.payment_screenshot ? `
+              <div class="pt-2 border-t border-slate-200 space-y-1.5">
+                <span class="font-bold text-slate-700 flex items-center gap-1.5"><i class="bi bi-receipt text-[#123B32]"></i> Payment Screenshot / Receipt:</span>
+                <div class="flex items-start gap-3 bg-white p-2.5 rounded-xl border border-slate-200">
+                  <img src="${item.payment_screenshot}" alt="Payment Proof" class="max-h-48 max-w-[200px] w-auto h-auto object-contain bg-slate-950 rounded-lg border border-slate-300 shadow-sm p-1 cursor-pointer hover:opacity-90 transition-opacity" onclick="openPaymentScreenshotModal(${item.id})" title="Click to view full screenshot in modal">
+                  <div class="space-y-1 text-slate-500 text-[11px] flex-1">
+                    <span class="font-bold text-emerald-700 block"><i class="bi bi-check-circle-fill"></i> Uploaded by Attendee</span>
+                    <span class="block text-slate-400 text-[10px]">Click image to inspect full high-resolution receipt in modal.</span>
+                    <button type="button" onclick="openPaymentScreenshotModal(${item.id})" class="inline-flex items-center gap-1 text-[#123B32] font-bold hover:underline mt-1 cursor-pointer"><i class="bi bi-arrows-fullscreen text-[10px]"></i> View in Modal</button>
+                  </div>
+                </div>
+              </div>
+            ` : `
+              <div class="pt-1 border-t border-slate-200 text-[11px] text-slate-400 italic">No payment screenshot attached by attendee.</div>
+            `}
           </div>
 
           <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
@@ -3825,6 +3972,17 @@
               <span class="block text-slate-500 font-bold mb-1">Description:</span>
               <p class="whitespace-pre-line text-slate-700 leading-relaxed">${item.description || 'No description provided.'}</p>
             </div>
+            ${item.whatsapp_group_link ? `
+              <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-between gap-3">
+                <div class="space-y-0.5 min-w-0">
+                  <span class="block text-emerald-900 font-bold text-xs flex items-center gap-1.5"><i class="bi bi-whatsapp text-emerald-600"></i> WhatsApp Group Link:</span>
+                  <span class="block text-emerald-700 font-mono text-[11px] truncate select-all">${item.whatsapp_group_link}</span>
+                </div>
+                <a href="${item.whatsapp_group_link}" target="_blank" class="px-3 py-1.5 bg-[#25D366] text-white rounded-lg font-bold text-xs shrink-0 flex items-center gap-1 shadow-xs hover:bg-[#1ebd5a]">
+                  <span>Open Group</span> <i class="bi bi-box-arrow-up-right text-[10px]"></i>
+                </a>
+              </div>
+            ` : ''}
           </div>
         `;
         actionsHtml = `
@@ -4753,6 +4911,10 @@
 
     function closeModal() {
       document.getElementById('modal-backdrop').classList.add('hidden');
+      const container = document.getElementById('modal-container');
+      if (container) {
+        container.className = 'bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar';
+      }
     }
 
     function showConfirmModal(title, message, confirmBtnText, onConfirm) {
