@@ -1055,6 +1055,22 @@ app.setErrorHandler((error, request, reply) => {
 });
 
 // ----------------------------------------------------
+// LIGHTWEIGHT HEALTH CHECK FOR CRON JOBS & UPTIME MONITORS
+// Returns ultra-minimal plain text (2 bytes) to prevent cron-job payload limits
+// ----------------------------------------------------
+const handleHealthCheck = (request, reply) => {
+  reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  if (request.query && request.query.json === 'true') {
+    return reply.type('application/json').send({ status: 'ok' });
+  }
+  return reply.type('text/plain').send('OK');
+};
+
+app.get('/health', handleHealthCheck);
+app.get('/api/health', handleHealthCheck);
+app.get('/ping', handleHealthCheck);
+
+// ----------------------------------------------------
 // VALIDATION & DUPLICATE PREVENTION HELPERS
 // ----------------------------------------------------
 const isValidEmailStr = (email) => {
