@@ -21,8 +21,8 @@ const PORT = process.env.PORT || 5000;
 const DATABASE_URL = process.env.DATABASE_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'vimalraj5207@gmail.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ShazuAdmin2026!';
 const { Configuration, AccountApi, SendApi } = require('hostinger-mail-api-sdk');
+const storage = require('./utils/storage');
 
 const HOSTINGER_API_KEY = process.env.HOSTINGER_API_KEY;
 const HOSTINGER_SENDER_EMAIL = process.env.HOSTINGER_SENDER_EMAIL || 'info@shazusofttechnologies.org';
@@ -1464,6 +1464,9 @@ app.post('/api/public/events/register', async (request, reply) => {
   const initialPaymentStatus = 'Pending Verification';
   const category = attendee_category || 'College / University Student (UG / PG)';
 
+  // Automatically stream payment proof image to Neon S3 Object Storage bucket
+  const finalScreenshot = await storage.ensureStorageUrl(cleanScreenshot, 'receipts');
+
   const result = await pool.query(
     `INSERT INTO event_registrations (
       event_id, event_title, attendee_category, name, email, phone, gender,
@@ -1490,7 +1493,7 @@ app.post('/api/public/events/register', async (request, reply) => {
       tokenNo,
       initialPaymentStatus,
       validDeclaration,
-      cleanScreenshot
+      finalScreenshot
     ]
   );
 
@@ -1513,7 +1516,7 @@ app.post('/api/public/events/register', async (request, reply) => {
     token_no: tokenNo,
     payment_status: initialPaymentStatus,
     declaration_agreed: validDeclaration,
-    payment_screenshot: cleanScreenshot,
+    payment_screenshot: finalScreenshot,
     registered_at: new Date()
   };
 
@@ -1623,6 +1626,7 @@ app.post('/api/public/events/upload-payment-proof', async (request, reply) => {
     }
 
     const reg = check.rows[0];
+    const finalScreenshot = await storage.ensureStorageUrl(cleanScreenshot, 'receipts');
 
     await pool.query(
       `UPDATE event_registrations 
@@ -1630,14 +1634,14 @@ app.post('/api/public/events/upload-payment-proof', async (request, reply) => {
            transaction_id = CASE WHEN $2 != '' THEN $2 ELSE transaction_id END,
            updated_at = CURRENT_TIMESTAMP 
        WHERE id = $3`,
-      [cleanScreenshot, cleanTxn, reg.id]
+      [finalScreenshot, cleanTxn, reg.id]
     );
 
     return {
       success: true,
       message: 'Payment screenshot attached successfully! Our administration team will verify your receipt.',
       token_no: reg.token_no,
-      payment_screenshot: cleanScreenshot
+      payment_screenshot: finalScreenshot
     };
   } catch (err) {
     request.log.error(err, 'Failed to upload payment proof');
@@ -1785,11 +1789,12 @@ app.post('/api/public/careers/apply', async (request, reply) => {
   }
 
   const tokenNo = generateTokenNo('SST-APP');
+  const finalResume = await storage.ensureStorageUrl(trimmedResume, 'resumes');
 
   const result = await pool.query(
     `INSERT INTO applications (job_id, job_title, applicant_name, email, phone, resume_url, message, token_no, status)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Pending') RETURNING *`,
-    [parsedJobId, cleanJobTitle, trimmedName, trimmedEmail, trimmedPhone, resume_url || '', message || '', tokenNo]
+    [parsedJobId, cleanJobTitle, trimmedName, trimmedEmail, trimmedPhone, finalResume || '', message || '', tokenNo]
   );
 
   const application = (result.rows && result.rows[0]) ? result.rows[0] : {
@@ -1798,7 +1803,7 @@ app.post('/api/public/careers/apply', async (request, reply) => {
     applicant_name: trimmedName,
     email: trimmedEmail,
     phone: trimmedPhone,
-    resume_url: resume_url || '',
+    resume_url: finalResume || '',
     message: message || '',
     token_no: tokenNo,
     status: 'Pending',
@@ -2651,10 +2656,11 @@ app.get('/api/admin/courses-services', { preValidation: [app.authenticate] }, as
 
 app.post('/api/admin/courses-services', { preValidation: [app.authenticate] }, async (request) => {
   const { title, offering_type, price_range, duration, description, image_url, is_active } = request.body;
+  const finalImage = await storage.ensureStorageUrl(image_url, 'courses');
   const result = await pool.query(
     `INSERT INTO courses_services (title, offering_type, price_range, duration, description, image_url, is_active)
      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [title, offering_type || 'Course', price_range || 'Custom', duration || 'Variable', description || '', image_url || '', is_active !== false]
+    [title, offering_type || 'Course', price_range || 'Custom', duration || 'Variable', description || '', finalImage || '', is_active !== false]
   );
   return { offering: result.rows[0] };
 });
@@ -2662,11 +2668,12 @@ app.post('/api/admin/courses-services', { preValidation: [app.authenticate] }, a
 app.put('/api/admin/courses-services/:id', { preValidation: [app.authenticate] }, async (request) => {
   const { id } = request.params;
   const { title, offering_type, price_range, duration, description, image_url, is_active } = request.body;
+  const finalImage = await storage.ensureStorageUrl(image_url, 'courses');
   const result = await pool.query(
     `UPDATE courses_services
      SET title=$1, offering_type=$2, price_range=$3, duration=$4, description=$5, image_url=$6, is_active=$7
      WHERE id=$8 RETURNING *`,
-    [title, offering_type, price_range, duration, description, image_url, is_active, id]
+    [title, offering_type, price_range, duration, description, finalImage, is_active, id]
   );
   return { offering: result.rows[0] };
 });
@@ -2685,10 +2692,11 @@ app.get('/api/admin/announcements', { preValidation: [app.authenticate] }, async
 
 app.post('/api/admin/announcements', { preValidation: [app.authenticate] }, async (request) => {
   const { title, content, badge_type, link_url, image_url, priority, is_active } = request.body;
+  const finalImage = await storage.ensureStorageUrl(image_url, 'announcements');
   const result = await pool.query(
     `INSERT INTO announcements (title, content, badge_type, link_url, image_url, priority, is_active)
      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [title, content, badge_type || 'New', link_url || '', image_url || '', priority || 1, is_active !== false]
+    [title, content, badge_type || 'New', link_url || '', finalImage || '', priority || 1, is_active !== false]
   );
   return { announcement: result.rows[0] };
 });
@@ -2696,11 +2704,12 @@ app.post('/api/admin/announcements', { preValidation: [app.authenticate] }, asyn
 app.put('/api/admin/announcements/:id', { preValidation: [app.authenticate] }, async (request) => {
   const { id } = request.params;
   const { title, content, badge_type, link_url, image_url, priority, is_active } = request.body;
+  const finalImage = await storage.ensureStorageUrl(image_url, 'announcements');
   const result = await pool.query(
     `UPDATE announcements
      SET title=$1, content=$2, badge_type=$3, link_url=$4, image_url=$5, priority=$6, is_active=$7
      WHERE id=$8 RETURNING *`,
-    [title, content, badge_type, link_url, image_url, priority, is_active, id]
+    [title, content, badge_type, link_url, finalImage, priority, is_active, id]
   );
   return { announcement: result.rows[0] };
 });
@@ -2711,6 +2720,40 @@ app.delete('/api/admin/announcements/:id', { preValidation: [app.authenticate] }
   return { message: 'Announcement deleted successfully' };
 });
 
+// Neon S3 Object Storage API Endpoints
+app.post('/api/admin/storage/upload', { preValidation: [app.authenticate] }, async (request, reply) => {
+  const { image_base64, folder } = request.body || {};
+  if (!image_base64) {
+    return reply.status(400).send({ error: 'image_base64 is required' });
+  }
+
+  try {
+    const uploadRes = await storage.uploadBase64Image(image_base64, folder || 'assets/uploads');
+    const viewUrl = await storage.getPresignedViewUrl(uploadRes.key, 86400 * 7); // 7-day presigned URL
+    return {
+      success: true,
+      key: uploadRes.key,
+      url: viewUrl,
+      bucket: uploadRes.bucket
+    };
+  } catch (err) {
+    request.log.error(err, 'Object storage upload failed');
+    return reply.status(500).send({ error: `Storage upload failed: ${err.message}` });
+  }
+});
+
+app.get('/api/admin/storage/view-url', { preValidation: [app.authenticate] }, async (request, reply) => {
+  const { key, expires_in } = request.query || {};
+  if (!key) return reply.status(400).send({ error: 'key query param is required' });
+  try {
+    const expiry = parseInt(expires_in, 10) || 3600;
+    const url = await storage.getPresignedViewUrl(key, expiry);
+    return { success: true, key, url };
+  } catch (err) {
+    return reply.status(500).send({ error: err.message });
+  }
+});
+
 // Admin Events CRUD
 app.get('/api/admin/events', { preValidation: [app.authenticate] }, async () => {
   const { rows } = await pool.query('SELECT * FROM events ORDER BY created_at DESC');
@@ -2719,10 +2762,13 @@ app.get('/api/admin/events', { preValidation: [app.authenticate] }, async () => 
 
 app.post('/api/admin/events', { preValidation: [app.authenticate] }, async (request) => {
   const { title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr, whatsapp_group_link } = request.body || {};
+  const finalImage = await storage.ensureStorageUrl(image_url, 'events');
+  const finalQr = await storage.ensureStorageUrl(payment_qr, 'events/qr');
+
   const result = await pool.query(
     `INSERT INTO events (title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr, whatsapp_group_link)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
-    [title, category || 'General', description || '', event_date || '', location || '', registration_fee || 'Free', registration_link || '', image_url || '', status || 'Upcoming', upi_id || '', payment_qr || '', whatsapp_group_link || '']
+    [title, category || 'General', description || '', event_date || '', location || '', registration_fee || 'Free', registration_link || '', finalImage || '', status || 'Upcoming', upi_id || '', finalQr || '', whatsapp_group_link || '']
   );
   return { event: result.rows[0] };
 });
@@ -2730,11 +2776,14 @@ app.post('/api/admin/events', { preValidation: [app.authenticate] }, async (requ
 app.put('/api/admin/events/:id', { preValidation: [app.authenticate] }, async (request) => {
   const { id } = request.params;
   const { title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr, whatsapp_group_link } = request.body || {};
+  const finalImage = await storage.ensureStorageUrl(image_url, 'events');
+  const finalQr = await storage.ensureStorageUrl(payment_qr, 'events/qr');
+
   const result = await pool.query(
     `UPDATE events
      SET title=$1, category=$2, description=$3, event_date=$4, location=$5, registration_fee=$6, registration_link=$7, image_url=$8, status=$9, upi_id=$10, payment_qr=$11, whatsapp_group_link=$12
      WHERE id=$13 RETURNING *`,
-    [title, category, description, event_date, location, registration_fee, registration_link, image_url, status, upi_id, payment_qr, whatsapp_group_link || '', id]
+    [title, category, description, event_date, location, registration_fee, registration_link, finalImage, status, upi_id, finalQr, whatsapp_group_link || '', id]
   );
   return { event: result.rows[0] };
 });
@@ -2934,10 +2983,11 @@ app.post('/api/admin/slider', { preValidation: [app.authenticate] }, async (requ
   if (!title || !image_url) {
     return reply.status(400).send({ error: 'Title and Image URL are required' });
   }
+  const finalImage = await storage.ensureStorageUrl(image_url, 'hero');
   const result = await pool.query(
     `INSERT INTO hero_slides (badge, title, subtitle, image_url, display_order, is_active)
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-    [badge || 'EVENT', title, subtitle || '', image_url, display_order || 0, is_active !== false]
+    [badge || 'EVENT', title, subtitle || '', finalImage, display_order || 0, is_active !== false]
   );
   return { message: 'Hero slide added successfully', slide: result.rows[0] };
 });
@@ -2945,6 +2995,7 @@ app.post('/api/admin/slider', { preValidation: [app.authenticate] }, async (requ
 app.put('/api/admin/slider/:id', { preValidation: [app.authenticate] }, async (request, reply) => {
   const { id } = request.params;
   const { badge, title, subtitle, image_url, display_order, is_active } = request.body || {};
+  const finalImage = image_url ? await storage.ensureStorageUrl(image_url, 'hero') : image_url;
   const result = await pool.query(
     `UPDATE hero_slides
      SET badge = COALESCE($1, badge),
@@ -2954,7 +3005,7 @@ app.put('/api/admin/slider/:id', { preValidation: [app.authenticate] }, async (r
          display_order = COALESCE($5, display_order),
          is_active = COALESCE($6, is_active)
      WHERE id = $7 RETURNING *`,
-    [badge, title, subtitle, image_url, display_order, is_active, id]
+    [badge, title, subtitle, finalImage, display_order, is_active, id]
   );
   if (!result.rows.length) return reply.status(404).send({ error: 'Slide not found' });
   return { message: 'Hero slide updated successfully', slide: result.rows[0] };
@@ -2967,7 +3018,7 @@ app.delete('/api/admin/slider/:id', { preValidation: [app.authenticate] }, async
 });
 
 // ==========================================
-// 🖼️ ADMIN GALLERY MANAGEMENT (BLOB STORAGE)
+// 🖼️ ADMIN GALLERY MANAGEMENT (OBJECT STORAGE)
 // ==========================================
 app.get('/api/admin/gallery', { preValidation: [app.authenticate] }, async () => {
   const { rows } = await pool.query('SELECT * FROM gallery ORDER BY id DESC');
@@ -2977,12 +3028,13 @@ app.get('/api/admin/gallery', { preValidation: [app.authenticate] }, async () =>
 app.post('/api/admin/gallery', { preValidation: [app.authenticate] }, async (request, reply) => {
   const { title, category, image_blob, description, is_active } = request.body || {};
   if (!title || !image_blob) {
-    return reply.status(400).send({ error: 'Title and image (BLOB/Base64) are required.' });
+    return reply.status(400).send({ error: 'Title and image are required.' });
   }
+  const finalImage = await storage.ensureStorageUrl(image_blob, 'gallery');
   const result = await pool.query(
     `INSERT INTO gallery (title, category, image_blob, description, is_active)
      VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [title.trim(), category || 'General', image_blob, description || '', is_active !== false]
+    [title.trim(), category || 'General', finalImage, description || '', is_active !== false]
   );
   return { message: 'Photo added to gallery successfully', item: result.rows[0] };
 });
@@ -2992,6 +3044,7 @@ app.put('/api/admin/gallery/:id', { preValidation: [app.authenticate] }, async (
   const { title, category, image_blob, description, is_active } = request.body || {};
   const current = (await pool.query('SELECT * FROM gallery WHERE id = $1', [id])).rows[0];
   if (!current) return reply.status(404).send({ error: 'Gallery item not found' });
+  const finalImage = image_blob ? await storage.ensureStorageUrl(image_blob, 'gallery') : image_blob;
   const result = await pool.query(
     `UPDATE gallery
      SET title = COALESCE($1, title),
@@ -3001,7 +3054,7 @@ app.put('/api/admin/gallery/:id', { preValidation: [app.authenticate] }, async (
          is_active = COALESCE($5, is_active),
          updated_at = CURRENT_TIMESTAMP
      WHERE id = $6 RETURNING *`,
-    [title, category, image_blob, description, is_active, id]
+    [title, category, finalImage, description, is_active, id]
   );
   return { message: 'Gallery item updated successfully', item: result.rows[0] };
 });
