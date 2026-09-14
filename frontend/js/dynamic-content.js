@@ -1918,6 +1918,7 @@ ${job.description || 'No description provided.'}
     const isFree = regData.is_free !== undefined ? regData.is_free : (fee.toLowerCase().includes('free') || fee === '0' || fee === '');
     const utr = regData.transaction_id || '';
     let screenshot = regData.payment_screenshot || '';
+    const whatsappLink = regData.whatsapp_group_link || '';
 
     const modalHtml = `
       <div id="public-notice-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-200 overflow-y-auto">
@@ -1925,18 +1926,22 @@ ${job.description || 'No description provided.'}
           
           <!-- Header -->
           <div class="text-center space-y-1.5 pb-2 border-b border-slate-100 dark:border-slate-800">
-            <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-2xl shadow-xs">
-              <i class="bi bi-hourglass-split"></i>
+            <div class="w-12 h-12 rounded-full ${isFree ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400'} flex items-center justify-center mx-auto text-2xl shadow-xs">
+              <i class="bi ${isFree ? 'bi-patch-check-fill' : 'bi-hourglass-split'}"></i>
             </div>
-            <h3 class="text-base sm:text-lg font-black font-heading text-slate-900 dark:text-white">Registration Received! ⏳</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Registration verification pending admin approval</p>
+            <h3 class="text-base sm:text-lg font-black font-heading text-slate-900 dark:text-white">
+              ${isFree ? 'Registration Confirmed! 🎉' : 'Registration Received! ⏳'}
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              ${isFree ? 'Your entry pass is active & official pass dispatched to your email' : 'Registration verification pending admin approval'}
+            </p>
           </div>
 
           <!-- Event & Token Dossier Card -->
           <div class="bg-slate-50 dark:bg-slate-850 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
             <div class="flex items-center justify-between gap-2">
               <span class="text-slate-400 font-mono text-[10px] uppercase font-bold">Event</span>
-              <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 font-bold font-mono text-[10.5px]">${fee}</span>
+              <span class="px-2 py-0.5 rounded-full ${isFree ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300'} font-bold font-mono text-[10.5px]">${fee}</span>
             </div>
             <div class="font-bold text-slate-900 dark:text-white text-sm truncate">${title}</div>
             
@@ -1954,21 +1959,50 @@ ${job.description || 'No description provided.'}
             </div>
           </div>
 
-          <!-- Official WhatsApp Group Notice (Only accessible after admin verification) -->
-          <div class="p-3.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-2xl flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-[#25D366] flex items-center justify-center text-lg shrink-0">
-              <i class="bi bi-whatsapp"></i>
+          ${isFree ? `
+            <!-- Immediate Official Attendance QR Pass for Free Events -->
+            <div class="bg-emerald-50/70 dark:bg-emerald-950/40 border-2 border-emerald-300 dark:border-emerald-700/80 p-4 rounded-2xl text-center space-y-2">
+              <span class="text-[10.5px] uppercase font-bold text-emerald-800 dark:text-emerald-300 tracking-wider block">Official Attendance Entry QR Pass</span>
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(tokenNo)}" alt="Attendance QR Code" class="w-32 h-32 mx-auto bg-white p-2 rounded-xl border border-emerald-200 shadow-sm">
+              <div class="font-mono font-black text-sm text-emerald-900 dark:text-emerald-200">${tokenNo}</div>
+              <p class="text-[10.5px] text-emerald-700 dark:text-emerald-300">Show this QR code at the event gate desk for direct check-in.</p>
             </div>
-            <div class="text-xs space-y-0.5 min-w-0">
-              <span class="font-bold text-slate-800 dark:text-slate-200 block text-[11.5px] flex items-center gap-1.5">
-                Official WhatsApp Community Group
-                <span class="px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[10px] rounded font-mono font-semibold">Verification Required</span>
-              </span>
-              <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">
-                Your WhatsApp Community Group link will be dispatched to your email and unlocked on the status tracking portal once your registration is officially verified by administration.
-              </span>
+
+            <!-- Active WhatsApp Group Link for Free Events -->
+            ${whatsappLink ? `
+              <div class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 rounded-2xl flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-[#25D366] flex items-center justify-center text-lg shrink-0">
+                    <i class="bi bi-whatsapp"></i>
+                  </div>
+                  <div class="text-xs min-w-0">
+                    <span class="font-bold text-slate-900 dark:text-white block text-[11.5px]">Official WhatsApp Group</span>
+                    <span class="text-[10.5px] text-slate-500 dark:text-slate-400 block truncate">Connect with organizers & delegates</span>
+                  </div>
+                </div>
+                <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold rounded-xl text-xs shadow-md transition-all shrink-0 flex items-center gap-1.5">
+                  <i class="bi bi-whatsapp"></i>
+                  <span>Join Group</span>
+                </a>
+              </div>
+            ` : ''}
+          ` : `
+            <!-- Official WhatsApp Group Notice (Only accessible after admin verification for paid events) -->
+            <div class="p-3.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-2xl flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-[#25D366] flex items-center justify-center text-lg shrink-0">
+                <i class="bi bi-whatsapp"></i>
+              </div>
+              <div class="text-xs space-y-0.5 min-w-0">
+                <span class="font-bold text-slate-800 dark:text-slate-200 block text-[11.5px] flex items-center gap-1.5">
+                  Official WhatsApp Community Group
+                  <span class="px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[10px] rounded font-mono font-semibold">Verification Required</span>
+                </span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">
+                  Your WhatsApp Community Group link will be dispatched to your email and unlocked on the status tracking portal once your registration is officially verified by administration.
+                </span>
+              </div>
             </div>
-          </div>
+          `}
 
           ${!isFree ? `
             <!-- Payment Screenshot Section for Paid Events -->
@@ -2520,7 +2554,7 @@ ${job.description || 'No description provided.'}
         fee: fee,
         transaction_id: utr,
         payment_screenshot: data.payment_screenshot || body.payment_screenshot || '',
-        whatsapp_group_link: null,
+        whatsapp_group_link: isFree ? (data.whatsapp_group_link || (data.registration && data.registration.whatsapp_group_link) || null) : null,
         is_free: isFree
       });
     } catch (err) {
