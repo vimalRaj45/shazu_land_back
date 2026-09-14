@@ -21,6 +21,7 @@ const PORT = process.env.PORT || 5000;
 const DATABASE_URL = process.env.DATABASE_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'vimalraj5207@gmail.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ShazuAdmin2026!';
 const { Configuration, AccountApi, SendApi } = require('hostinger-mail-api-sdk');
 const storage = require('./utils/storage');
 
