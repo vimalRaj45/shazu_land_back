@@ -117,12 +117,11 @@ async function issueCertificate({
 }
 
 /**
- * Retrieves required/optional fields for a template
- * @param {string} templateNameOrId
- * @returns {Promise<Object>}
+ * Retrieves all available certificate templates
+ * @returns {Promise<Array>}
  */
-async function getTemplateRequiredFields(templateNameOrId) {
-  const url = `${BASE_URL}/api/v1/external/templates/${encodeURIComponent(templateNameOrId)}`;
+async function getTemplates() {
+  const url = `${BASE_URL}/api/v1/external/templates`;
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -132,12 +131,14 @@ async function getTemplateRequiredFields(templateNameOrId) {
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.message || `Failed to fetch template (HTTP ${response.status})`);
+    throw new Error(data.message || `Failed to fetch templates (HTTP ${response.status})`);
   }
-  return data;
+  return data.templates || data.data || [];
 }
 
 module.exports = {
   issueCertificate,
-  getTemplateRequiredFields
+  getTemplateRequiredFields,
+  getTemplates
 };
+

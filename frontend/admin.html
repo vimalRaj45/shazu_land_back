@@ -5040,17 +5040,19 @@
     async function loadCertificatesTab() {
       renderTableSkeleton('certificates-table-body', 7);
       try {
-        const [regRes, memRes, evRes, histRes] = await Promise.all([
+        const [regRes, memRes, evRes, histRes, tplRes] = await Promise.all([
           safeFetchJson(`${API_BASE}/api/admin/event-registrations`, { headers: getAuthHeaders() }),
           safeFetchJson(`${API_BASE}/api/admin/memberships`, { headers: getAuthHeaders() }),
           safeFetchJson(`${API_BASE}/api/admin/events`, { headers: getAuthHeaders() }),
-          safeFetchJson(`${API_BASE}/api/admin/certificates/history`, { headers: getAuthHeaders() })
+          safeFetchJson(`${API_BASE}/api/admin/certificates/history`, { headers: getAuthHeaders() }),
+          safeFetchJson(`${API_BASE}/api/admin/certificates/templates`, { headers: getAuthHeaders() })
         ]);
 
         if (regRes.ok) tableData.registrations = regRes.data.registrations || [];
         if (memRes.ok) tableData.memberships = memRes.data.memberships || [];
         if (evRes.ok) tableData.events = evRes.data.events || [];
         if (histRes.ok) tableData.issued_certificates = histRes.data.certificates || [];
+        if (tplRes && tplRes.ok) tableData.templates = tplRes.data.templates || [];
 
         // Populate Event Select filter dropdown
         const evSelect = document.getElementById('cert-event-select');
@@ -5383,6 +5385,26 @@
       const defaultAssoc = document.getElementById('cert-default-assoc')?.value || 'Shazu Soft Technologies';
       const finalAssoc = association || defaultAssoc;
 
+      const availableTemplates = (tableData.templates && tableData.templates.length > 0)
+        ? tableData.templates
+        : [
+            { id: '0a5f6da0-d0cf-43a5-8cce-ff7da5dbf1a8', name: 'MEMBERSHIP_ACAR', mapped_associations: ['E2E Tech Association'] },
+            { id: 'a80cae10-7092-467b-a3c9-ed8a18cad5df', name: 'MEMBERSHIP_WASP', mapped_associations: [] },
+            { id: '386bfb0d-3dbb-413d-afea-e67591fa97f0', name: 'MEMBERSHIP_IAMHP', mapped_associations: [] },
+            { id: '116b1b57-02eb-479b-82c8-2b0b13bcd832', name: 'POWER BI', mapped_associations: [] },
+            { id: 'b2d8f2da-fef8-4d47-ba25-145247e87bbf', name: 'Powerbi', mapped_associations: [] },
+            { id: 'ed3a660d-897a-4de4-9005-b133f61d072f', name: 'MEMBERSHIP', mapped_associations: ['IEEE Student Chapter Test'] }
+          ];
+
+      let defaultTpl = '';
+      if (sourceType === 'membership') {
+        const found = availableTemplates.find(t => (t.name || '').toLowerCase().includes('member') || (t.mapped_associations || []).some(a => finalAssoc.toLowerCase().includes(a.toLowerCase())));
+        defaultTpl = found ? found.name : 'MEMBERSHIP_ACAR';
+      } else {
+        const found = availableTemplates.find(t => (title || '').toLowerCase().includes((t.name || '').toLowerCase()) || (t.name || '').toLowerCase().includes('power') || (t.name || '').toLowerCase().includes('bi'));
+        defaultTpl = found ? found.name : (availableTemplates[0]?.name || 'POWER BI');
+      }
+
       showModal(`
         <div class="flex items-center justify-between pb-3 border-b border-slate-200">
           <div class="flex items-center gap-2.5">
@@ -5399,6 +5421,22 @@
           <input type="hidden" id="cert-form-source-type" value="${sourceType}">
           <input type="hidden" id="cert-form-source-id" value="${sourceId}">
           <input type="hidden" id="cert-form-token" value="${token}">
+
+          <!-- TEMPLATE SELECTOR -->
+          <div>
+            <label class="block text-slate-700 font-bold mb-1 flex items-center justify-between">
+              <span>Choose Certificate Template *</span>
+              <span class="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-mono font-bold">CertiVerify Template</span>
+            </label>
+            <select id="cert-form-template" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-none focus:border-[#123B32] cursor-pointer">
+              ${availableTemplates.map(t => {
+                const isSelected = t.name === defaultTpl || t.id === defaultTpl;
+                const assocTag = (t.mapped_associations && t.mapped_associations.length > 0) ? ` (${t.mapped_associations.join(', ')})` : '';
+                return `<option value="${t.name}" ${isSelected ? 'selected' : ''}>${t.name}${assocTag}</option>`;
+              }).join('')}
+              <option value="">-- Auto-Detect / Default Template --</option>
+            </select>
+          </div>
 
           <div>
             <label class="block text-slate-700 font-bold mb-1">Recipient Full Name *</label>
@@ -5454,6 +5492,7 @@
       const sourceType = document.getElementById('cert-form-source-type')?.value || 'custom';
       const sourceId = document.getElementById('cert-form-source-id')?.value || '';
       const token = document.getElementById('cert-form-token')?.value || '';
+      const templateName = document.getElementById('cert-form-template')?.value || undefined;
       const name = document.getElementById('cert-form-name')?.value.trim();
       const email = document.getElementById('cert-form-email')?.value.trim();
       const title = document.getElementById('cert-form-title')?.value.trim();
@@ -5465,6 +5504,7 @@
           method: 'POST',
           headers: getAuthHeaders(),
           body: JSON.stringify({
+            template_name: templateName,
             recipient_name: name,
             recipient_email: email,
             course_title: title,

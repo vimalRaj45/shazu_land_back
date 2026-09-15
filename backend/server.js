@@ -3390,6 +3390,16 @@ app.get('/api/admin/certificates/history', { preValidation: [app.authenticate] }
   }
 });
 
+// 4. Get Available Certificate Templates from CertiVerify
+app.get('/api/admin/certificates/templates', { preValidation: [app.authenticate] }, async (request, reply) => {
+  try {
+    const templates = await certificateService.getTemplates();
+    return { success: true, templates };
+  } catch (err) {
+    return reply.status(500).send({ error: err.message });
+  }
+});
+
 // Admin Hero Slider Management
 app.get('/api/admin/slider', { preValidation: [app.authenticate] }, async () => {
   const { rows } = await pool.query('SELECT * FROM hero_slides ORDER BY display_order ASC, id ASC');
