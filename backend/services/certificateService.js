@@ -136,6 +136,27 @@ async function getTemplates() {
   return data.templates || data.data || [];
 }
 
+/**
+ * Retrieves required fields for a specific template
+ * @param {string} templateNameOrId
+ * @returns {Promise<Object>}
+ */
+async function getTemplateRequiredFields(templateNameOrId) {
+  const url = `${BASE_URL}/api/v1/external/templates/${encodeURIComponent(templateNameOrId)}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-API-Key': API_KEY
+    }
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || `Failed to fetch template (HTTP ${response.status})`);
+  }
+  return data;
+}
+
 module.exports = {
   issueCertificate,
   getTemplateRequiredFields,
