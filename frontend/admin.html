@@ -5381,28 +5381,37 @@
       openIssueCertificateModal('custom', '', '', '', '', defaultAssoc, '');
     }
 
-    function openIssueCertificateModal(sourceType = 'custom', sourceId = '', name = '', email = '', title = '', association = '', token = '') {
+    async function fetchCertificateTemplates() {
+      if (tableData.templates && tableData.templates.length > 0) return tableData.templates;
+      try {
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/certificates/templates`, { headers: getAuthHeaders() });
+        if (ok && data.templates) {
+          tableData.templates = data.templates;
+          return tableData.templates;
+        }
+      } catch (_) {}
+      return [];
+    }
+
+    async function openIssueCertificateModal(sourceType = 'custom', sourceId = '', name = '', email = '', title = '', association = '', token = '') {
       const defaultAssoc = document.getElementById('cert-default-assoc')?.value || 'Shazu Soft Technologies';
       const finalAssoc = association || defaultAssoc;
 
-      const availableTemplates = (tableData.templates && tableData.templates.length > 0)
-        ? tableData.templates
-        : [
-            { id: '0a5f6da0-d0cf-43a5-8cce-ff7da5dbf1a8', name: 'MEMBERSHIP_ACAR', mapped_associations: ['E2E Tech Association'] },
-            { id: 'a80cae10-7092-467b-a3c9-ed8a18cad5df', name: 'MEMBERSHIP_WASP', mapped_associations: [] },
-            { id: '386bfb0d-3dbb-413d-afea-e67591fa97f0', name: 'MEMBERSHIP_IAMHP', mapped_associations: [] },
-            { id: '116b1b57-02eb-479b-82c8-2b0b13bcd832', name: 'POWER BI', mapped_associations: [] },
-            { id: 'b2d8f2da-fef8-4d47-ba25-145247e87bbf', name: 'Powerbi', mapped_associations: [] },
-            { id: 'ed3a660d-897a-4de4-9005-b133f61d072f', name: 'MEMBERSHIP', mapped_associations: ['IEEE Student Chapter Test'] }
-          ];
+      let availableTemplates = tableData.templates || [];
+      if (!availableTemplates.length) {
+        availableTemplates = await fetchCertificateTemplates();
+      }
 
       let defaultTpl = '';
       if (sourceType === 'membership') {
         const found = availableTemplates.find(t => (t.name || '').toLowerCase().includes('member') || (t.mapped_associations || []).some(a => finalAssoc.toLowerCase().includes(a.toLowerCase())));
-        defaultTpl = found ? found.name : 'MEMBERSHIP_ACAR';
-      } else {
-        const found = availableTemplates.find(t => (title || '').toLowerCase().includes((t.name || '').toLowerCase()) || (t.name || '').toLowerCase().includes('power') || (t.name || '').toLowerCase().includes('bi'));
-        defaultTpl = found ? found.name : (availableTemplates[0]?.name || 'POWER BI');
+        if (found) defaultTpl = found.name;
+      } else if (sourceType === 'event') {
+        const found = availableTemplates.find(t => (title || '').toLowerCase().includes((t.name || '').toLowerCase()) || (t.name || '').toLowerCase().includes('event') || (t.name || '').toLowerCase().includes('power'));
+        if (found) defaultTpl = found.name;
+      }
+      if (!defaultTpl && availableTemplates.length > 0) {
+        defaultTpl = availableTemplates[0].name;
       }
 
       showModal(`
@@ -5422,18 +5431,18 @@
           <input type="hidden" id="cert-form-source-id" value="${sourceId}">
           <input type="hidden" id="cert-form-token" value="${token}">
 
-          <!-- TEMPLATE SELECTOR -->
+          <!-- DYNAMIC SERVER-FETCHED TEMPLATE SELECTOR -->
           <div>
             <label class="block text-slate-700 font-bold mb-1 flex items-center justify-between">
               <span>Choose Certificate Template *</span>
-              <span class="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-mono font-bold">CertiVerify Template</span>
+              <span class="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-mono font-bold">Live CertiVerify Template</span>
             </label>
             <select id="cert-form-template" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-none focus:border-[#123B32] cursor-pointer">
-              ${availableTemplates.map(t => {
+              ${availableTemplates.length > 0 ? availableTemplates.map(t => {
                 const isSelected = t.name === defaultTpl || t.id === defaultTpl;
                 const assocTag = (t.mapped_associations && t.mapped_associations.length > 0) ? ` (${t.mapped_associations.join(', ')})` : '';
                 return `<option value="${t.name}" ${isSelected ? 'selected' : ''}>${t.name}${assocTag}</option>`;
-              }).join('')}
+              }).join('') : '<option value="">-- No Templates Available --</option>'}
               <option value="">-- Auto-Detect / Default Template --</option>
             </select>
           </div>
