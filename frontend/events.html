@@ -509,6 +509,14 @@
         <div id="dynamic-events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Dynamic events populated by js/dynamic-content.js -->
         </div>
+
+        <!-- Sentinel element for IntersectionObserver infinite lazy loading -->
+        <div id="events-lazy-sentinel" class="w-full h-6 pointer-events-none opacity-0" aria-hidden="true"></div>
+
+        <!-- Progressive Batch Loading Controller -->
+        <div id="events-batch-controls" class="pt-6 pb-2 text-center" aria-live="polite">
+          <!-- Dynamic batch loading UI rendered by js/dynamic-content.js -->
+        </div>
       </div>
     </section>
   </main>

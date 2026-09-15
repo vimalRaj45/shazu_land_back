@@ -1293,9 +1293,27 @@ app.get('/api/public/announcements', async () => {
   return { announcements: rows };
 });
 
-app.get('/api/public/events', async () => {
-  const { rows } = await pool.query("SELECT * FROM events WHERE status != 'Cancelled' ORDER BY created_at DESC");
-  return { events: rows };
+app.get('/api/public/events', async (request, reply) => {
+  reply.header('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+  try {
+    const { limit, offset, page } = request.query || {};
+    if (limit) {
+      const parsedLimit = parseInt(limit, 10) || 12;
+      const parsedOffset = offset ? (parseInt(offset, 10) || 0) : page ? ((Math.max(1, parseInt(page, 10)) - 1) * parsedLimit) : 0;
+      const countResult = await pool.query("SELECT COUNT(*) AS total FROM events WHERE status != 'Cancelled'");
+      const total = parseInt(countResult.rows[0]?.total || 0, 10);
+      const { rows } = await pool.query(
+        "SELECT * FROM events WHERE status != 'Cancelled' ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+        [parsedLimit, parsedOffset]
+      );
+      return { events: rows, total, limit: parsedLimit, offset: parsedOffset };
+    }
+    const { rows } = await pool.query("SELECT * FROM events WHERE status != 'Cancelled' ORDER BY created_at DESC");
+    return { events: rows };
+  } catch (err) {
+    if (app && app.log) app.log.warn('Events query error:', err);
+    return { events: [] };
+  }
 });
 
 app.get('/api/public/careers', async () => {
@@ -1307,9 +1325,14 @@ app.get('/api/public/careers', async () => {
   }
 });
 
-app.get('/api/public/courses-services', async () => {
-  const { rows } = await pool.query('SELECT * FROM courses_services WHERE is_active = TRUE ORDER BY created_at DESC');
-  return { offerings: rows, courses: rows };
+app.get('/api/public/courses-services', async (request, reply) => {
+  reply.header('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+  try {
+    const { rows } = await pool.query('SELECT * FROM courses_services WHERE is_active = TRUE ORDER BY created_at DESC');
+    return { offerings: rows, courses: rows };
+  } catch (err) {
+    return { offerings: [], courses: [] };
+  }
 });
 
 // Public Hero Slider Endpoint

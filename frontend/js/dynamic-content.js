@@ -711,6 +711,261 @@
     return false;
   };
 
+  // Progressive Batch Loading & Lazy Rendering State
+  window.eventBatchState = window.eventBatchState || {
+    pageSize: 9,
+    currentCount: 0,
+    totalCount: 0,
+    currentFilteredList: [],
+    isLoadingMore: false,
+    observer: null
+  };
+
+  // Render individual event card HTML with optimized lazy-loading and decoding
+  window.renderEventCardHtml = function (ev) {
+    const fee = ev.registration_fee || 'Free';
+    const isPaid = fee !== 'Free' && fee !== '0' && fee !== '' && !String(fee).toLowerCase().includes('free');
+    const defaultImg = ev.category && ev.category.toLowerCase().includes('hackathon') ? 
+      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80' : 
+      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
+    const eventImg = ev.image_url || defaultImg;
+    const categoryLabel = ev.category ? ev.category.split('|')[0].trim().toUpperCase() : 'EVENT';
+    const hasLongDesc = ev.description && ev.description.length > 110;
+    const isPast = window.isEventPassed(ev);
+
+    return `
+      <div id="event-card-${ev.id}" data-event-id="${ev.id}" class="event-carousel-card bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
+        
+        <!-- Top Card Meta Strip (Category & Status/Price) -->
+        <div class="px-4 py-2.5 bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2 z-10">
+          <span class="h-6 px-2.5 inline-flex items-center gap-1.5 bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] rounded-full uppercase tracking-wider shadow-xs shrink-0">
+            <i class="bi bi-tag-fill text-[9px] text-emerald-300"></i>${categoryLabel}
+          </span>
+          ${isPast ? `
+            <span class="h-6 px-2.5 inline-flex items-center bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[10.5px] rounded-full font-mono shadow-xs shrink-0">
+              <i class="bi bi-check2-circle mr-1 text-emerald-500"></i> Concluded
+            </span>
+          ` : `
+            <span class="h-6 px-2.5 inline-flex items-center ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full font-mono shadow-xs shrink-0">
+              ${fee}
+            </span>
+          `}
+        </div>
+
+        <!-- Event Poster Canvas - Perfect Fit Full Image Orientation with Ambient Backdrop Glow -->
+        <div class="h-64 sm:h-72 w-full relative overflow-hidden bg-slate-950 flex items-center justify-center group/img cursor-pointer select-none" onclick="window.openEventPosterModal('${ev.id}')" title="Click to view full event poster">
+          <!-- Ambient blurred backdrop with lazy-loading & asynchronous decoding -->
+          <img src="${eventImg}" loading="lazy" decoding="async" aria-hidden="true" alt="" class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-125 pointer-events-none" onerror="this.style.display='none'">
+          <div class="absolute inset-0 bg-slate-950/25 pointer-events-none"></div>
+
+          <!-- Full Uncropped Event Poster with Perfect Fit Orientation & Native Lazy Loading -->
+          <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${defaultImg}'" class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain mx-auto p-1.5 transition-transform duration-300 group-hover/img:scale-[1.02] ${isPast ? 'grayscale-25' : ''}">
+
+          <!-- Sleek Fullscreen Poster Pill Button -->
+          <button type="button" onclick="event.stopPropagation(); window.openEventPosterModal('${ev.id}')" class="absolute bottom-2.5 right-2.5 z-10 h-7 px-3 inline-flex items-center gap-1.5 rounded-lg bg-black/75 hover:bg-[#123B32] dark:bg-black/75 dark:hover:bg-emerald-700 text-white font-bold text-[11px] shadow-lg backdrop-blur-md border border-white/20 hover:border-emerald-400/60 transition-all duration-200 hover:scale-105 cursor-pointer group/btn" title="Click to view full poster">
+            <i class="bi bi-arrows-angle-expand text-[10px] text-amber-300 group-hover/btn:text-white transition-colors"></i>
+            <span>View Poster</span>
+          </button>
+        </div>
+
+        <!-- Card Content Body -->
+        <div class="p-5 sm:p-6 space-y-3.5 flex-1 flex flex-col justify-between">
+          <div class="space-y-2">
+            <!-- Title -->
+            <h3 class="text-base sm:text-lg font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors leading-snug">
+              ${ev.title}
+            </h3>
+
+            <!-- Event Date & Venue Details -->
+            <div class="flex flex-wrap items-center gap-y-1 gap-x-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium pt-0.5">
+              <span class="inline-flex items-center gap-1.5 text-[#123B32] dark:text-emerald-400 font-bold font-mono">
+                <i class="bi bi-calendar3 text-xs text-amber-500 dark:text-amber-400"></i>
+                <span>${ev.event_date || 'TBA'}</span>
+              </span>
+              <span class="text-slate-300 dark:text-slate-700">•</span>
+              <span class="inline-flex items-center gap-1.5 truncate max-w-[200px]">
+                <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400 text-xs shrink-0"></i>
+                <span class="truncate">${ev.location || 'Salem, Tamil Nadu'}</span>
+              </span>
+            </div>
+
+            <!-- Description with Read More Toggle -->
+            <div class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed pt-1">
+              <p id="event-desc-${ev.id}" class="line-clamp-2 transition-all">
+                ${ev.description || 'Join us for this comprehensive technical session and professional networking event.'}
+              </p>
+              ${hasLongDesc ? `
+                <button type="button" onclick="toggleEventDescription('${ev.id}')" id="event-desc-btn-${ev.id}" class="text-[11px] font-bold text-[#123B32] dark:text-emerald-400 hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer">
+                  <span>Read more</span> <i class="bi bi-chevron-down text-[9px]"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Action Buttons: Register CTA (or Concluded Notice) & Accessible Share Button -->
+          <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+            ${isPast ? `
+              <button type="button" disabled class="flex-1 py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700/80 pointer-events-none opacity-85 select-none" title="Registration Closed - Event Date Passed">
+                <i class="bi bi-lock-fill text-xs"></i>
+                <span>Registration Closed</span>
+              </button>
+            ` : `
+              <button onclick="openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer">
+                <i class="bi bi-ticket-perforated text-sm"></i>
+                <span>Register For Event</span>
+                <i class="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+              </button>
+            `}
+            <button type="button" onclick="openShareModal('${ev.id}')" class="w-10 h-10 bg-slate-100 hover:bg-[#E8EFEB] dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#123B32] dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 rounded-xl transition-all duration-200 flex items-center justify-center shadow-xs cursor-pointer shrink-0 group/share" title="Share Event" aria-label="Share Event">
+              <i class="bi bi-share-fill text-xs group-hover/share:scale-110 transition-transform pointer-events-none"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // Progressive Batch Appender: loads next slice of events into the container
+  window.loadNextEventBatch = function () {
+    const container = document.getElementById('dynamic-events-container');
+    if (!container) return;
+    const state = window.eventBatchState;
+    if (state.isLoadingMore) return;
+    if (state.currentCount >= state.totalCount) {
+      window.updateEventBatchControls();
+      return;
+    }
+
+    state.isLoadingMore = true;
+    window.updateEventBatchControls();
+
+    const start = state.currentCount;
+    const end = Math.min(start + state.pageSize, state.totalCount);
+    const nextSlice = state.currentFilteredList.slice(start, end);
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = nextSlice.map(ev => window.renderEventCardHtml(ev)).join('');
+    
+    while (tempDiv.firstChild) {
+      container.appendChild(tempDiv.firstChild);
+    }
+
+    state.currentCount = end;
+    state.isLoadingMore = false;
+
+    window.updateEventBatchControls();
+    window.setupEventsLazyObserver();
+  };
+
+  // Updates the modern Batch Progress and "Load More" controls
+  window.updateEventBatchControls = function () {
+    let ctrlContainer = document.getElementById('events-batch-controls');
+    const container = document.getElementById('dynamic-events-container');
+    if (!ctrlContainer && container && container.parentNode) {
+      ctrlContainer = document.createElement('div');
+      ctrlContainer.id = 'events-batch-controls';
+      ctrlContainer.className = 'pt-8 pb-4 text-center space-y-4';
+      container.parentNode.appendChild(ctrlContainer);
+    }
+    if (!ctrlContainer) return;
+
+    // Remove legacy carousel pagination if present
+    const legacyPag = document.getElementById('events-carousel-pagination');
+    if (legacyPag) legacyPag.innerHTML = '';
+
+    const { currentCount, totalCount, isLoadingMore } = window.eventBatchState;
+    if (totalCount <= 0) {
+      ctrlContainer.innerHTML = '';
+      return;
+    }
+
+    const pct = Math.min(100, Math.round((currentCount / totalCount) * 100));
+    const hasMore = currentCount < totalCount;
+
+    if (!hasMore) {
+      ctrlContainer.innerHTML = `
+        <div class="inline-flex flex-col items-center gap-2 px-6 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
+          <div class="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+            <i class="bi bi-check-circle-fill text-emerald-600 dark:text-emerald-400 text-sm"></i>
+            <span>Showing all ${totalCount} events</span>
+          </div>
+          <button type="button" onclick="document.getElementById('dynamic-events-container').scrollIntoView({ behavior: 'smooth', block: 'start' })" class="text-[11px] font-semibold text-[#123B32] dark:text-emerald-400 hover:underline inline-flex items-center gap-1 cursor-pointer">
+            <i class="bi bi-arrow-up-circle"></i> Back to top
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    ctrlContainer.innerHTML = `
+      <div class="max-w-md mx-auto space-y-3.5">
+        <!-- Progress Counter & Bar -->
+        <div class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 px-1">
+          <span>Loaded <strong class="text-slate-900 dark:text-white font-bold">${currentCount}</strong> of <strong class="text-slate-900 dark:text-white font-bold">${totalCount}</strong> events</span>
+          <span class="font-mono text-emerald-700 dark:text-emerald-400 font-bold">${pct}%</span>
+        </div>
+        <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+          <div class="bg-gradient-to-r from-[#123B32] to-[#C47D4C] dark:from-emerald-500 dark:to-teal-400 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+        </div>
+
+        <!-- Load More Button -->
+        <div class="pt-2">
+          <button type="button" onclick="window.loadNextEventBatch()" id="btn-load-more-events" class="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-[#123B32] hover:bg-[#2F5B4E] dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-bold text-xs shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer">
+            ${isLoadingMore ? `
+              <span class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              <span>Loading more events...</span>
+            ` : `
+              <i class="bi bi-arrow-down-circle text-sm text-amber-300"></i>
+              <span>Load More Events (${totalCount - currentCount} remaining)</span>
+            `}
+          </button>
+          <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-2 font-medium">Scroll down to auto-load or click button</p>
+        </div>
+      </div>
+    `;
+  };
+
+  // Attaches IntersectionObserver to the sentinel element for automatic scroll loading
+  window.setupEventsLazyObserver = function () {
+    let sentinel = document.getElementById('events-lazy-sentinel');
+    const container = document.getElementById('dynamic-events-container');
+    if (!sentinel && container && container.parentNode) {
+      sentinel = document.createElement('div');
+      sentinel.id = 'events-lazy-sentinel';
+      sentinel.className = 'w-full h-8 pointer-events-none opacity-0';
+      const controls = document.getElementById('events-batch-controls');
+      if (controls) {
+        container.parentNode.insertBefore(sentinel, controls);
+      } else {
+        container.parentNode.appendChild(sentinel);
+      }
+    }
+
+    if (!sentinel || !('IntersectionObserver' in window)) return;
+
+    if (window.eventBatchState.observer) {
+      window.eventBatchState.observer.disconnect();
+    }
+
+    if (window.eventBatchState.currentCount >= window.eventBatchState.totalCount) {
+      return;
+    }
+
+    window.eventBatchState.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !window.eventBatchState.isLoadingMore && window.eventBatchState.currentCount < window.eventBatchState.totalCount) {
+          window.loadNextEventBatch();
+        }
+      });
+    }, {
+      rootMargin: '250px 0px',
+      threshold: 0.05
+    });
+
+    window.eventBatchState.observer.observe(sentinel);
+  };
+
+  // Main Entry: filters list, resets batch pagination, and starts first batch
   window.renderEventsList = function (eventsList) {
     const container = document.getElementById('dynamic-events-container');
     if (!container) return;
@@ -727,133 +982,23 @@
       `;
       const existingPagination = document.getElementById('events-carousel-pagination');
       if (existingPagination) existingPagination.innerHTML = '';
+      const batchControls = document.getElementById('events-batch-controls');
+      if (batchControls) batchControls.innerHTML = '';
+      if (window.eventBatchState && window.eventBatchState.observer) {
+        window.eventBatchState.observer.disconnect();
+      }
       return;
     }
 
-    container.innerHTML = eventsList.map(ev => {
-      const fee = ev.registration_fee || 'Free';
-      const isPaid = fee !== 'Free' && fee !== '0' && fee !== '' && !String(fee).toLowerCase().includes('free');
-      const defaultImg = ev.category && ev.category.toLowerCase().includes('hackathon') ? 
-        'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80' : 
-        'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
-      const eventImg = ev.image_url || defaultImg;
-      const categoryLabel = ev.category ? ev.category.split('|')[0].trim().toUpperCase() : 'EVENT';
-      const hasLongDesc = ev.description && ev.description.length > 110;
-      const isPast = window.isEventPassed(ev);
+    // Reset Batch State
+    window.eventBatchState.currentFilteredList = eventsList;
+    window.eventBatchState.totalCount = eventsList.length;
+    window.eventBatchState.currentCount = 0;
+    window.eventBatchState.isLoadingMore = false;
 
-      return `
-        <div id="event-card-${ev.id}" data-event-id="${ev.id}" class="event-carousel-card bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
-          
-          <!-- Top Card Meta Strip (Category & Status/Price) -->
-          <div class="px-4 py-2.5 bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2 z-10">
-            <span class="h-6 px-2.5 inline-flex items-center gap-1.5 bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] rounded-full uppercase tracking-wider shadow-xs shrink-0">
-              <i class="bi bi-tag-fill text-[9px] text-emerald-300"></i>${categoryLabel}
-            </span>
-            ${isPast ? `
-              <span class="h-6 px-2.5 inline-flex items-center bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[10.5px] rounded-full font-mono shadow-xs shrink-0">
-                <i class="bi bi-check2-circle mr-1 text-emerald-500"></i> Concluded
-              </span>
-            ` : `
-              <span class="h-6 px-2.5 inline-flex items-center ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full font-mono shadow-xs shrink-0">
-                ${fee}
-              </span>
-            `}
-          </div>
-
-          <!-- Event Poster Canvas - Perfect Fit Full Image Orientation with Ambient Backdrop Glow -->
-          <div class="h-64 sm:h-72 w-full relative overflow-hidden bg-slate-950 flex items-center justify-center group/img cursor-pointer select-none" onclick="window.openEventPosterModal('${ev.id}')" title="Click to view full event poster">
-            <!-- Ambient blurred backdrop ensuring any letterboxing is glowing and aesthetic -->
-            <img src="${eventImg}" aria-hidden="true" alt="" class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-125 pointer-events-none">
-            <div class="absolute inset-0 bg-slate-950/25 pointer-events-none"></div>
-
-            <!-- Full Uncropped Event Poster with Perfect Fit Orientation -->
-            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain mx-auto p-1.5 transition-transform duration-300 group-hover/img:scale-[1.02] ${isPast ? 'grayscale-25' : ''}">
-
-            <!-- Sleek Fullscreen Poster Pill Button -->
-            <button type="button" onclick="event.stopPropagation(); window.openEventPosterModal('${ev.id}')" class="absolute bottom-2.5 right-2.5 z-10 h-7 px-3 inline-flex items-center gap-1.5 rounded-lg bg-black/75 hover:bg-[#123B32] dark:bg-black/75 dark:hover:bg-emerald-700 text-white font-bold text-[11px] shadow-lg backdrop-blur-md border border-white/20 hover:border-emerald-400/60 transition-all duration-200 hover:scale-105 cursor-pointer group/btn" title="Click to view full poster">
-              <i class="bi bi-arrows-angle-expand text-[10px] text-amber-300 group-hover/btn:text-white transition-colors"></i>
-              <span>View Poster</span>
-            </button>
-          </div>
-
-          <!-- Card Content Body -->
-          <div class="p-5 sm:p-6 space-y-3.5 flex-1 flex flex-col justify-between">
-            <div class="space-y-2">
-              <!-- Title -->
-              <h3 class="text-base sm:text-lg font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors leading-snug">
-                ${ev.title}
-              </h3>
-
-              <!-- Event Date & Venue Details -->
-              <div class="flex flex-wrap items-center gap-y-1 gap-x-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium pt-0.5">
-                <span class="inline-flex items-center gap-1.5 text-[#123B32] dark:text-emerald-400 font-bold font-mono">
-                  <i class="bi bi-calendar3 text-xs text-amber-500 dark:text-amber-400"></i>
-                  <span>${ev.event_date || 'TBA'}</span>
-                </span>
-                <span class="text-slate-300 dark:text-slate-700">•</span>
-                <span class="inline-flex items-center gap-1.5 truncate max-w-[200px]">
-                  <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400 text-xs shrink-0"></i>
-                  <span class="truncate">${ev.location || 'Salem, Tamil Nadu'}</span>
-                </span>
-              </div>
-
-              <!-- Description with Read More Toggle -->
-              <div class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed pt-1">
-                <p id="event-desc-${ev.id}" class="line-clamp-2 transition-all">
-                  ${ev.description || 'Join us for this comprehensive technical session and professional networking event.'}
-                </p>
-                ${hasLongDesc ? `
-                  <button type="button" onclick="toggleEventDescription('${ev.id}')" id="event-desc-btn-${ev.id}" class="text-[11px] font-bold text-[#123B32] dark:text-emerald-400 hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer">
-                    <span>Read more</span> <i class="bi bi-chevron-down text-[9px]"></i>
-                  </button>
-                ` : ''}
-              </div>
-            </div>
-
-            <!-- Action Buttons: Register CTA (or Concluded Notice) & Accessible Share Button -->
-            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-              ${isPast ? `
-                <button type="button" disabled class="flex-1 py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700/80 pointer-events-none opacity-85 select-none" title="Registration Closed - Event Date Passed">
-                  <i class="bi bi-lock-fill text-xs"></i>
-                  <span>Registration Closed</span>
-                </button>
-              ` : `
-                <button onclick="openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer">
-                  <i class="bi bi-ticket-perforated text-sm"></i>
-                  <span>Register For Event</span>
-                  <i class="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                </button>
-              `}
-              <button type="button" onclick="openShareModal('${ev.id}')" class="w-10 h-10 bg-slate-100 hover:bg-[#E8EFEB] dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#123B32] dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 rounded-xl transition-all duration-200 flex items-center justify-center shadow-xs cursor-pointer shrink-0 group/share" title="Share Event" aria-label="Share Event">
-                <i class="bi bi-share-fill text-xs group-hover/share:scale-110 transition-transform pointer-events-none"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    // Render Dot/Line Carousel Pagination Indicators
-    let pagContainer = document.getElementById('events-carousel-pagination');
-    if (!pagContainer && container.parentNode) {
-      pagContainer = document.createElement('div');
-      pagContainer.id = 'events-carousel-pagination';
-      container.parentNode.appendChild(pagContainer);
-    }
-
-    if (pagContainer) {
-      if (eventsList.length <= 1) {
-        pagContainer.innerHTML = '';
-      } else {
-        pagContainer.innerHTML = `
-          <div class="flex items-center justify-center gap-2 pt-6">
-            ${eventsList.map((ev, idx) => `
-              <button type="button" onclick="scrollToEventCard('event-card-${ev.id}', ${idx})" id="event-dot-${idx}" class="event-pagination-dot ${idx === 0 ? 'w-7 bg-[#123B32] dark:bg-emerald-400' : 'w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400'} h-2 rounded-full transition-all duration-300 cursor-pointer" aria-label="Go to event ${idx + 1}" title="Event ${idx + 1}"></button>
-            `).join('')}
-          </div>
-        `;
-      }
-    }
+    // Clear Container and Render First Batch
+    container.innerHTML = '';
+    window.loadNextEventBatch();
   };
 
   // Open Event Poster Exhibition Lightbox Modal
@@ -2883,13 +3028,18 @@ ${job.description || 'No description provided.'}
       });
     });
 
-    // Tier 2: Live Search Input
+    // Tier 2: Live Search Input (debounced to eliminate typing lag and DOM thrashing)
     const searchInput = document.getElementById('event-search');
     if (searchInput && !searchInput.dataset.spaBound) {
       searchInput.dataset.spaBound = 'true';
+      let searchDebounceTimer = null;
       searchInput.addEventListener('input', (e) => {
-        window.eventFilterState.search = e.target.value;
-        window.applyEventFilters();
+        clearTimeout(searchDebounceTimer);
+        const val = e.target.value;
+        searchDebounceTimer = setTimeout(() => {
+          window.eventFilterState.search = val;
+          window.applyEventFilters();
+        }, 180);
       });
     }
 
