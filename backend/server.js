@@ -24,6 +24,7 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'vimalraj5207@gmail.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ShazuAdmin2026!';
 const { Configuration, AccountApi, SendApi } = require('hostinger-mail-api-sdk');
 const storage = require('./utils/storage');
+const certificateService = require('./services/certificateService');
 
 const HOSTINGER_API_KEY = process.env.HOSTINGER_API_KEY;
 const HOSTINGER_SENDER_EMAIL = process.env.HOSTINGER_SENDER_EMAIL || 'info@shazusofttechnologies.org';
@@ -3179,10 +3180,13 @@ async function callCertificateApi(payload) {
 // 1. Single Certificate Issuance
 app.post('/api/admin/certificates/issue', { preValidation: [app.authenticate] }, async (request, reply) => {
   const {
+    template_name,
+    template_id,
     recipient_name,
     recipient_email,
     association_name,
     course_title,
+    field_data,
     send_email,
     source_type, // 'event', 'membership', or 'custom'
     source_id,
@@ -3200,28 +3204,19 @@ app.post('/api/admin/certificates/issue', { preValidation: [app.authenticate] },
   }
 
   try {
-    const certPayload = {
-      recipient_name: cleanName,
-      recipient_email: cleanEmail,
-      association_name: cleanAssoc,
-      course_title: cleanTitle,
-      send_email: shouldSendEmail
-    };
+    const certResult = await certificateService.issueCertificate({
+      templateName: template_name || (source_type === 'membership' ? 'MEMBERSHIP' : undefined),
+      templateId: template_id,
+      associationName: cleanAssoc,
+      recipientName: cleanName,
+      recipientEmail: cleanEmail,
+      courseTitle: cleanTitle,
+      fieldData: field_data || {},
+      sendEmail: shouldSendEmail
+    });
 
-    const certRes = await callCertificateApi(certPayload);
-
-    if (!certRes.ok) {
-      const errMsg = certRes.error || `Certificate issuance API returned HTTP ${certRes.status}`;
-      return reply.status(certRes.status >= 400 && certRes.status < 600 ? certRes.status : 502).send({
-        error: errMsg,
-        details: certRes.data
-      });
-    }
-
-    const certData = certRes.data || {};
-    const d = certData.data || {};
-    const certificateId = d.unique_code || d.certificate_id || certData.certificate_id || certData.id || certData.certificate?.id || '';
-    const certificateUrl = d.verification_url || d.download_url || certData.verification_url || certData.download_url || certData.certificate_url || certData.url || '';
+    const certificateId = certResult.uniqueCode || certResult.certificateId;
+    const certificateUrl = certResult.verificationUrl || certResult.downloadUrl;
 
     // Update source record if tied to an event registration or membership
     if (source_type === 'event' && source_id) {
@@ -3259,7 +3254,7 @@ app.post('/api/admin/certificates/issue', { preValidation: [app.authenticate] },
           token_no || null,
           certificateId,
           certificateUrl,
-          JSON.stringify(certData),
+          JSON.stringify(certResult.raw || certResult),
           request.user?.email || 'admin'
         ]
       );
@@ -3278,7 +3273,11 @@ app.post('/api/admin/certificates/issue', { preValidation: [app.authenticate] },
       certificate: {
         id: certificateId,
         url: certificateUrl,
-        ...certData
+        downloadUrl: certResult.downloadUrl,
+        verificationUrl: certResult.verificationUrl,
+        previewImageUrl: certResult.previewImageUrl,
+        emailStatus: certResult.emailStatus,
+        ...certResult.raw
       },
       log: savedLog
     };
@@ -3315,58 +3314,54 @@ app.post('/api/admin/certificates/batch-issue', { preValidation: [app.authentica
     }
 
     try {
-      const certRes = await callCertificateApi({
-        recipient_name: cleanName,
-        recipient_email: cleanEmail,
-        association_name: cleanAssoc,
-        course_title: cleanTitle,
-        send_email: shouldSendEmail
+      const certResult = await certificateService.issueCertificate({
+        templateName: item.template_name || (item.source_type === 'membership' ? 'MEMBERSHIP' : undefined),
+        templateId: item.template_id,
+        associationName: cleanAssoc,
+        recipientName: cleanName,
+        recipientEmail: cleanEmail,
+        courseTitle: cleanTitle,
+        fieldData: item.field_data || {},
+        sendEmail: shouldSendEmail
       });
 
-      if (certRes.ok) {
-        const certData = certRes.data || {};
-        const d = certData.data || {};
-        const certificateId = d.unique_code || d.certificate_id || certData.certificate_id || certData.id || '';
-        const certificateUrl = d.verification_url || d.download_url || certData.verification_url || certData.certificate_url || certData.url || '';
+      const certificateId = certResult.uniqueCode || certResult.certificateId;
+      const certificateUrl = certResult.verificationUrl || certResult.downloadUrl;
 
-        if (item.source_type === 'event' && item.source_id) {
-          await pool.query(
-            `UPDATE event_registrations 
-             SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
-             WHERE id::text = $3 OR token_no = $3`,
-            [certificateId, certificateUrl, String(item.source_id)]
-          );
-        } else if (item.source_type === 'membership' && item.source_id) {
-          await pool.query(
-            `UPDATE memberships 
-             SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
-             WHERE id::text = $3 OR token_no = $3`,
-            [certificateId, certificateUrl, String(item.source_id)]
-          );
-        }
-
-        try {
-          await pool.query(
-            `INSERT INTO issued_certificates (
-              recipient_name, recipient_email, association_name, course_title,
-              source_type, source_id, token_no, certificate_id, certificate_url,
-              certificate_response, issued_by
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-            [
-              cleanName, cleanEmail, cleanAssoc, cleanTitle,
-              item.source_type || 'custom', item.source_id ? String(item.source_id) : null,
-              item.token_no || null, certificateId, certificateUrl, JSON.stringify(certData),
-              request.user?.email || 'admin'
-            ]
-          );
-        } catch (_) {}
-
-        results.push({ item, success: true, certificate_id: certificateId, certificate_url: certificateUrl });
-        successful++;
-      } else {
-        results.push({ item, success: false, error: certRes.error || `HTTP ${certRes.status}` });
-        failed++;
+      if (item.source_type === 'event' && item.source_id) {
+        await pool.query(
+          `UPDATE event_registrations 
+           SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
+           WHERE id::text = $3 OR token_no = $3`,
+          [certificateId, certificateUrl, String(item.source_id)]
+        );
+      } else if (item.source_type === 'membership' && item.source_id) {
+        await pool.query(
+          `UPDATE memberships 
+           SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
+           WHERE id::text = $3 OR token_no = $3`,
+          [certificateId, certificateUrl, String(item.source_id)]
+        );
       }
+
+      try {
+        await pool.query(
+          `INSERT INTO issued_certificates (
+            recipient_name, recipient_email, association_name, course_title,
+            source_type, source_id, token_no, certificate_id, certificate_url,
+            certificate_response, issued_by
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+          [
+            cleanName, cleanEmail, cleanAssoc, cleanTitle,
+            item.source_type || 'custom', item.source_id ? String(item.source_id) : null,
+            item.token_no || null, certificateId, certificateUrl, JSON.stringify(certResult.raw || certResult),
+            request.user?.email || 'admin'
+          ]
+        );
+      } catch (_) {}
+
+      results.push({ item, success: true, certificate_id: certificateId, certificate_url: certificateUrl, verification_url: certResult.verificationUrl, download_url: certResult.downloadUrl });
+      successful++;
     } catch (err) {
       results.push({ item, success: false, error: err.message });
       failed++;
