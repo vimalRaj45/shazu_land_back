@@ -273,6 +273,13 @@
           <span id="badge-events-count" class="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
+        <!-- PROVIDE CERTIFICATE MODULE TAB -->
+        <button onclick="switchTab('certificates')" id="nav-certificates" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-patch-check-fill text-amber-500"></i>
+          <span>Provide Certificate</span>
+          <span id="badge-certificates-count" class="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
+        </button>
+
         <a href="attendance.html" target="_blank" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-qr-code-scan text-emerald-600"></i>
           <span>Attendance Hub</span>
@@ -900,6 +907,111 @@
       </div>
 
       <!-- ========================================== -->
+      <!-- TAB: PROVIDE CERTIFICATE ENGINE -->
+      <!-- ========================================== -->
+      <div id="tab-certificates" class="hidden space-y-4">
+        <!-- Top Banner / Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div>
+            <div class="flex items-center gap-2.5">
+              <span class="p-2.5 bg-amber-500/10 text-amber-700 rounded-xl border border-amber-500/20"><i class="bi bi-patch-check-fill text-xl text-amber-600"></i></span>
+              <div>
+                <h2 class="text-lg font-bold font-heading text-slate-900">Digital Certificate Issuance Center</h2>
+                <p class="text-xs text-slate-500">Generate, certify & dispatch verified digital credentials for event attendees and approved members</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="openCustomCertificateModal()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs">
+              <i class="bi bi-pencil-square text-amber-600"></i> Custom Issue
+            </button>
+            <button type="button" onclick="batchIssueSelectedCertificates()" id="btn-batch-issue-cert" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="bi bi-lightning-charge-fill text-amber-300"></i> Batch Issue Selected (<span id="cert-selected-count">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- Controls Toolbar: Source Subtabs & Eligibility Filters -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+          <!-- Top Row: Source Subtabs -->
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div class="inline-flex bg-slate-100 p-1 rounded-xl gap-1">
+              <button type="button" onclick="switchCertSource('events')" id="cert-src-btn-events" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-[#123B32] shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
+                <i class="bi bi-calendar-event"></i> Event Registrations
+              </button>
+              <button type="button" onclick="switchCertSource('memberships')" id="cert-src-btn-memberships" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5 cursor-pointer">
+                <i class="bi bi-award"></i> Membership Submissions
+              </button>
+              <button type="button" onclick="switchCertSource('history')" id="cert-src-btn-history" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5 cursor-pointer">
+                <i class="bi bi-clock-history"></i> Issued History
+              </button>
+            </div>
+            
+            <div id="cert-counter-banner" class="text-xs font-medium text-slate-600 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="cert-summary-count">Loading recipients...</span>
+            </div>
+          </div>
+
+          <!-- Second Row: Dynamic Filter Controls -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+            <!-- 1. Search Input -->
+            <div class="relative">
+              <i class="bi bi-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+              <input type="text" id="cert-filter-search" oninput="applyCertFilters()" placeholder="Search name, email, token..." class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#123B32]">
+            </div>
+
+            <!-- 2. Event Selector (Visible for Events source) -->
+            <div id="cert-event-filter-wrapper">
+              <select id="cert-event-select" onchange="applyCertFilters()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#123B32] cursor-pointer">
+                <option value="all">All Events</option>
+              </select>
+            </div>
+
+            <!-- 3. Verification & Eligibility Filter -->
+            <div>
+              <select id="cert-eligibility-select" onchange="applyCertFilters()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#123B32] cursor-pointer">
+                <option value="eligible" selected>Eligible Only (Free + Paid Verified)</option>
+                <option value="all">All Records</option>
+                <option value="issued">Certificate Already Issued</option>
+                <option value="not_issued">Certificate Pending Issuance</option>
+                <option value="pending_verify">Pending Payment Verification (Paid)</option>
+              </select>
+            </div>
+
+            <!-- 4. Association / Organization Preset -->
+            <div>
+              <input type="text" id="cert-default-assoc" placeholder="Association Override (optional)" value="Shazu Soft Technologies" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#123B32]" title="Default association name on certificate">
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[950px] text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold text-[10px]">
+                <tr>
+                  <th class="p-3 w-10 text-center">
+                    <input type="checkbox" id="cert-select-all" onchange="toggleSelectAllCerts(this.checked)" class="rounded border-slate-300 text-[#123B32] focus:ring-[#123B32] cursor-pointer">
+                  </th>
+                  <th class="p-3">Recipient</th>
+                  <th class="p-3">Course / Event Title</th>
+                  <th class="p-3">Association / Org</th>
+                  <th class="p-3">Verification & Fee Status</th>
+                  <th class="p-3">Certificate Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="certificates-table-body" class="divide-y divide-slate-100">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
       <!-- TAB 7: ANNOUNCEMENTS CRUD -->
       <!-- ========================================== -->
       <div id="tab-announcements" class="hidden space-y-4">
@@ -1203,6 +1315,8 @@
       careers: [],
       applications: [],
       memberships: [],
+      certificates: [],
+      issued_certificates: [],
       announcements: [],
       offerings: [],
       slides: [],
@@ -1603,9 +1717,10 @@
 
             <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
               <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">Update Verification Status</span>
-              <div class="flex gap-2 pt-1">
+              <div class="flex gap-2 pt-1 flex-wrap">
                 <button onclick="updateRegistrationPaymentStatus(${rec.id}, 'Verified'); closeModal();" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-check-circle-fill"></i> Mark Verified & Email Pass</button>
                 <button onclick="updateRegistrationPaymentStatus(${rec.id}, 'Rejected'); closeModal();" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-x-circle"></i> Reject</button>
+                ${isEventRegistrationEligible(rec) ? `<button onclick="closeModal(); quickProvideCertificate('event', ${rec.id})" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-patch-check-fill"></i> Provide Certificate</button>` : ''}
               </div>
             </div>
           </div>
@@ -1680,9 +1795,10 @@
           </div>
 
           <div class="flex justify-between items-center pt-3 border-t border-slate-200">
-            <div class="flex gap-2">
+            <div class="flex gap-2 flex-wrap">
               <button onclick="updateMembershipStatus(${rec.id}, 'Approved', document.getElementById('modal-membership-notes').value); closeModal();" class="px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-patch-check"></i> Grant Charter</button>
               <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'Membership Update: ${rec.membership_type}')" class="px-3 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Email</button>
+              ${isMembershipEligible(rec) ? `<button onclick="closeModal(); quickProvideCertificate('membership', ${rec.id})" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-patch-check-fill"></i> Provide Certificate</button>` : ''}
             </div>
             <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
           </div>
@@ -1937,7 +2053,7 @@
       const activeBtn = document.getElementById(`nav-${tabId}`);
       if (activeBtn) activeBtn.classList.add('active');
 
-      const tabs = ['analytics', 'leads', 'registrations', 'events', 'careers', 'applications', 'memberships', 'announcements', 'offerings', 'slider', 'users', 'audit'];
+      const tabs = ['analytics', 'leads', 'registrations', 'events', 'certificates', 'careers', 'applications', 'memberships', 'announcements', 'offerings', 'slider', 'users', 'audit'];
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.add('hidden');
@@ -1967,6 +2083,7 @@
       else if (tabId === 'leads') loadLeads();
       else if (tabId === 'registrations') loadRegistrations();
       else if (tabId === 'events') loadEvents();
+      else if (tabId === 'certificates') loadCertificatesTab();
       else if (tabId === 'careers') loadCareers();
       else if (tabId === 'applications') loadApplications();
       else if (tabId === 'memberships') loadMemberships();
@@ -2497,6 +2614,7 @@
           </td>
           <td class="p-3 text-right space-x-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
             <button onclick="openRowDetails('registrations', ${r.id})" title="View Details" class="p-1.5 bg-slate-100 hover:bg-[#123B32] hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-eye"></i></button>
+            ${isEventRegistrationEligible(r) ? `<button onclick="event.stopPropagation(); quickProvideCertificate('event', ${r.id})" title="${r.certificate_issued ? 'Re-Issue Certificate' : 'Provide Certificate'}" class="px-2 py-1 ${r.certificate_issued ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-amber-500 hover:bg-amber-600'} text-white font-bold rounded-lg text-[11px] shadow-2xs cursor-pointer inline-flex items-center gap-1"><i class="bi bi-patch-check-fill"></i> ${r.certificate_issued ? 'Cert ✓' : 'Cert'}</button>` : ''}
             ${r.payment_status !== 'Verified' ? `<button onclick="updateRegistrationPaymentStatus(${r.id}, 'Verified')" title="Verify Pass & Email Token" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-[11px] shadow-2xs cursor-pointer"><i class="bi bi-check-circle"></i> Verify</button>` : ''}
             <button onclick="confirmDeleteRegistration(${r.id})" title="Delete Registration" class="p-1.5 bg-slate-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-trash"></i></button>
           </td>
@@ -3210,6 +3328,7 @@
           </td>
           <td class="p-3 text-right space-x-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
             <button onclick="openRowDetails('memberships', ${m.id})" title="View Full 11-Field Dossier" class="p-1.5 bg-slate-100 hover:bg-[#123B32] hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-eye"></i></button>
+            ${isMembershipEligible(m) ? `<button onclick="event.stopPropagation(); quickProvideCertificate('membership', ${m.id})" title="${m.certificate_issued ? 'Re-Issue Certificate' : 'Provide Certificate'}" class="px-2 py-1 ${m.certificate_issued ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-amber-500 hover:bg-amber-600'} text-white font-bold rounded-lg text-[11px] shadow-2xs cursor-pointer inline-flex items-center gap-1"><i class="bi bi-patch-check-fill"></i> ${m.certificate_issued ? 'Cert ✓' : 'Cert'}</button>` : ''}
             <button onclick="confirmDeleteMembership(${m.id})" title="Delete Application" class="p-1.5 bg-slate-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-trash"></i></button>
           </td>
         </tr>
@@ -4861,6 +4980,633 @@
           </tr>
         `;
       }).join('') || '<tr><td colspan="8" class="p-8 text-center text-slate-400">No system audit records found for this filter.</td></tr>';
+    }
+
+    // ====================================================
+    // 🎓 DIGITAL CERTIFICATE VERIFICATION & ISSUANCE ENGINE
+    // ====================================================
+    let certActiveSource = 'events'; // 'events' | 'memberships' | 'history'
+    let selectedCertIds = new Set();
+
+    function isEventRegistrationEligible(r) {
+      if (!r) return false;
+      const fee = String(r.registration_fee || '').trim().toLowerCase();
+      const method = String(r.payment_method || '').trim().toLowerCase();
+      const isFree = fee.includes('free') || fee === '0' || fee === '' || method.includes('free');
+      const payStatus = String(r.payment_status || '').trim().toLowerCase();
+      const isVerified = payStatus === 'verified' || payStatus === 'approved' || payStatus === 'confirmed';
+      return isFree || isVerified;
+    }
+
+    function isMembershipEligible(m) {
+      if (!m) return false;
+      const status = String(m.status || '').trim().toLowerCase();
+      return status === 'approved' || status === 'active member' || status === 'verified';
+    }
+
+    function switchCertSource(source) {
+      certActiveSource = source;
+      selectedCertIds.clear();
+      updateCertBatchCounter();
+
+      const btnEvents = document.getElementById('cert-src-btn-events');
+      const btnMembers = document.getElementById('cert-src-btn-memberships');
+      const btnHistory = document.getElementById('cert-src-btn-history');
+      const eventFilterWrapper = document.getElementById('cert-event-filter-wrapper');
+
+      [btnEvents, btnMembers, btnHistory].forEach(btn => {
+        if (!btn) return;
+        btn.classList.remove('bg-white', 'text-[#123B32]', 'font-bold', 'shadow-xs');
+        btn.classList.add('text-slate-600', 'hover:text-slate-900', 'font-semibold');
+      });
+
+      const currentBtn = source === 'events' ? btnEvents : (source === 'memberships' ? btnMembers : btnHistory);
+      if (currentBtn) {
+        currentBtn.classList.remove('text-slate-600', 'hover:text-slate-900', 'font-semibold');
+        currentBtn.classList.add('bg-white', 'text-[#123B32]', 'font-bold', 'shadow-xs');
+      }
+
+      if (eventFilterWrapper) {
+        if (source === 'events') {
+          eventFilterWrapper.classList.remove('hidden');
+        } else {
+          eventFilterWrapper.classList.add('hidden');
+        }
+      }
+
+      applyCertFilters();
+    }
+
+    async function loadCertificatesTab() {
+      renderTableSkeleton('certificates-table-body', 7);
+      try {
+        const [regRes, memRes, evRes, histRes] = await Promise.all([
+          safeFetchJson(`${API_BASE}/api/admin/event-registrations`, { headers: getAuthHeaders() }),
+          safeFetchJson(`${API_BASE}/api/admin/memberships`, { headers: getAuthHeaders() }),
+          safeFetchJson(`${API_BASE}/api/admin/events`, { headers: getAuthHeaders() }),
+          safeFetchJson(`${API_BASE}/api/admin/certificates/history`, { headers: getAuthHeaders() })
+        ]);
+
+        if (regRes.ok) tableData.registrations = regRes.data.registrations || [];
+        if (memRes.ok) tableData.memberships = memRes.data.memberships || [];
+        if (evRes.ok) tableData.events = evRes.data.events || [];
+        if (histRes.ok) tableData.issued_certificates = histRes.data.certificates || [];
+
+        // Populate Event Select filter dropdown
+        const evSelect = document.getElementById('cert-event-select');
+        if (evSelect) {
+          const currentVal = evSelect.value;
+          const evOptions = ['<option value="all">All Events</option>'];
+          const uniqueTitles = new Set();
+          (tableData.events || []).forEach(e => { if (e.title) uniqueTitles.add(e.title.trim()); });
+          (tableData.registrations || []).forEach(r => { if (r.event_title) uniqueTitles.add(r.event_title.trim()); });
+          uniqueTitles.forEach(t => {
+            evOptions.push(`<option value="${t.replace(/"/g, '&quot;')}">${t}</option>`);
+          });
+          evSelect.innerHTML = evOptions.join('');
+          if (currentVal && uniqueTitles.has(currentVal)) evSelect.value = currentVal;
+        }
+
+        // Compute global certificates count: eligible pending issuance
+        const pendingEvents = (tableData.registrations || []).filter(r => isEventRegistrationEligible(r) && !r.certificate_issued).length;
+        const pendingMems = (tableData.memberships || []).filter(m => isMembershipEligible(m) && !m.certificate_issued).length;
+        const totalPending = pendingEvents + pendingMems;
+        const badge = document.getElementById('badge-certificates-count');
+        if (badge) badge.textContent = totalPending;
+
+        applyCertFilters();
+      } catch (err) {
+        showToast('Error loading certificate candidates', 'error');
+      }
+    }
+
+    function applyCertFilters() {
+      const searchVal = (document.getElementById('cert-filter-search')?.value || '').trim().toLowerCase();
+      const eventVal = document.getElementById('cert-event-select')?.value || 'all';
+      const eligibilityVal = document.getElementById('cert-eligibility-select')?.value || 'eligible';
+
+      const tbody = document.getElementById('certificates-table-body');
+      const counterEl = document.getElementById('cert-summary-count');
+      if (!tbody) return;
+
+      if (certActiveSource === 'history') {
+        const histRecords = (tableData.issued_certificates || []).filter(c => {
+          if (!searchVal) return true;
+          const hay = `${c.recipient_name} ${c.recipient_email} ${c.course_title} ${c.token_no} ${c.certificate_id} ${c.association_name}`.toLowerCase();
+          return hay.includes(searchVal);
+        });
+
+        if (counterEl) {
+          counterEl.textContent = `Showing ${histRecords.length} issued certificate ledgers`;
+        }
+
+        tbody.innerHTML = histRecords.map(c => `
+          <tr class="hover:bg-amber-50/30 transition-colors">
+            <td class="p-3 text-center">
+              <i class="bi bi-check2-all text-emerald-600 font-bold"></i>
+            </td>
+            <td class="p-3">
+              <span class="font-bold text-slate-900 block">${c.recipient_name}</span>
+              <span class="text-[11px] text-slate-500 font-mono block">${c.recipient_email}</span>
+              ${c.token_no ? `<span class="inline-block mt-0.5 px-1.5 py-0.2 bg-slate-100 text-slate-700 font-mono rounded text-[10px] font-semibold">${c.token_no}</span>` : ''}
+            </td>
+            <td class="p-3 font-medium text-slate-800">
+              <span class="block font-semibold">${c.course_title}</span>
+              <span class="text-[10px] text-slate-400 font-mono capitalize">Source: ${c.source_type || 'custom'} #${c.source_id || ''}</span>
+            </td>
+            <td class="p-3 text-slate-600 font-medium">
+              ${c.association_name || 'Shazu Soft Technologies'}
+            </td>
+            <td class="p-3">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <i class="bi bi-patch-check-fill"></i> Issued ${new Date(c.issued_at).toLocaleDateString()}
+              </span>
+            </td>
+            <td class="p-3">
+              ${c.certificate_id ? `<span class="font-mono text-[11px] font-bold text-slate-700 block truncate max-w-[140px]" title="${c.certificate_id}">ID: ${c.certificate_id}</span>` : ''}
+              ${c.certificate_url ? `
+                <a href="${c.certificate_url}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-[#123B32] hover:underline mt-0.5">
+                  <i class="bi bi-box-arrow-up-right"></i> View Certificate
+                </a>
+              ` : '<span class="text-slate-400 text-[11px]">No URL</span>'}
+            </td>
+            <td class="p-3 text-right space-x-1 whitespace-nowrap">
+              <button onclick="openIssueCertificateModal('${c.source_type || 'custom'}', '${c.source_id || ''}', '${c.recipient_name.replace(/'/g, "\\'")}', '${c.recipient_email}', '${c.course_title.replace(/'/g, "\\'")}', '${(c.association_name || '').replace(/'/g, "\\'")}', '${c.token_no || ''}')" title="Re-Issue Certificate" class="px-2.5 py-1 bg-slate-100 hover:bg-[#123B32] hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1">
+                <i class="bi bi-arrow-repeat"></i> Re-Issue
+              </button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-400">No certificates have been issued yet.</td></tr>';
+        return;
+      }
+
+      let records = [];
+      if (certActiveSource === 'events') {
+        records = (tableData.registrations || []).map(r => {
+          const eligible = isEventRegistrationEligible(r);
+          const fee = String(r.registration_fee || '').trim().toLowerCase();
+          const isFree = fee.includes('free') || fee === '0' || fee === '' || (r.payment_method || '').toLowerCase().includes('free');
+          return {
+            sourceType: 'event',
+            id: r.id,
+            raw: r,
+            name: r.name,
+            email: r.email,
+            token_no: r.token_no,
+            title: r.event_title || 'Event Attendance',
+            association: 'Shazu Soft Technologies',
+            isFree,
+            eligible,
+            isIssued: !!r.certificate_issued,
+            certId: r.certificate_id,
+            certUrl: r.certificate_url,
+            paymentStatus: r.payment_status || 'Pending Verification',
+            date: r.registered_at
+          };
+        });
+
+        // Filter by event select
+        if (eventVal !== 'all') {
+          records = records.filter(r => (r.title || '').trim().toLowerCase() === eventVal.trim().toLowerCase());
+        }
+      } else {
+        // Memberships
+        records = (tableData.memberships || []).map(m => {
+          const eligible = isMembershipEligible(m);
+          return {
+            sourceType: 'membership',
+            id: m.id,
+            raw: m,
+            name: m.name,
+            email: m.email,
+            token_no: m.token_no,
+            title: `${m.membership_type} Charter Certification`,
+            association: m.association_name || 'Shazu Soft Technologies',
+            isFree: false,
+            eligible,
+            isIssued: !!m.certificate_issued,
+            certId: m.certificate_id,
+            certUrl: m.certificate_url,
+            paymentStatus: m.status || 'Pending Review',
+            date: m.created_at
+          };
+        });
+      }
+
+      // Filter by Eligibility
+      if (eligibilityVal === 'eligible') {
+        records = records.filter(r => r.eligible);
+      } else if (eligibilityVal === 'issued') {
+        records = records.filter(r => r.isIssued);
+      } else if (eligibilityVal === 'not_issued') {
+        records = records.filter(r => !r.isIssued && r.eligible);
+      } else if (eligibilityVal === 'pending_verify') {
+        records = records.filter(r => !r.eligible);
+      }
+
+      // Search filter
+      if (searchVal) {
+        records = records.filter(r => {
+          const hay = `${r.name} ${r.email} ${r.title} ${r.token_no || ''} ${r.association || ''}`.toLowerCase();
+          return hay.includes(searchVal);
+        });
+      }
+
+      const totalEligible = records.filter(r => r.eligible).length;
+      const totalIssued = records.filter(r => r.isIssued).length;
+      if (counterEl) {
+        counterEl.textContent = `Showing ${records.length} records (${totalEligible} eligible, ${totalIssued} issued)`;
+      }
+
+      tbody.innerHTML = records.map(r => {
+        const isChecked = selectedCertIds.has(`${r.sourceType}_${r.id}`);
+        const canCheck = r.eligible;
+
+        let feeBadge = '';
+        if (r.sourceType === 'event') {
+          if (r.isFree) {
+            feeBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><i class="bi bi-gift-fill text-xs"></i> Free Pass • Auto-Eligible ✓</span>`;
+          } else if (r.eligible) {
+            feeBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><i class="bi bi-check-circle-fill text-xs"></i> Paid • Payment Verified ✓</span>`;
+          } else {
+            feeBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300"><i class="bi bi-hourglass-split text-xs"></i> Paid • ${r.paymentStatus}</span>`;
+          }
+        } else {
+          if (r.eligible) {
+            feeBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><i class="bi bi-award-fill text-xs"></i> Membership Approved ✓</span>`;
+          } else {
+            feeBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300"><i class="bi bi-clock text-xs"></i> ${r.paymentStatus}</span>`;
+          }
+        }
+
+        let certStatusBadge = '';
+        if (r.isIssued) {
+          certStatusBadge = `
+            <div>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-2xs">
+                <i class="bi bi-patch-check-fill"></i> Issued ✓
+              </span>
+              ${r.certUrl ? `<a href="${r.certUrl}" target="_blank" class="block text-[10.5px] font-bold text-[#123B32] hover:underline mt-0.5 truncate max-w-[150px]"><i class="bi bi-box-arrow-up-right"></i> View Certificate</a>` : ''}
+            </div>
+          `;
+        } else if (r.eligible) {
+          certStatusBadge = `
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-300">
+              <i class="bi bi-lightning-fill text-sky-600"></i> Ready to Issue
+            </span>
+          `;
+        } else {
+          certStatusBadge = `
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200" title="Verify payment or approve membership to unlock certificate issuance">
+              <i class="bi bi-lock-fill"></i> Verification Needed
+            </span>
+          `;
+        }
+
+        return `
+          <tr class="hover:bg-amber-50/20 transition-colors">
+            <td class="p-3 text-center">
+              <input type="checkbox" onchange="toggleCertSelection('${r.sourceType}_${r.id}', this.checked)" ${isChecked ? 'checked' : ''} ${!canCheck ? 'disabled title="Only eligible records can be batch issued"' : ''} class="rounded border-slate-300 text-[#123B32] focus:ring-[#123B32] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">
+            </td>
+            <td class="p-3">
+              <span class="font-bold text-slate-900 block">${r.name}</span>
+              <span class="text-[11px] text-slate-500 font-mono block">${r.email}</span>
+              ${r.token_no ? `<span class="inline-block mt-0.5 px-1.5 py-0.2 bg-slate-100 text-slate-700 font-mono rounded text-[10px] font-semibold">${r.token_no}</span>` : ''}
+            </td>
+            <td class="p-3">
+              <span class="font-semibold text-slate-800 block">${r.title}</span>
+              <span class="text-[10px] text-slate-400 font-mono">${new Date(r.date).toLocaleDateString()}</span>
+            </td>
+            <td class="p-3 font-medium text-slate-700">
+              ${r.association}
+            </td>
+            <td class="p-3">
+              ${feeBadge}
+            </td>
+            <td class="p-3">
+              ${certStatusBadge}
+            </td>
+            <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
+              ${r.eligible ? `
+                <button onclick="openIssueCertificateModal('${r.sourceType}', '${r.id}', '${r.name.replace(/'/g, "\\'")}', '${r.email}', '${r.title.replace(/'/g, "\\'")}', '${r.association.replace(/'/g, "\\'")}', '${r.token_no || ''}')" title="Provide Certificate" class="px-3 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-lg text-xs transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5">
+                  <i class="bi bi-patch-check-fill text-amber-400"></i>
+                  <span>${r.isIssued ? 'Re-Issue' : 'Provide Certificate'}</span>
+                </button>
+              ` : `
+                ${r.sourceType === 'event' ? `
+                  <button onclick="updateRegistrationPaymentStatus(${r.id}, 'Verified').then(loadCertificatesTab)" title="Verify Payment to Unlock Certificate" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs cursor-pointer inline-flex items-center gap-1">
+                    <i class="bi bi-check-circle"></i> Verify Payment
+                  </button>
+                ` : `
+                  <button onclick="updateMembershipStatus(${r.id}, 'Approved').then(loadCertificatesTab)" title="Approve Membership to Unlock Certificate" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs cursor-pointer inline-flex items-center gap-1">
+                    <i class="bi bi-check-circle"></i> Approve Member
+                  </button>
+                `}
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-400">No matching records found for this filter.</td></tr>';
+    }
+
+    function toggleCertSelection(key, checked) {
+      if (checked) {
+        selectedCertIds.add(key);
+      } else {
+        selectedCertIds.delete(key);
+      }
+      updateCertBatchCounter();
+    }
+
+    function toggleSelectAllCerts(checked) {
+      if (checked) {
+        if (certActiveSource === 'events') {
+          (tableData.registrations || []).filter(r => isEventRegistrationEligible(r)).forEach(r => selectedCertIds.add(`event_${r.id}`));
+        } else if (certActiveSource === 'memberships') {
+          (tableData.memberships || []).filter(m => isMembershipEligible(m)).forEach(m => selectedCertIds.add(`membership_${m.id}`));
+        }
+      } else {
+        selectedCertIds.clear();
+      }
+
+      updateCertBatchCounter();
+      applyCertFilters();
+    }
+
+    function updateCertBatchCounter() {
+      const countEl = document.getElementById('cert-selected-count');
+      const batchBtn = document.getElementById('btn-batch-issue-cert');
+      const count = selectedCertIds.size;
+      if (countEl) countEl.textContent = count;
+      if (batchBtn) {
+        batchBtn.disabled = count === 0;
+      }
+    }
+
+    function quickProvideCertificate(sourceType, sourceId) {
+      let rec = null;
+      if (sourceType === 'event') {
+        rec = (tableData.registrations || []).find(r => r.id === parseInt(sourceId, 10));
+        if (rec) {
+          openIssueCertificateModal(
+            'event',
+            rec.id,
+            rec.name,
+            rec.email,
+            rec.event_title || 'Certificate of Excellence',
+            'Shazu Soft Technologies',
+            rec.token_no || ''
+          );
+        }
+      } else if (sourceType === 'membership') {
+        rec = (tableData.memberships || []).find(m => m.id === parseInt(sourceId, 10));
+        if (rec) {
+          openIssueCertificateModal(
+            'membership',
+            rec.id,
+            rec.name,
+            rec.email,
+            `${rec.membership_type} Charter Certification`,
+            rec.association_name || 'Shazu Soft Technologies',
+            rec.token_no || ''
+          );
+        }
+      }
+    }
+
+    function openCustomCertificateModal() {
+      const defaultAssoc = document.getElementById('cert-default-assoc')?.value || 'Shazu Soft Technologies';
+      openIssueCertificateModal('custom', '', '', '', '', defaultAssoc, '');
+    }
+
+    function openIssueCertificateModal(sourceType = 'custom', sourceId = '', name = '', email = '', title = '', association = '', token = '') {
+      const defaultAssoc = document.getElementById('cert-default-assoc')?.value || 'Shazu Soft Technologies';
+      const finalAssoc = association || defaultAssoc;
+
+      showModal(`
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div class="flex items-center gap-2.5">
+            <span class="p-2 bg-amber-100 text-amber-800 rounded-xl text-lg"><i class="bi bi-patch-check-fill"></i></span>
+            <div>
+              <h3 class="text-base font-bold font-heading text-slate-900 leading-tight">Issue Official Digital Certificate</h3>
+              <p class="text-[11px] text-slate-500">Connected to SST Digital Credential Verification & Issuance API</p>
+            </div>
+          </div>
+          <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <form onsubmit="submitCertificateIssuanceForm(event)" class="space-y-3.5 text-xs pt-1">
+          <input type="hidden" id="cert-form-source-type" value="${sourceType}">
+          <input type="hidden" id="cert-form-source-id" value="${sourceId}">
+          <input type="hidden" id="cert-form-token" value="${token}">
+
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">Recipient Full Name *</label>
+            <input type="text" id="cert-form-name" required value="${(name || '').replace(/"/g, '&quot;')}" placeholder="e.g. Aravind Kumar" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-none focus:border-[#123B32]">
+          </div>
+
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">Recipient Email Address *</label>
+            <input type="email" id="cert-form-email" required value="${(email || '').replace(/"/g, '&quot;')}" placeholder="e.g. aravind@example.com" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-mono focus:outline-none focus:border-[#123B32]">
+          </div>
+
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">Course / Event / Recognition Title *</label>
+            <input type="text" id="cert-form-title" required value="${(title || '').replace(/"/g, '&quot;')}" placeholder="e.g. AI & Cloud Symposium 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-medium focus:outline-none focus:border-[#123B32]">
+          </div>
+
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">Association / Organization Name *</label>
+            <input type="text" id="cert-form-assoc" required value="${(finalAssoc || '').replace(/"/g, '&quot;')}" placeholder="e.g. E2E Tech Association or Shazu Soft Technologies" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-medium focus:outline-none focus:border-[#123B32]">
+          </div>
+
+          <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="font-bold text-amber-900 block text-xs">Dispatch Official Email Notification</span>
+              <span class="text-[11px] text-amber-700">API will email the certificate directly to recipient</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="cert-form-send-email" checked class="sr-only peer">
+              <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs cursor-pointer">Cancel</button>
+            <button type="submit" id="btn-submit-cert-issue" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md">
+              <i class="bi bi-patch-check-fill text-amber-300"></i>
+              <span>Generate & Issue Certificate</span>
+            </button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function submitCertificateIssuanceForm(e) {
+      if (e) e.preventDefault();
+
+      const btn = document.getElementById('btn-submit-cert-issue');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="bi bi-arrow-repeat animate-spin"></i> <span>Issuing Certificate...</span>`;
+      }
+
+      const sourceType = document.getElementById('cert-form-source-type')?.value || 'custom';
+      const sourceId = document.getElementById('cert-form-source-id')?.value || '';
+      const token = document.getElementById('cert-form-token')?.value || '';
+      const name = document.getElementById('cert-form-name')?.value.trim();
+      const email = document.getElementById('cert-form-email')?.value.trim();
+      const title = document.getElementById('cert-form-title')?.value.trim();
+      const assoc = document.getElementById('cert-form-assoc')?.value.trim();
+      const sendEmail = document.getElementById('cert-form-send-email')?.checked ?? true;
+
+      try {
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/certificates/issue`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            recipient_name: name,
+            recipient_email: email,
+            course_title: title,
+            association_name: assoc,
+            send_email: sendEmail,
+            source_type: sourceType,
+            source_id: sourceId,
+            token_no: token
+          })
+        });
+
+        if (!ok) {
+          throw new Error(data.error || 'Certificate issuance API failed.');
+        }
+
+        const cert = data.certificate || {};
+        const certUrl = cert.url || cert.certificate_url || '';
+        const certId = cert.id || cert.certificate_id || 'CERT-OK';
+
+        closeModal();
+        showToast(`Certificate #${certId} successfully issued to ${name}!`);
+
+        // Refresh data in tables
+        await loadCertificatesTab();
+        if (sourceType === 'event') loadRegistrations();
+        if (sourceType === 'membership') loadMemberships();
+
+        // Show success modal with view link
+        showModal(`
+          <div class="text-center py-4 space-y-3">
+            <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto text-2xl border border-emerald-300">
+              <i class="bi bi-patch-check-fill"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 font-heading">Digital Certificate Successfully Issued!</h3>
+            <p class="text-xs text-slate-600">The verified credential has been recorded in the database ledger${sendEmail ? ' and emailed to the recipient.' : '.'}</p>
+            
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1 font-mono text-left">
+              <div><strong class="text-slate-500">Recipient:</strong> ${name} (${email})</div>
+              <div><strong class="text-slate-500">Course / Event:</strong> ${title}</div>
+              <div><strong class="text-slate-500">Certificate ID:</strong> ${certId}</div>
+            </div>
+
+            ${certUrl ? `
+              <div class="pt-2">
+                <a href="${certUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-xl text-xs shadow-md">
+                  <i class="bi bi-box-arrow-up-right"></i> View Issued Certificate
+                </a>
+              </div>
+            ` : ''}
+
+            <div class="pt-2">
+              <button onclick="closeModal()" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs">Done</button>
+            </div>
+          </div>
+        `);
+      } catch (err) {
+        showToast(err.message, 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="bi bi-patch-check-fill text-amber-300"></i> <span>Retry Issuance</span>`;
+        }
+      }
+    }
+
+    async function batchIssueSelectedCertificates() {
+      if (selectedCertIds.size === 0) {
+        showToast('Please select at least one eligible recipient for batch issuance', 'error');
+        return;
+      }
+
+      const defaultAssoc = document.getElementById('cert-default-assoc')?.value.trim() || 'Shazu Soft Technologies';
+
+      const items = [];
+      selectedCertIds.forEach(key => {
+        const [sourceType, idStr] = key.split('_');
+        const id = parseInt(idStr, 10);
+        if (sourceType === 'event') {
+          const r = (tableData.registrations || []).find(x => x.id === id);
+          if (r && isEventRegistrationEligible(r)) {
+            items.push({
+              source_type: 'event',
+              source_id: r.id,
+              recipient_name: r.name,
+              recipient_email: r.email,
+              course_title: r.event_title || 'Certificate of Attendance',
+              association_name: defaultAssoc,
+              token_no: r.token_no,
+              send_email: true
+            });
+          }
+        } else if (sourceType === 'membership') {
+          const m = (tableData.memberships || []).find(x => x.id === id);
+          if (m && isMembershipEligible(m)) {
+            items.push({
+              source_type: 'membership',
+              source_id: m.id,
+              recipient_name: m.name,
+              recipient_email: m.email,
+              course_title: `${m.membership_type} Charter Certification`,
+              association_name: m.association_name || defaultAssoc,
+              token_no: m.token_no,
+              send_email: true
+            });
+          }
+        }
+      });
+
+      if (items.length === 0) {
+        showToast('No eligible recipients found among selection', 'error');
+        return;
+      }
+
+      showConfirmModal(
+        `Batch Issue ${items.length} Digital Certificates`,
+        `Are you sure you want to issue and dispatch verified digital certificates for all ${items.length} selected recipients? Official credentials will be generated and dispatched.`,
+        `Yes, Issue ${items.length} Certificates`,
+        async () => {
+          startLoadingState();
+          showToast(`Issuing ${items.length} certificates in batch...`);
+          try {
+            const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/certificates/batch-issue`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ items })
+            });
+
+            if (!ok) throw new Error(data.error || 'Batch certificate issuance failed');
+
+            selectedCertIds.clear();
+            updateCertBatchCounter();
+            showToast(`Batch completed: ${data.successful} issued successfully, ${data.failed} failed.`);
+
+            await loadCertificatesTab();
+            loadRegistrations();
+            loadMemberships();
+          } catch (err) {
+            showToast(err.message, 'error');
+          } finally {
+            stopLoadingState();
+          }
+        }
+      );
     }
 
     function renderTableSkeleton(tbodyId, cols = 6, rows = 5) {

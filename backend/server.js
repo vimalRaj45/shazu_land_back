@@ -29,6 +29,11 @@ const HOSTINGER_API_KEY = process.env.HOSTINGER_API_KEY;
 const HOSTINGER_SENDER_EMAIL = process.env.HOSTINGER_SENDER_EMAIL || 'info@shazusofttechnologies.org';
 const HOSTINGER_SENDER_NAME = process.env.HOSTINGER_SENDER_NAME || 'Shazu Soft Technologies';
 
+// SST Digital Certificate Verification & Issuance API Configuration
+const CERTIFICATE_API_URL = process.env.CERTIFICATE_API_URL || 'https://shazusoft-cert-backend.onrender.com/api/v1/external/certificates/issue';
+const CERTIFICATE_API_KEY = process.env.CERTIFICATE_API_KEY || 'cv_live_87193fd43c328c5938e34464f7d66fee4ad60e878c3b6316';
+const CERTIFICATE_API_FALLBACK_URL = process.env.CERTIFICATE_API_FALLBACK_URL || 'https://certificates.shazusofttechnologies.org/api/v1/external/certificates/issue';
+
 // Initialize Hostinger Mail SDK Services
 const hostingerMailConfig = new Configuration({
   apiKey: HOSTINGER_API_KEY,
@@ -173,6 +178,7 @@ const mockDb = {
   registrations: [],
   job_applications: [],
   memberships: [],
+  certificates: [],
   page_views: [],
   audit_logs: [
     { id: 1, admin_name: 'System Kernel', admin_email: 'system@shazusofttechnologies.org', action_type: 'SYSTEM_BOOT', entity_type: 'SYSTEM', entity_id: 'NODE_FASTIFY', details: 'Fastify core runtime engine and migration initialized', ip_address: '127.0.0.1', status: 'SUCCESS', created_at: new Date() }
@@ -288,6 +294,11 @@ function handleMockQuery(sql, params = []) {
   // 15. Page Views
   if (lower.includes('from page_views')) {
     return { rows: mockDb.page_views };
+  }
+
+  // 15b. Issued Certificates
+  if (lower.includes('from issued_certificates')) {
+    return { rows: mockDb.certificates || [] };
   }
 
   // 16. Gallery
@@ -907,8 +918,34 @@ async function initDatabase() {
       ALTER TABLE memberships ADD COLUMN IF NOT EXISTS professional_qualification VARCHAR(255);
       ALTER TABLE memberships ADD COLUMN IF NOT EXISTS present_designation VARCHAR(255);
       ALTER TABLE memberships ADD COLUMN IF NOT EXISTS organization_name_address TEXT;
-      ALTER TABLE memberships ADD COLUMN IF NOT EXISTS declaration_agreed BOOLEAN DEFAULT TRUE;
       ALTER TABLE memberships ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE memberships ADD COLUMN IF NOT EXISTS certificate_issued BOOLEAN DEFAULT FALSE;
+      ALTER TABLE memberships ADD COLUMN IF NOT EXISTS certificate_id VARCHAR(255);
+      ALTER TABLE memberships ADD COLUMN IF NOT EXISTS certificate_url TEXT;
+      ALTER TABLE memberships ADD COLUMN IF NOT EXISTS certificate_issued_at TIMESTAMP;
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS certificate_issued BOOLEAN DEFAULT FALSE;
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS certificate_id VARCHAR(255);
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS certificate_url TEXT;
+      ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS certificate_issued_at TIMESTAMP;
+    `);
+
+    // Issued Certificates Ledger
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS issued_certificates (
+        id SERIAL PRIMARY KEY,
+        recipient_name VARCHAR(255) NOT NULL,
+        recipient_email VARCHAR(255) NOT NULL,
+        association_name VARCHAR(255),
+        course_title VARCHAR(255) NOT NULL,
+        source_type VARCHAR(50) DEFAULT 'event',
+        source_id VARCHAR(100),
+        token_no VARCHAR(100),
+        certificate_id VARCHAR(255),
+        certificate_url TEXT,
+        certificate_response JSONB,
+        issued_by VARCHAR(255),
+        issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     // 9. Courses & Services Catalog
@@ -3085,6 +3122,277 @@ app.delete('/api/admin/event-registrations/:id', { preValidation: [app.authentic
   const { id } = request.params;
   await pool.query('DELETE FROM event_registrations WHERE id = $1', [id]);
   return { message: 'Registration deleted successfully' };
+});
+
+// ====================================================
+// 🎓 DIGITAL CERTIFICATE VERIFICATION & ISSUANCE ENGINE
+// ====================================================
+
+// Resilient Certificate Dispatcher (handles primary endpoint + custom domain fallbacks)
+async function callCertificateApi(payload) {
+  const endpoints = [
+    CERTIFICATE_API_URL,
+    CERTIFICATE_API_FALLBACK_URL,
+    'https://shazusoft-cert-backend.onrender.com/api/v1/external/certificates/issue',
+    'https://certificates.shazusofttechnologies.org/api/v1/external/certificates/issue'
+  ].filter((v, i, a) => v && a.indexOf(v) === i);
+
+  let lastStatus = 500;
+  let lastError = 'Failed to communicate with Certificate API';
+  let lastData = {};
+
+  for (const endpoint of endpoints) {
+    try {
+      if (app && app.log) app.log.info({ endpoint, payload }, 'Attempting certificate issuance dispatch');
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': CERTIFICATE_API_KEY
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        return { ok: true, status: res.status, data };
+      }
+
+      lastStatus = res.status;
+      lastData = data;
+      lastError = data.error || data.message || `HTTP ${res.status}`;
+
+      // If method not allowed or not found, try next candidate
+      if (res.status === 404 || res.status === 405) {
+        continue;
+      }
+      break;
+    } catch (err) {
+      lastError = err.message;
+    }
+  }
+
+  return { ok: false, status: lastStatus, error: lastError, data: lastData };
+}
+
+// 1. Single Certificate Issuance
+app.post('/api/admin/certificates/issue', { preValidation: [app.authenticate] }, async (request, reply) => {
+  const {
+    recipient_name,
+    recipient_email,
+    association_name,
+    course_title,
+    send_email,
+    source_type, // 'event', 'membership', or 'custom'
+    source_id,
+    token_no
+  } = request.body || {};
+
+  const cleanName = (recipient_name || '').trim();
+  const cleanEmail = (recipient_email || '').trim().toLowerCase();
+  const cleanAssoc = (association_name || 'Shazu Soft Technologies').trim();
+  const cleanTitle = (course_title || 'Certificate of Excellence').trim();
+  const shouldSendEmail = send_email !== false;
+
+  if (!cleanName || !cleanEmail) {
+    return reply.status(400).send({ error: 'Recipient name and email address are required.' });
+  }
+
+  try {
+    const certPayload = {
+      recipient_name: cleanName,
+      recipient_email: cleanEmail,
+      association_name: cleanAssoc,
+      course_title: cleanTitle,
+      send_email: shouldSendEmail
+    };
+
+    const certRes = await callCertificateApi(certPayload);
+
+    if (!certRes.ok) {
+      const errMsg = certRes.error || `Certificate issuance API returned HTTP ${certRes.status}`;
+      return reply.status(certRes.status >= 400 && certRes.status < 600 ? certRes.status : 502).send({
+        error: errMsg,
+        details: certRes.data
+      });
+    }
+
+    const certData = certRes.data || {};
+    const d = certData.data || {};
+    const certificateId = d.unique_code || d.certificate_id || certData.certificate_id || certData.id || certData.certificate?.id || '';
+    const certificateUrl = d.verification_url || d.download_url || certData.verification_url || certData.download_url || certData.certificate_url || certData.url || '';
+
+    // Update source record if tied to an event registration or membership
+    if (source_type === 'event' && source_id) {
+      await pool.query(
+        `UPDATE event_registrations 
+         SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
+         WHERE id::text = $3 OR token_no = $3`,
+        [certificateId, certificateUrl, String(source_id)]
+      );
+    } else if (source_type === 'membership' && source_id) {
+      await pool.query(
+        `UPDATE memberships 
+         SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
+         WHERE id::text = $3 OR token_no = $3`,
+        [certificateId, certificateUrl, String(source_id)]
+      );
+    }
+
+    // Insert into issued_certificates table
+    let savedLog = null;
+    try {
+      const logRes = await pool.query(
+        `INSERT INTO issued_certificates (
+          recipient_name, recipient_email, association_name, course_title,
+          source_type, source_id, token_no, certificate_id, certificate_url,
+          certificate_response, issued_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+        [
+          cleanName,
+          cleanEmail,
+          cleanAssoc,
+          cleanTitle,
+          source_type || 'custom',
+          source_id ? String(source_id) : null,
+          token_no || null,
+          certificateId,
+          certificateUrl,
+          JSON.stringify(certData),
+          request.user?.email || 'admin'
+        ]
+      );
+      savedLog = logRes.rows && logRes.rows[0];
+    } catch (dbErr) {
+      if (app && app.log) app.log.warn('Certificate logging note:', dbErr.message);
+    }
+
+    if (typeof logAudit === 'function') {
+      logAudit('CERTIFICATE_ISSUED', source_type ? source_type.toUpperCase() : 'CUSTOM', source_id || 'NEW', `Issued certificate for ${cleanName} (${cleanTitle})`, request).catch(() => {});
+    }
+
+    return {
+      success: true,
+      message: 'Certificate successfully generated & issued!',
+      certificate: {
+        id: certificateId,
+        url: certificateUrl,
+        ...certData
+      },
+      log: savedLog
+    };
+  } catch (err) {
+    if (app && app.log) app.log.error(err, 'Failed to issue certificate via API');
+    return reply.status(500).send({
+      error: `Certificate generation failed: ${err.message}`
+    });
+  }
+});
+
+// 2. Batch Certificate Issuance
+app.post('/api/admin/certificates/batch-issue', { preValidation: [app.authenticate] }, async (request, reply) => {
+  const { items } = request.body || {};
+  if (!Array.isArray(items) || items.length === 0) {
+    return reply.status(400).send({ error: 'Array of recipient items is required.' });
+  }
+
+  const results = [];
+  let successful = 0;
+  let failed = 0;
+
+  for (const item of items) {
+    const cleanName = (item.recipient_name || '').trim();
+    const cleanEmail = (item.recipient_email || '').trim().toLowerCase();
+    const cleanAssoc = (item.association_name || 'Shazu Soft Technologies').trim();
+    const cleanTitle = (item.course_title || 'Certificate of Completion').trim();
+    const shouldSendEmail = item.send_email !== false;
+
+    if (!cleanName || !cleanEmail) {
+      results.push({ item, success: false, error: 'Name and email are required.' });
+      failed++;
+      continue;
+    }
+
+    try {
+      const certRes = await callCertificateApi({
+        recipient_name: cleanName,
+        recipient_email: cleanEmail,
+        association_name: cleanAssoc,
+        course_title: cleanTitle,
+        send_email: shouldSendEmail
+      });
+
+      if (certRes.ok) {
+        const certData = certRes.data || {};
+        const d = certData.data || {};
+        const certificateId = d.unique_code || d.certificate_id || certData.certificate_id || certData.id || '';
+        const certificateUrl = d.verification_url || d.download_url || certData.verification_url || certData.certificate_url || certData.url || '';
+
+        if (item.source_type === 'event' && item.source_id) {
+          await pool.query(
+            `UPDATE event_registrations 
+             SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
+             WHERE id::text = $3 OR token_no = $3`,
+            [certificateId, certificateUrl, String(item.source_id)]
+          );
+        } else if (item.source_type === 'membership' && item.source_id) {
+          await pool.query(
+            `UPDATE memberships 
+             SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
+             WHERE id::text = $3 OR token_no = $3`,
+            [certificateId, certificateUrl, String(item.source_id)]
+          );
+        }
+
+        try {
+          await pool.query(
+            `INSERT INTO issued_certificates (
+              recipient_name, recipient_email, association_name, course_title,
+              source_type, source_id, token_no, certificate_id, certificate_url,
+              certificate_response, issued_by
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+            [
+              cleanName, cleanEmail, cleanAssoc, cleanTitle,
+              item.source_type || 'custom', item.source_id ? String(item.source_id) : null,
+              item.token_no || null, certificateId, certificateUrl, JSON.stringify(certData),
+              request.user?.email || 'admin'
+            ]
+          );
+        } catch (_) {}
+
+        results.push({ item, success: true, certificate_id: certificateId, certificate_url: certificateUrl });
+        successful++;
+      } else {
+        results.push({ item, success: false, error: certRes.error || `HTTP ${certRes.status}` });
+        failed++;
+      }
+    } catch (err) {
+      results.push({ item, success: false, error: err.message });
+      failed++;
+    }
+  }
+
+  if (typeof logAudit === 'function') {
+    logAudit('CERTIFICATES_BATCH_ISSUED', 'BATCH', `${successful}/${items.length}`, `Batch issued ${successful} certificates`, request).catch(() => {});
+  }
+
+  return {
+    total: items.length,
+    successful,
+    failed,
+    results
+  };
+});
+
+// 3. Issued Certificates History Ledger
+app.get('/api/admin/certificates/history', { preValidation: [app.authenticate] }, async () => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM issued_certificates ORDER BY issued_at DESC LIMIT 500');
+    return { certificates: rows };
+  } catch (err) {
+    return { certificates: [] };
+  }
 });
 
 // Admin Hero Slider Management
