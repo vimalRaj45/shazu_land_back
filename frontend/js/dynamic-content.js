@@ -753,7 +753,7 @@
         </div>
 
         <!-- Event Poster Canvas - Perfect Fit Full Image Orientation with Ambient Backdrop Glow -->
-        <div class="h-64 sm:h-72 w-full relative overflow-hidden bg-slate-950 flex items-center justify-center group/img cursor-pointer select-none" onclick="window.openEventPosterModal('${ev.id}')" title="Click to view full event poster">
+        <div class="h-72 sm:h-80 w-full relative overflow-hidden bg-slate-950 flex items-center justify-center group/img cursor-pointer select-none" onclick="window.openEventPosterModal('${ev.id}')" title="Click to view full event poster">
           <!-- Ambient blurred backdrop with lazy-loading & asynchronous decoding -->
           <img src="${eventImg}" loading="lazy" decoding="async" aria-hidden="true" alt="" class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-125 pointer-events-none" onerror="this.style.display='none'">
           <div class="absolute inset-0 bg-slate-950/25 pointer-events-none"></div>

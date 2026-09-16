@@ -2862,11 +2862,18 @@
           </div>
 
           <!-- EVENT POSTER IMAGE BLOB UPLOAD -->
-          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-            <label class="block text-slate-700 font-semibold text-xs flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><i class="bi bi-image text-[#123B32]"></i> Event Poster Banner (File / BLOB Upload)</span>
-              <span class="text-[10px] text-slate-500">Max 5MB (PNG/JPG/WebP)</span>
-            </label>
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-slate-700 font-semibold text-xs flex items-center gap-1.5">
+                <i class="bi bi-image text-[#123B32]"></i> Event Poster Banner (File / BLOB Upload)
+              </label>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200">
+                Recommended: 1080 × 1350 px (4:5)
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500">
+              For best visual fit on website and social media, design in <strong>1080 × 1350 px (4:5 Portrait)</strong> or <strong>1200 × 1600 px (3:4)</strong>. Max 5MB (WebP/PNG/JPG).
+            </p>
             <input type="file" id="ev-poster-file" accept="image/*" onchange="handleEventPosterUpload(event)" class="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs cursor-pointer">
             <input type="hidden" id="ev-image-url" value="${ev.image_url || ''}">
             
@@ -2874,7 +2881,7 @@
               <img id="ev-poster-preview-img" src="${ev.image_url || ''}" alt="Event Poster Preview" class="h-24 max-w-[140px] w-auto object-contain bg-slate-900 rounded-xl border border-slate-200 shadow-sm p-1">
               <div class="text-[11px] text-slate-600">
                 <span class="font-bold text-emerald-700 flex items-center gap-1"><i class="bi bi-check-circle-fill"></i> Event Poster Attached</span>
-                <span class="text-slate-400 text-[10px] block">Full orientation preserved (Portrait/Flyer, Square, Landscape). Displayed in full without cropping on event cards.</span>
+                <span class="text-slate-400 text-[10px] block">Full orientation preserved. Displays in high-fidelity 4:5 / 3:4 portrait on event cards and lightbox modal.</span>
               </div>
             </div>
           </div>
