@@ -66,6 +66,42 @@
         linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     }
+
+    /* Blinking & Shaking animation for Free Internship pill */
+    @keyframes blinkAndShake {
+      0%, 100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+      }
+      10%, 30% {
+        transform: translateX(-4px) rotate(-1.5deg) scale(1.02);
+      }
+      20%, 40% {
+        transform: translateX(4px) rotate(1.5deg) scale(1.02);
+      }
+      50% {
+        transform: translateX(0) scale(1);
+        opacity: 0.65;
+        box-shadow: 0 0 16px rgba(16, 185, 129, 0.7);
+      }
+      65% {
+        opacity: 1;
+        transform: scale(1.05);
+        box-shadow: 0 0 22px rgba(245, 158, 11, 0.85);
+      }
+      80% {
+        opacity: 0.8;
+      }
+    }
+
+    .pill-free-intern {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      animation: blinkAndShake 2.4s infinite ease-in-out;
+      transform-origin: center;
+    }
   </style>
 </head>
 <body class="bg-brand-white dark:bg-[#0b131f] text-brand-darkText dark:text-[#E2E8F0] antialiased min-h-screen flex flex-col blueprint-grid transition-colors duration-200">
@@ -429,9 +465,21 @@
         <div class="bg-white dark:bg-[#111c2e] rounded-3xl border-2 border-emerald-900/15 dark:border-emerald-500/20 shadow-2xl p-6 sm:p-10 relative">
           
           <!-- Top Badge Ribbon -->
-          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8">
             <div>
-              <span class="text-xs font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">Candidate Registration Dossier</span>
+              <div class="flex items-center gap-2.5 mb-2 flex-wrap">
+                <span class="text-xs font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">Candidate Registration Dossier</span>
+                
+                <!-- Blinking & Shaking Free Intern Pill -->
+                <span class="pill-free-intern px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-md border-2 border-emerald-300 dark:border-emerald-400">
+                  <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+                  </span>
+                  <i class="bi bi-gift-fill text-amber-300"></i>
+                  <span>100% Free Internship</span>
+                </span>
+              </div>
               <h2 class="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 dark:text-white">
                 Winter Internship Application Form
               </h2>
@@ -439,8 +487,13 @@
                 Fill in your student and academic credentials to register for the Winter Internship Programme.
               </p>
             </div>
-            <div class="px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5">
-              <i class="bi bi-shield-check"></i> Verified SST Application
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="pill-free-intern px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-md border border-amber-300">
+                <i class="bi bi-lightning-charge-fill text-slate-950"></i> Free Intern • No Fees
+              </span>
+              <div class="px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5">
+                <i class="bi bi-shield-check"></i> Verified SST Application
+              </div>
             </div>
           </div>
 
@@ -576,7 +629,7 @@
             <div class="pt-2">
               <button type="submit" id="submit-btn" class="w-full py-4 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-sm font-bold rounded-2xl shadow-lg transition-all hover:shadow-xl hover:scale-[1.01] flex items-center justify-center gap-2 cursor-pointer">
                 <i class="bi bi-send-check-fill text-lg"></i>
-                <span id="btn-text">Submit Winter Internship Registration</span>
+                <span id="btn-text">Submit Free Winter Internship Registration (100% Free)</span>
               </button>
               <p class="text-center text-[11px] text-slate-500 mt-2">
                 Upon submission, a unique Reference Token will be issued instantly to track review progress.
