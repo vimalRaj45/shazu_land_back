@@ -179,6 +179,7 @@ const mockDb = {
   registrations: [],
   job_applications: [],
   memberships: [],
+  internships: [],
   certificates: [],
   page_views: [],
   audit_logs: [
@@ -198,6 +199,7 @@ function handleMockQuery(sql, params = []) {
     else if (lower.includes('from registrations')) count = mockDb.registrations.length;
     else if (lower.includes('from job_applications')) count = mockDb.job_applications.length;
     else if (lower.includes('from memberships')) count = mockDb.memberships.length;
+    else if (lower.includes('from internship_applications') || lower.includes('from internships')) count = mockDb.internships.length;
     else if (lower.includes('from page_views')) count = mockDb.page_views.length;
     else if (lower.includes('from events')) count = mockDb.events.length;
     else if (lower.includes('from gallery')) count = mockDb.gallery.length;
@@ -272,6 +274,26 @@ function handleMockQuery(sql, params = []) {
       return { rows: match };
     }
     return { rows: mockDb.memberships };
+  }
+
+  // 12b. Internship Applications
+  if (lower.includes('from internship_applications') || lower.includes('from internships')) {
+    if (lower.includes('where lower(token_no)') && params && params[0]) {
+      const match = mockDb.internships.filter(i => (i.token_no || '').toLowerCase() === String(params[0]).toLowerCase());
+      return { rows: match };
+    }
+    if (lower.includes('where lower(email)') && lower.includes('where lower(domain)') && params) {
+      const match = mockDb.internships.filter(i => 
+        (i.email || '').toLowerCase() === String(params[0]).toLowerCase() &&
+        (i.domain || '').toLowerCase() === String(params[1]).toLowerCase()
+      );
+      return { rows: match };
+    }
+    if (lower.includes('where id =') && params && params[0]) {
+      const match = mockDb.internships.filter(i => i.id === parseInt(params[0], 10));
+      return { rows: match };
+    }
+    return { rows: mockDb.internships };
   }
 
   // 13. Contacts / Leads with token search
@@ -418,6 +440,55 @@ function handleMockQuery(sql, params = []) {
     return { rows: [item], rowCount: 1 };
   }
 
+  if (lower.startsWith('insert into internship_applications') || lower.startsWith('insert into internships')) {
+    const item = {
+      id: mockDb.internships.length + 1,
+      token_no: params[0] || generateTokenNo('SST-INT'),
+      name: params[1],
+      email: params[2],
+      phone: params[3] || '',
+      gender: params[4] || '',
+      college_name: params[5],
+      degree_department: params[6] || '',
+      year_of_study: params[7] || '',
+      roll_no: params[8] || '',
+      domain: params[9],
+      training_period: params[10] || '2 Weeks',
+      preferred_mode: params[11] || 'Online',
+      start_date: params[12] || '',
+      notes: params[13] || '',
+      status: 'Pending Review',
+      admin_notes: '',
+      certificate_issued: false,
+      certificate_id: null,
+      certificate_url: null,
+      certificate_issued_at: null,
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+    mockDb.internships.push(item);
+    return { rows: [item], rowCount: 1 };
+  }
+
+  if (lower.startsWith('update internship_applications')) {
+    const id = parseInt(params[params.length - 1], 10);
+    const match = mockDb.internships.find(item => item.id === id);
+    if (match) {
+      if (params[0]) match.status = params[0];
+      if (params[1] !== undefined) match.admin_notes = params[1];
+      match.updated_at = new Date();
+      return { rows: [match], rowCount: 1 };
+    }
+    return { rows: [], rowCount: 0 };
+  }
+
+  if (lower.startsWith('delete from internship_applications')) {
+    const id = parseInt(params[0], 10);
+    const idx = mockDb.internships.findIndex(item => item.id === id);
+    if (idx !== -1) mockDb.internships.splice(idx, 1);
+    return { rows: [], rowCount: 1 };
+  }
+
   if (lower.startsWith('insert into analytics_events') || lower.startsWith('insert into page_views')) {
     const item = { id: mockDb.page_views.length + 1, page_path: params[0], user_agent: params[1], ip_address: params[2], device_type: params[3], referrer: params[4], created_at: new Date() };
     mockDb.page_views.push(item);
@@ -446,7 +517,15 @@ const pool = {
   },
   async query(sql, params = []) {
     if (realPool) {
-      return await realPool.query(sql, params);
+      try {
+        return await realPool.query(sql, params);
+      } catch (err) {
+        if (err.code === 'ENOTFOUND' || (err.message && (err.message.includes('ENOTFOUND') || err.message.includes('Connection terminated')))) {
+          app.log.warn('Neon query failure (' + err.message + '), falling back to in-memory handler');
+          return handleMockQuery(sql, params);
+        }
+        throw err;
+      }
     }
     return handleMockQuery(sql, params);
   }
@@ -871,6 +950,35 @@ async function initDatabase() {
         declaration_agreed BOOLEAN DEFAULT TRUE,
         status VARCHAR(50) DEFAULT 'Pending Review',
         admin_notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // 8b. Winter Internship Applications Table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS internship_applications (
+        id SERIAL PRIMARY KEY,
+        token_no VARCHAR(100) UNIQUE NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        phone VARCHAR(50),
+        gender VARCHAR(50),
+        college_name VARCHAR(255) NOT NULL,
+        degree_department VARCHAR(255),
+        year_of_study VARCHAR(50),
+        roll_no VARCHAR(100),
+        domain VARCHAR(255) NOT NULL,
+        training_period VARCHAR(50) NOT NULL,
+        preferred_mode VARCHAR(50) DEFAULT 'Online',
+        start_date VARCHAR(50),
+        notes TEXT,
+        status VARCHAR(50) DEFAULT 'Pending Review',
+        admin_notes TEXT,
+        certificate_issued BOOLEAN DEFAULT FALSE,
+        certificate_id VARCHAR(255),
+        certificate_url TEXT,
+        certificate_issued_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -2112,6 +2220,184 @@ app.post('/api/public/membership/apply', async (request, reply) => {
   return { message: 'Membership application submitted successfully!', token_no: tokenNo, membership };
 });
 
+// ----------------------------------------------------
+// WINTER INTERNSHIP PROGRAMME REGISTRATION
+// ----------------------------------------------------
+app.post('/api/public/internships/apply', async (request, reply) => {
+  const {
+    name,
+    email,
+    phone,
+    gender,
+    college_name,
+    degree_department,
+    year_of_study,
+    roll_no,
+    domain,
+    training_period,
+    preferred_mode,
+    start_date,
+    notes
+  } = request.body || {};
+
+  const trimmedName = (name || '').trim();
+  const trimmedEmail = (email || '').trim().toLowerCase();
+  const trimmedPhone = (phone || '').trim();
+  const cleanCollege = (college_name || '').trim();
+  const cleanDomain = (domain || '').trim();
+  const cleanDuration = (training_period || '2 Weeks').trim();
+  const cleanMode = (preferred_mode || 'Online').trim();
+
+  if (!isValidNameStr(trimmedName)) {
+    return reply.status(400).send({ error: 'Please enter your full name (minimum 2 characters).' });
+  }
+
+  if (!isValidEmailStr(trimmedEmail)) {
+    return reply.status(400).send({ error: 'Please enter a valid email address (e.g., student@domain.com).' });
+  }
+
+  if (trimmedPhone && !isValidPhoneStr(trimmedPhone)) {
+    return reply.status(400).send({ error: 'Please enter a valid mobile / WhatsApp phone number.' });
+  }
+
+  if (!cleanCollege || cleanCollege.length < 2) {
+    return reply.status(400).send({ error: 'Please specify your college or university institution name.' });
+  }
+
+  if (!cleanDomain) {
+    return reply.status(400).send({ error: 'Please select an internship domain of interest.' });
+  }
+
+  // Duplicate Check: Same email & domain
+  const existingApp = await pool.query(
+    `SELECT token_no, status FROM internship_applications 
+     WHERE LOWER(email) = LOWER($1) AND LOWER(domain) = LOWER($2) AND status != 'Rejected' ORDER BY id DESC LIMIT 1`,
+    [trimmedEmail, cleanDomain]
+  );
+
+  if (existingApp.rows && existingApp.rows.length > 0) {
+    const existing = existingApp.rows[0];
+    return reply.status(409).send({
+      error: `An active internship application in "${cleanDomain}" already exists for email ${trimmedEmail}.`,
+      is_duplicate: true,
+      token_no: existing.token_no,
+      status: existing.status
+    });
+  }
+
+  const tokenNo = generateTokenNo('SST-INT');
+
+  const result = await pool.query(
+    `INSERT INTO internship_applications (
+      token_no, name, email, phone, gender, college_name, degree_department,
+      year_of_study, roll_no, domain, training_period, preferred_mode, start_date, notes, status
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'Pending Review') RETURNING *`,
+    [
+      tokenNo,
+      trimmedName,
+      trimmedEmail,
+      trimmedPhone,
+      gender || '',
+      cleanCollege,
+      degree_department || '',
+      year_of_study || '',
+      roll_no || '',
+      cleanDomain,
+      cleanDuration,
+      cleanMode,
+      start_date || '',
+      notes || ''
+    ]
+  );
+
+  const internship = (result.rows && result.rows[0]) ? result.rows[0] : {
+    token_no: tokenNo,
+    name: trimmedName,
+    email: trimmedEmail,
+    phone: trimmedPhone,
+    gender: gender || '',
+    college_name: cleanCollege,
+    degree_department: degree_department || '',
+    year_of_study: year_of_study || '',
+    roll_no: roll_no || '',
+    domain: cleanDomain,
+    training_period: cleanDuration,
+    preferred_mode: cleanMode,
+    start_date: start_date || '',
+    notes: notes || '',
+    status: 'Pending Review',
+    created_at: new Date()
+  };
+
+  // Automated Branded Confirmation Email
+  const internHtml = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #123B32; border-radius: 16px; padding: 28px; color: #0f172a; background-color: #ffffff;">
+      <div style="text-align: center; border-bottom: 2px solid #E8EFEB; padding-bottom: 18px; margin-bottom: 22px;">
+        <h2 style="color: #123B32; margin: 0; font-size: 22px; letter-spacing: 0.5px;">SHAZU SOFT TECHNOLOGIES</h2>
+        <p style="margin: 4px 0 0; color: #64748b; font-size: 12px; font-weight: bold; letter-spacing: 1px;">EDUCATION • SOFTWARE • RESEARCH</p>
+        <span style="display: inline-block; background-color: #dcfce7; color: #15803d; padding: 6px 16px; border-radius: 99px; font-size: 12px; font-weight: bold; margin-top: 12px;">🎓 WINTER INTERNSHIP REGISTRATION CONFIRMED</span>
+      </div>
+      
+      <p style="font-size: 15px; line-height: 1.6;">Dear <strong>${trimmedName}</strong>,</p>
+      <p style="font-size: 14px; color: #334155; line-height: 1.6;">Thank you for registering for the <strong>Winter Internship Programme</strong> at Shazu Soft Technologies! We have successfully registered your application profile.</p>
+      
+      <div style="background-color: #f8fafc; border: 2px dashed #123B32; border-radius: 14px; padding: 20px; text-align: center; margin: 22px 0;">
+        <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: bold; letter-spacing: 1px;">Your Official Internship Reference Token:</span>
+        <div style="font-size: 24px; font-family: 'Courier New', monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin: 8px 0;">${tokenNo}</div>
+        <span style="display: inline-block; background-color: #fef3c7; color: #b45309; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: bold;">Status: Pending Academic Review</span>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 13px;">
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 0; color: #64748b; width: 40%;"><strong>Selected Domain:</strong></td>
+          <td style="padding: 8px 0; color: #0f172a; font-weight: bold;">${cleanDomain}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 0; color: #64748b;"><strong>Training Period:</strong></td>
+          <td style="padding: 8px 0; color: #0f172a;">${cleanDuration}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 0; color: #64748b;"><strong>College / Institute:</strong></td>
+          <td style="padding: 8px 0; color: #0f172a;">${cleanCollege}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 0; color: #64748b;"><strong>Training Mode:</strong></td>
+          <td style="padding: 8px 0; color: #0f172a;">${cleanMode}</td>
+        </tr>
+      </table>
+
+      <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px; margin: 20px 0;">
+        <strong style="color: #166534; font-size: 13px;">What You Will Experience:</strong>
+        <ul style="margin: 8px 0 0; padding-left: 20px; font-size: 12px; color: #166534; line-height: 1.6;">
+          <li>Hands-on practical industry tools & architecture exposure</li>
+          <li>Live guided mentor support and real-world code implementation</li>
+          <li>Digital verifiable SST completion certificate upon successful project submission</li>
+        </ul>
+      </div>
+
+      <p style="font-size: 13px; color: #64748b; line-height: 1.5;">You can track your real-time application status anytime at <a href="${FRONTEND_URL}/track.html" style="color: #123B32; font-weight: bold;">${FRONTEND_URL}/track.html</a> using your reference token.</p>
+      
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 24px; font-size: 12px; color: #94a3b8; text-align: center;">
+        Need assistance? Call: <strong>+91 90803 88211</strong> | Email: <strong>info@shazusofttechnologies.org</strong><br>
+        Shazu Soft Technologies • Build Skills. Gain Experience. Shape Your Future.
+      </div>
+    </div>
+  `;
+
+  sendHostingerEmail({
+    toEmail: trimmedEmail,
+    toName: trimmedName,
+    subject: `🎓 Winter Internship Registration Confirmed [Ref: ${tokenNo}] - SST`,
+    htmlContent: internHtml
+  });
+
+  return {
+    message: 'Internship application submitted successfully! Your reference token is ready.',
+    token_no: tokenNo,
+    internship
+  };
+});
+
 // Unified Status Checker & Admin Notes Tracker
 app.get('/api/public/track/:token', async (request, reply) => {
   const token = (request.params.token || '').trim();
@@ -2287,7 +2573,52 @@ app.get('/api/public/track/:token', async (request, reply) => {
       };
     }
 
-    return reply.status(404).send({ error: `Reference token "${cleanToken}" was not found. Please verify your token (e.g. SST-PASS-..., SST-APP-..., SST-MEM-..., SST-LEAD-...).` });
+    // 5. Search Internship Applications
+    const internRes = await pool.query('SELECT * FROM internship_applications WHERE LOWER(token_no) = LOWER($1)', [cleanToken]);
+    if (internRes.rows && internRes.rows.length > 0) {
+      const intern = internRes.rows[0];
+      const isApproved = intern.status === 'Approved' || intern.status === 'Shortlisted' || intern.status === 'Completed';
+      const isRejected = intern.status === 'Rejected' || intern.status === 'Cancelled';
+      let statusColor = 'amber';
+      if (isApproved) statusColor = 'emerald';
+      else if (isRejected) statusColor = 'rose';
+
+      return {
+        found: true,
+        token_no: intern.token_no,
+        category_type: 'Internship Application',
+        title: `Internship - ${intern.domain} (${intern.training_period})`,
+        applicant_name: intern.name,
+        email: intern.email,
+        phone: intern.phone,
+        status: intern.status || 'Pending Review',
+        status_color: statusColor,
+        admin_notes: intern.admin_notes || '',
+        created_at: intern.created_at,
+        updated_at: intern.updated_at || intern.created_at,
+        certificate_issued: intern.certificate_issued || false,
+        certificate_url: intern.certificate_url || null,
+        certificate_id: intern.certificate_id || null,
+        details: {
+          college_name: intern.college_name || '',
+          degree_department: intern.degree_department || '',
+          year_of_study: intern.year_of_study || '',
+          roll_no: intern.roll_no || '',
+          domain: intern.domain || '',
+          training_period: intern.training_period || '',
+          preferred_mode: intern.preferred_mode || '',
+          start_date: intern.start_date || ''
+        },
+        timeline: [
+          { stage: 'Application Registered', date: intern.created_at, completed: true },
+          { stage: 'Academic & Profile Review', completed: true },
+          { stage: isApproved ? 'Internship Allocation Confirmed' : (isRejected ? 'Application Declined' : 'Under Review'), completed: isApproved, current: !isApproved && !isRejected },
+          { stage: 'Internship Completion & Certification', completed: intern.status === 'Completed' || intern.certificate_issued === true }
+        ]
+      };
+    }
+
+    return reply.status(404).send({ error: `Reference token "${cleanToken}" was not found. Please verify your token (e.g. SST-INT-..., SST-PASS-..., SST-APP-..., SST-MEM-..., SST-LEAD-...).` });
   } catch (err) {
     return reply.status(500).send({ error: 'Failed to look up token status: ' + err.message });
   }
@@ -2801,6 +3132,73 @@ app.delete('/api/admin/memberships/:id', { preValidation: [app.authenticate] }, 
   return { message: 'Membership record deleted' };
 });
 
+// ----------------------------------------------------
+// Admin Internship Registrations Management
+// ----------------------------------------------------
+app.get('/api/admin/internships', { preValidation: [app.authenticate] }, async () => {
+  const { rows } = await pool.query('SELECT * FROM internship_applications ORDER BY created_at DESC');
+  return { internships: rows };
+});
+
+app.put('/api/admin/internships/:id/status', { preValidation: [app.authenticate] }, async (request, reply) => {
+  const { id } = request.params;
+  const { status, admin_notes } = request.body || {};
+
+  const currentRes = await pool.query('SELECT * FROM internship_applications WHERE id = $1', [id]);
+  if (currentRes.rows.length === 0) return reply.status(404).send({ error: 'Internship record not found' });
+  let intern = currentRes.rows[0];
+
+  const result = await pool.query(
+    'UPDATE internship_applications SET status = COALESCE($1, status), admin_notes = COALESCE($2, admin_notes), updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *',
+    [status, admin_notes !== undefined ? admin_notes : intern.admin_notes, id]
+  );
+  intern = result.rows[0];
+
+  // If approved or shortlisted, send official acceptance email
+  if (status === 'Approved' || status === 'Shortlisted') {
+    const approvalHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #123B32; border-radius: 16px; padding: 28px; color: #0f172a; background-color: #ffffff;">
+        <div style="text-align: center; border-bottom: 2px solid #E8EFEB; padding-bottom: 18px; margin-bottom: 20px;">
+          <h2 style="color: #123B32; margin: 0;">SHAZU SOFT TECHNOLOGIES</h2>
+          <span style="display: inline-block; background-color: #dcfce7; color: #15803d; padding: 6px 18px; border-radius: 99px; font-size: 13px; font-weight: bold; margin-top: 10px;">🎉 INTERNSHIP OFFER & ALLOCATION APPROVED</span>
+        </div>
+        <p>Dear <strong>${intern.name}</strong>,</p>
+        <p>Congratulations! We are delighted to inform you that your application for the <strong>Winter Internship Programme</strong> in <strong>${intern.domain} (${intern.training_period})</strong> has been <strong>APPROVED</strong>!</p>
+        
+        <div style="background-color: #f0fdf4; border: 2px solid #16a34a; padding: 18px; border-radius: 12px; text-align: center; margin: 20px 0;">
+          <span style="font-size: 11px; text-transform: uppercase; color: #166534; font-weight: bold; letter-spacing: 1px;">OFFICIAL INTERNSHIP TOKEN NUMBER</span>
+          <div style="font-size: 24px; font-family: monospace; font-weight: bold; color: #15803d; letter-spacing: 2px; margin: 8px 0;">${intern.token_no}</div>
+          <span style="font-size: 12px; color: #166534;">Domain: <strong>${intern.domain}</strong> | Duration: <strong>${intern.training_period}</strong></span>
+        </div>
+
+        ${admin_notes ? `
+          <div style="background-color: #f8fafc; border-left: 4px solid #123B32; padding: 12px 16px; margin: 16px 0;">
+            <span style="font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase;">ADMINISTRATOR REMARKS & ONBOARDING NOTES:</span>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #1e293b;">${admin_notes}</p>
+          </div>
+        ` : ''}
+
+        <p style="font-size: 13px; color: #475569;">Our technical mentor coordinator will reach out to schedule your kickoff onboarding briefing. Please keep your reference token handy.</p>
+        <p style="font-size: 13px; color: #64748b; margin-top: 20px;">Warm regards,<br><strong>Academic & Internship Council</strong><br>Shazu Soft Technologies</p>
+      </div>
+    `;
+    sendHostingerEmail({
+      toEmail: intern.email,
+      toName: intern.name,
+      subject: `🎉 CONGRATULATIONS! SST Internship Approved [Ref: ${intern.token_no}]`,
+      htmlContent: approvalHtml
+    });
+  }
+
+  return { internship: intern };
+});
+
+app.delete('/api/admin/internships/:id', { preValidation: [app.authenticate] }, async (request) => {
+  const { id } = request.params;
+  await pool.query('DELETE FROM internship_applications WHERE id = $1', [id]);
+  return { message: 'Internship record deleted' };
+});
+
 // Admin Courses & Services CRUD
 app.get('/api/admin/courses-services', { preValidation: [app.authenticate] }, async () => {
   const { rows } = await pool.query('SELECT * FROM courses_services ORDER BY created_at DESC');
@@ -3233,6 +3631,13 @@ app.post('/api/admin/certificates/issue', { preValidation: [app.authenticate] },
          WHERE id::text = $3 OR token_no = $3`,
         [certificateId, certificateUrl, String(source_id)]
       );
+    } else if (source_type === 'internship' && source_id) {
+      await pool.query(
+        `UPDATE internship_applications 
+         SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
+         WHERE id::text = $3 OR token_no = $3`,
+        [certificateId, certificateUrl, String(source_id)]
+      );
     }
 
     // Insert into issued_certificates table
@@ -3338,6 +3743,13 @@ app.post('/api/admin/certificates/batch-issue', { preValidation: [app.authentica
       } else if (item.source_type === 'membership' && item.source_id) {
         await pool.query(
           `UPDATE memberships 
+           SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
+           WHERE id::text = $3 OR token_no = $3`,
+          [certificateId, certificateUrl, String(item.source_id)]
+        );
+      } else if (item.source_type === 'internship' && item.source_id) {
+        await pool.query(
+          `UPDATE internship_applications 
            SET certificate_issued = TRUE, certificate_id = $1, certificate_url = $2, certificate_issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
            WHERE id::text = $3 OR token_no = $3`,
           [certificateId, certificateUrl, String(item.source_id)]
@@ -3611,7 +4023,8 @@ app.get('/api/admin/today-activity', { preValidation: [app.authenticate] }, asyn
       annsCountRes,
       offersCountRes,
       usersCountRes,
-      auditCountRes
+      auditCountRes,
+      internsCountRes
     ] = await Promise.all([
       pool.query('SELECT COUNT(*) FROM contact_inquiries'),
       pool.query('SELECT COUNT(*) FROM event_registrations'),
@@ -3622,7 +4035,8 @@ app.get('/api/admin/today-activity', { preValidation: [app.authenticate] }, asyn
       pool.query('SELECT COUNT(*) FROM announcements'),
       pool.query('SELECT COUNT(*) FROM courses_services'),
       pool.query('SELECT COUNT(*) FROM admins'),
-      pool.query('SELECT COUNT(*) FROM audit_logs')
+      pool.query('SELECT COUNT(*) FROM audit_logs'),
+      pool.query('SELECT COUNT(*) FROM internship_applications')
     ]);
 
     const counts = {
@@ -3635,7 +4049,8 @@ app.get('/api/admin/today-activity', { preValidation: [app.authenticate] }, asyn
       announcements: parseInt((annsCountRes.rows[0] && annsCountRes.rows[0].count) || 0, 10),
       offerings: parseInt((offersCountRes.rows[0] && offersCountRes.rows[0].count) || 0, 10),
       users: parseInt((usersCountRes.rows[0] && usersCountRes.rows[0].count) || 0, 10),
-      audit: parseInt((auditCountRes.rows[0] && auditCountRes.rows[0].count) || 0, 10)
+      audit: parseInt((auditCountRes.rows[0] && auditCountRes.rows[0].count) || 0, 10),
+      internships: parseInt((internsCountRes.rows[0] && internsCountRes.rows[0].count) || 0, 10)
     };
 
     // 2. Fetch today's business records (created today or in last 24h)

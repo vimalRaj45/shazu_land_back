@@ -3,7 +3,7 @@
 // ==========================================================================
 
 // Global Mobile Drawer Controller
-window.toggleMobileDrawer = function(e) {
+window.toggleMobileDrawer = function (e) {
   if (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -28,7 +28,7 @@ window.toggleMobileDrawer = function(e) {
   }
 };
 
-window.closeMobileDrawer = function(e) {
+window.closeMobileDrawer = function (e) {
   if (e && e.stopPropagation) {
     e.stopPropagation();
   }
@@ -44,9 +44,8 @@ window.closeMobileDrawer = function(e) {
 // Global Toast Feedback Helper
 function showToast(message, type = 'success') {
   const toast = document.createElement('div');
-  toast.className = `fixed bottom-5 right-5 px-3.5 py-2 rounded-md shadow-md z-50 text-[11px] font-medium text-white transition-all duration-200 transform translate-y-6 opacity-0 flex items-center gap-2 border ${
-    type === 'success' ? 'bg-[#123B32] border-[#2F5B4E]' : 'bg-red-700 border-red-800'
-  }`;
+  toast.className = `fixed bottom-5 right-5 px-3.5 py-2 rounded-md shadow-md z-50 text-[11px] font-medium text-white transition-all duration-200 transform translate-y-6 opacity-0 flex items-center gap-2 border ${type === 'success' ? 'bg-[#123B32] border-[#2F5B4E]' : 'bg-red-700 border-red-800'
+    }`;
   toast.innerHTML = `<i class="bi ${type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'} text-xs"></i> <span>${message}</span>`;
   document.body.appendChild(toast);
 
@@ -245,9 +244,9 @@ async function initHeroSlider() {
     let slidesToRender = [];
 
     try {
-      const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? (window.location.port === '5000' ? '' : 'http://localhost:5000') 
-        : (window.ENV?.API_BASE || 'https://shazu-land-back.onrender.com');
+      const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
+        : (window.ENV?.API_BASE || 'https://shazu-land-back-wiuk.onrender.com');
 
       const res = await fetch(`${API_BASE}/api/public/slider`);
       if (res.ok) {
@@ -686,7 +685,7 @@ async function navigateSPA(url, isPopState = false) {
     // Replace main content and attributes
     mainContainer.innerHTML = newMain.innerHTML;
     mainContainer.className = newMain.className;
-    
+
     if (newMain.hasAttribute('data-aos')) {
       mainContainer.setAttribute('data-aos', newMain.getAttribute('data-aos'));
     } else {
@@ -737,8 +736,8 @@ function prefetchSPALink(url) {
       .then(html => {
         if (html) spaPageCache.set(targetUrl.pathname, html);
       })
-      .catch(() => {});
-  } catch (e) {}
+      .catch(() => { });
+  } catch (e) { }
 }
 
 // Global Click Interceptor for SPA Links

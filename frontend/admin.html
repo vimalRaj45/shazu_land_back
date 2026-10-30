@@ -267,6 +267,13 @@
           <span id="badge-registrations-count" class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
+        <!-- WINTER INTERNSHIP REGISTRATIONS TAB -->
+        <button onclick="switchTab('internships')" id="nav-internships" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-mortarboard-fill text-emerald-600"></i>
+          <span>Intern Registrations</span>
+          <span id="badge-internships-count" class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
+        </button>
+
         <button onclick="switchTab('events')" id="nav-events" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-calendar-event text-amber-600"></i>
           <span>Events</span>
@@ -420,25 +427,25 @@
 
         <!-- Universal Multi-Format Export Dropdown -->
         <div class="relative group">
-          <button type="button" class="px-2.5 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+          <button type="button" onclick="openExportModal('csv')" class="px-2.5 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer" title="Customize Columns & Export">
             <i class="bi bi-download"></i>
             <span class="hidden sm:inline">Export Data</span>
             <i class="bi bi-chevron-down text-[10px]"></i>
           </button>
 
-          <div class="absolute right-0 top-full pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-50 min-w-[170px]">
+          <div class="absolute right-0 top-full pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-50 min-w-[190px]">
             <div class="bg-white border border-slate-200 rounded-xl shadow-xl p-1.5 space-y-1 text-xs text-slate-700">
-              <button onclick="exportCurrentTab('csv')" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 flex items-center gap-2 cursor-pointer font-medium">
+              <button onclick="openExportModal('csv')" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 flex items-center gap-2 cursor-pointer font-medium">
                 <i class="bi bi-file-earmark-spreadsheet text-emerald-600"></i>
-                <span>Download CSV (.csv)</span>
+                <span>Choose Columns & CSV</span>
               </button>
-              <button onclick="exportCurrentTab('json')" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 flex items-center gap-2 cursor-pointer font-medium">
+              <button onclick="openExportModal('json')" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 flex items-center gap-2 cursor-pointer font-medium">
                 <i class="bi bi-file-earmark-code text-amber-600"></i>
-                <span>Download JSON (.json)</span>
+                <span>Choose Columns & JSON</span>
               </button>
-              <button onclick="exportCurrentTab('print')" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 flex items-center gap-2 cursor-pointer font-medium">
+              <button onclick="openExportModal('print')" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 flex items-center gap-2 cursor-pointer font-medium">
                 <i class="bi bi-printer text-indigo-600"></i>
-                <span>Print Table Report</span>
+                <span>Custom Print Report</span>
               </button>
             </div>
           </div>
@@ -775,6 +782,73 @@
                 </tr>
               </thead>
               <tbody id="registrations-table-body" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- TAB: WINTER INTERNSHIP REGISTRATIONS         -->
+      <!-- ========================================== -->
+      <div id="tab-internships" class="hidden space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold font-heading text-slate-900 flex items-center gap-2">
+              <i class="bi bi-mortarboard-fill text-emerald-700"></i>
+              <span>Winter Internship Registrations</span>
+            </h2>
+            <p class="text-xs text-slate-500">Manage student applications, college credentials, training allocations, and certification</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportInternshipsCSV()" class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold shadow-2xs inline-flex items-center gap-1.5 cursor-pointer">
+              <i class="bi bi-download text-emerald-700"></i> Export CSV
+            </button>
+            <button onclick="loadInternships()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold shadow-2xs inline-flex items-center gap-1.5 cursor-pointer">
+              <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center gap-3 text-xs">
+          <div class="flex-1 min-w-[220px] relative">
+            <i class="bi bi-search absolute left-3 top-2.5 text-slate-400"></i>
+            <input type="text" id="internship-search-input" oninput="renderInternshipsTable()" placeholder="Search by student name, college, email, domain, or token..." class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-700">
+          </div>
+          <select id="internship-filter-domain" onchange="renderInternshipsTable()" class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-medium cursor-pointer">
+            <option value="ALL">All Domains</option>
+          </select>
+          <select id="internship-filter-duration" onchange="renderInternshipsTable()" class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-medium cursor-pointer">
+            <option value="ALL">All Durations</option>
+            <option value="1 Week">1 Week</option>
+            <option value="2 Weeks">2 Weeks</option>
+            <option value="4 Weeks">4 Weeks</option>
+          </select>
+          <select id="internship-filter-status" onchange="renderInternshipsTable()" class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-medium cursor-pointer">
+            <option value="ALL">All Statuses</option>
+            <option value="Pending Review">Pending Review</option>
+            <option value="Approved">Approved</option>
+            <option value="Shortlisted">Shortlisted</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[950px] text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold text-[10px]">
+                <tr>
+                  <th class="p-3">Applied Date</th>
+                  <th class="p-3">Student Dossier</th>
+                  <th class="p-3">College & Academics</th>
+                  <th class="p-3">Domain & Duration</th>
+                  <th class="p-3">Mode & Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="internships-table-body" class="divide-y divide-slate-100"></tbody>
             </table>
           </div>
         </div>
@@ -1290,7 +1364,7 @@
     var isLocalAdmin = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     var API_BASE = (window.ENV && window.ENV.API_BASE) || (isLocalAdmin 
       ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
-      : (window.SST_CONFIG ? window.SST_CONFIG.API_BASE_URL : 'https://shazu-land-back.onrender.com'));
+      : (window.SST_CONFIG ? window.SST_CONFIG.API_BASE_URL : 'https://shazu-land-back-wiuk.onrender.com'));
     window.API_BASE = API_BASE;
     let currentTab = 'analytics';
     let currentUser = null; // { id, name, email, role }
@@ -1311,6 +1385,7 @@
       analytics: null,
       leads: [],
       registrations: [],
+      internships: [],
       events: [],
       careers: [],
       applications: [],
@@ -1542,6 +1617,7 @@
 
         updateBadge('badge-leads-count', c.leads);
         updateBadge('badge-registrations-count', c.registrations);
+        updateBadge('badge-internships-count', c.internships);
         updateBadge('badge-events-count', c.events);
         updateBadge('badge-careers-count', c.careers);
         updateBadge('badge-applications-count', c.applications);
@@ -1727,6 +1803,90 @@
 
           <div class="flex justify-between items-center pt-3 border-t border-slate-200">
             <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'Event Pass Confirmation: ${rec.event_title}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Send Email</button>
+            <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
+          </div>
+        `);
+      } else if (tab === 'internships') {
+        const isApproved = rec.status === 'Approved' || rec.status === 'Shortlisted';
+        const isCompleted = rec.status === 'Completed';
+        const isRejected = rec.status === 'Rejected';
+        showModal(`
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="p-2 bg-emerald-100 text-emerald-800 rounded-xl text-lg"><i class="bi bi-mortarboard-fill"></i></span>
+              <div>
+                <h3 class="text-base font-bold text-slate-900 leading-tight">Internship Candidate Dossier</h3>
+                <span class="text-xs font-mono font-bold text-emerald-700">${rec.token_no || 'Token Pending'}</span>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-md text-xs font-bold ${isApproved ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : (isCompleted ? 'bg-purple-100 text-purple-800 border border-purple-300' : (isRejected ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800 border border-amber-300'))}">${rec.status || 'Pending Review'}</span>
+          </div>
+
+          <div class="space-y-3 py-2 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Student Name</span>
+                <span class="font-bold text-slate-900 text-sm block mt-0.5">${rec.name}</span>
+                <span class="text-[11px] text-slate-500">${rec.gender || 'Not specified'}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Registration Date</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${new Date(rec.created_at).toLocaleString()}</span>
+                <span class="text-[11px] font-mono text-emerald-700">${rec.training_period} • ${rec.preferred_mode || 'Online'}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Email Address</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5 break-all">${rec.email}</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone / WhatsApp</span>
+                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.phone || '—'}</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">College & Academic Details</span>
+              <span class="font-black text-slate-900 text-sm block">${rec.college_name}</span>
+              <div class="flex items-center gap-2 pt-1 flex-wrap text-slate-600">
+                <span class="font-semibold text-slate-800">${rec.degree_department || 'Department N/A'}</span>
+                <span>•</span>
+                <span>${rec.year_of_study || 'Year N/A'}</span>
+                ${rec.roll_no ? `<span>•</span><span class="font-mono text-slate-700">Roll: ${rec.roll_no}</span>` : ''}
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Chosen Domain & Training Program</span>
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <span class="font-bold text-emerald-800 text-sm">${rec.domain}</span>
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-900 font-bold rounded text-[11px]">${rec.training_period}</span>
+              </div>
+              ${rec.start_date ? `<div class="text-[11px] text-slate-500 pt-1">Preferred Start Date: <strong>${rec.start_date}</strong></div>` : ''}
+              ${rec.notes ? `<div class="p-2 bg-white rounded border border-slate-200 text-slate-700 text-[11px] mt-1 whitespace-pre-line">${rec.notes}</div>` : ''}
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Admin Notes & Remarks</span>
+              <textarea id="modal-intern-notes" rows="2" placeholder="Add administrative remarks or onboarding instructions..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-emerald-700">${rec.admin_notes || ''}</textarea>
+            </div>
+
+            <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1">
+              <span class="text-[10px] font-bold text-emerald-900 uppercase tracking-wider block">Update Allocation & Status</span>
+              <div class="flex gap-2 pt-1 flex-wrap">
+                <button onclick="saveInternshipModalStatus(${rec.id}, 'Approved')" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-check-circle-fill"></i> Approve & Send Email</button>
+                <button onclick="saveInternshipModalStatus(${rec.id}, 'In Progress')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-play-circle-fill"></i> In Progress</button>
+                <button onclick="saveInternshipModalStatus(${rec.id}, 'Completed')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-trophy-fill"></i> Mark Completed</button>
+                <button onclick="saveInternshipModalStatus(${rec.id}, 'Rejected')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-x-circle"></i> Reject</button>
+                <button onclick="closeModal(); quickProvideCertificate('internship', ${rec.id})" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-patch-check-fill"></i> Issue Certificate</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-3 border-t border-slate-200">
+            <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'SST Winter Internship Update: ${rec.domain}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Send Email</button>
             <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
           </div>
         `);
@@ -2031,7 +2191,7 @@
 
     function initiateGoogleLogin(e) {
       if (e) e.preventDefault();
-      const apiBase = (window.SST_CONFIG && window.SST_CONFIG.API_BASE_URL) || (window.ENV && window.ENV.API_BASE) || API_BASE || 'https://shazu-land-back.onrender.com';
+      const apiBase = (window.SST_CONFIG && window.SST_CONFIG.API_BASE_URL) || (window.ENV && window.ENV.API_BASE) || API_BASE || 'https://shazu-land-back-wiuk.onrender.com';
       showToast('Redirecting to Google Secure Sign-In...');
       window.location.href = `${apiBase}/api/auth/google`;
     }
@@ -2053,7 +2213,7 @@
       const activeBtn = document.getElementById(`nav-${tabId}`);
       if (activeBtn) activeBtn.classList.add('active');
 
-      const tabs = ['analytics', 'leads', 'registrations', 'events', 'certificates', 'careers', 'applications', 'memberships', 'announcements', 'offerings', 'slider', 'users', 'audit'];
+      const tabs = ['analytics', 'leads', 'registrations', 'internships', 'events', 'certificates', 'careers', 'applications', 'memberships', 'announcements', 'offerings', 'slider', 'users', 'audit'];
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.add('hidden');
@@ -2082,6 +2242,7 @@
       if (tabId === 'analytics') loadAnalytics();
       else if (tabId === 'leads') loadLeads();
       else if (tabId === 'registrations') loadRegistrations();
+      else if (tabId === 'internships') loadInternships();
       else if (tabId === 'events') loadEvents();
       else if (tabId === 'certificates') loadCertificatesTab();
       else if (tabId === 'careers') loadCareers();
@@ -2245,6 +2406,23 @@
 
       statusSelect.value = filterState.status || 'all';
       categorySelect.value = filterState.category || 'all';
+    }
+
+    function renderCurrentTabFiltered() {
+      if (currentTab === 'analytics') loadAnalytics();
+      else if (currentTab === 'leads') renderLeadsTable();
+      else if (currentTab === 'registrations') renderRegistrationsTable();
+      else if (currentTab === 'events') renderEventsTable();
+      else if (currentTab === 'careers') renderCareersTable();
+      else if (currentTab === 'applications') renderApplicationsTable();
+      else if (currentTab === 'memberships') renderMembershipsTable();
+      else if (currentTab === 'certificates' && typeof renderCertificatesTab === 'function') renderCertificatesTab();
+      else if (currentTab === 'announcements') renderAnnouncementsTable();
+      else if (currentTab === 'offerings') renderOfferingsTable();
+      else if (currentTab === 'slider') renderSliderTable();
+      else if (currentTab === 'gallery') renderGalleryTable();
+      else if (currentTab === 'users') renderUsersTable();
+      else if (currentTab === 'audit') renderAuditLogsTable();
     }
 
     function handleFilterChange(key, value) {
@@ -2757,6 +2935,178 @@
       `);
     }
     window.openPaymentScreenshotModal = openPaymentScreenshotModal;
+
+    // ==========================================
+    // TAB: WINTER INTERNSHIP REGISTRATIONS
+    // ==========================================
+    async function loadInternships() {
+      renderTableSkeleton('internships-table-body');
+      try {
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/internships`, { headers: getAuthHeaders() });
+        tableData.internships = data.internships || [];
+        const badgeEl = document.getElementById('badge-internships-count');
+        if (badgeEl) badgeEl.textContent = tableData.internships.length;
+        populateInternshipDomainDropdown();
+        renderInternshipsTable();
+      } catch (err) {
+        showToast('Error loading internship registrations', 'error');
+      }
+    }
+
+    function populateInternshipDomainDropdown() {
+      const select = document.getElementById('internship-filter-domain');
+      if (!select) return;
+      const domains = new Set();
+      (tableData.internships || []).forEach(i => {
+        if (i.domain && i.domain.trim()) domains.add(i.domain.trim());
+      });
+      const current = select.value;
+      select.innerHTML = '<option value="ALL">All Domains</option>' +
+        Array.from(domains).sort().map(d => `<option value="${d}" ${d === current ? 'selected' : ''}>${d}</option>`).join('');
+    }
+
+    function renderInternshipsTable() {
+      const tbody = document.getElementById('internships-table-body');
+      if (!tbody) return;
+
+      const q = (document.getElementById('internship-search-input')?.value || '').trim().toLowerCase();
+      const domFilter = document.getElementById('internship-filter-domain')?.value || 'ALL';
+      const durFilter = document.getElementById('internship-filter-duration')?.value || 'ALL';
+      const statusFilter = document.getElementById('internship-filter-status')?.value || 'ALL';
+
+      let items = (tableData.internships || []).filter(item => {
+        if (domFilter !== 'ALL' && item.domain !== domFilter) return false;
+        if (durFilter !== 'ALL' && !String(item.training_period).toLowerCase().includes(durFilter.toLowerCase())) return false;
+        if (statusFilter !== 'ALL' && item.status !== statusFilter) return false;
+
+        if (q) {
+          const matchStr = `${item.name} ${item.email} ${item.phone} ${item.college_name} ${item.degree_department} ${item.roll_no} ${item.domain} ${item.token_no}`.toLowerCase();
+          if (!matchStr.includes(q)) return false;
+        }
+        return true;
+      });
+
+      tbody.innerHTML = items.map(i => {
+        return `
+          <tr class="hover:bg-emerald-50/40 cursor-pointer transition-colors" onclick="openRowDetails('internships', ${i.id})">
+            <td class="p-3 text-slate-500 font-mono text-[11px] whitespace-nowrap">
+              ${new Date(i.created_at).toLocaleDateString()}
+              <div class="mt-0.5">
+                <span class="inline-block px-1.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-[9px] rounded">
+                  ${i.token_no || 'Token Pending'}
+                </span>
+              </div>
+            </td>
+            <td class="p-3">
+              <span class="block font-bold text-slate-900">${i.name}</span>
+              <span class="block text-[11px] text-slate-500">${i.email} • ${i.phone || '-'}</span>
+              ${i.gender ? `<span class="inline-block text-[10px] text-slate-400">${i.gender}</span>` : ''}
+            </td>
+            <td class="p-3">
+              <span class="font-bold text-slate-900 block truncate max-w-[220px]">${i.college_name}</span>
+              <span class="text-[11px] text-slate-600 block">${i.degree_department || 'General'} • ${i.year_of_study || '-'}</span>
+              ${i.roll_no ? `<span class="text-[10px] text-slate-400 font-mono block">Reg: ${i.roll_no}</span>` : ''}
+            </td>
+            <td class="p-3">
+              <span class="font-bold text-emerald-800 block">${i.domain}</span>
+              <span class="inline-block mt-0.5 px-2 py-0.2 bg-emerald-100 text-emerald-900 font-bold rounded text-[10px]">${i.training_period}</span>
+            </td>
+            <td class="p-3" onclick="event.stopPropagation()">
+              <span class="block text-[10px] text-slate-400 mb-1">${i.preferred_mode || 'Online'}</span>
+              <select onchange="updateInternshipStatus(${i.id}, this.value)" class="bg-white text-slate-800 border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-semibold cursor-pointer shadow-2xs">
+                <option value="Pending Review" ${i.status === 'Pending Review' ? 'selected' : ''}>Pending Review</option>
+                <option value="Approved" ${i.status === 'Approved' ? 'selected' : ''}>Approved & Emailed</option>
+                <option value="Shortlisted" ${i.status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
+                <option value="In Progress" ${i.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                <option value="Completed" ${i.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                <option value="Rejected" ${i.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+              </select>
+            </td>
+            <td class="p-3 text-right space-x-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
+              <button onclick="openRowDetails('internships', ${i.id})" title="View Full Dossier" class="p-1.5 bg-slate-100 hover:bg-[#123B32] hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-eye"></i></button>
+              <button onclick="quickProvideCertificate('internship', ${i.id})" title="${i.certificate_issued ? 'Re-Issue Certificate' : 'Issue Certificate'}" class="px-2 py-1 ${i.certificate_issued ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-amber-500 hover:bg-amber-600'} text-white font-bold rounded-lg text-[11px] shadow-2xs cursor-pointer inline-flex items-center gap-1"><i class="bi bi-patch-check-fill"></i> ${i.certificate_issued ? 'Cert ✓' : 'Cert'}</button>
+              <button onclick="confirmDeleteInternship(${i.id})" title="Delete Record" class="p-1.5 bg-slate-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No internship registrations found matching your filters.</td></tr>';
+    }
+
+    async function updateInternshipStatus(id, status, admin_notes = undefined) {
+      try {
+        const body = { status };
+        if (admin_notes !== undefined) body.admin_notes = admin_notes;
+
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/internships/${id}/status`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(body)
+        });
+        if (!ok) throw new Error(data.error || 'Status update failed');
+        showToast(status === 'Approved' ? 'Internship approved! Official confirmation emailed.' : `Status updated to ${status}`);
+        loadInternships();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function saveInternshipModalStatus(id, status) {
+      const notesEl = document.getElementById('modal-intern-notes');
+      const admin_notes = notesEl ? notesEl.value.trim() : undefined;
+      await updateInternshipStatus(id, status, admin_notes);
+      closeModal();
+    }
+
+    function confirmDeleteInternship(id) {
+      showConfirmModal('Delete Internship Registration', 'Are you sure you want to remove this internship application?', 'Delete Record', async () => {
+        try {
+          await safeFetchJson(`${API_BASE}/api/admin/internships/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          showToast('Internship record deleted');
+          loadInternships();
+        } catch (err) {
+          showToast('Delete failed', 'error');
+        }
+      });
+    }
+
+    function exportInternshipsCSV() {
+      const items = tableData.internships || [];
+      if (items.length === 0) {
+        showToast('No internship records to export', 'error');
+        return;
+      }
+
+      const headers = ['Token', 'Date', 'Name', 'Email', 'Phone', 'Gender', 'College', 'Department', 'Year', 'Roll No', 'Domain', 'Duration', 'Mode', 'Start Date', 'Status', 'Notes', 'Certificate Issued'];
+      const rows = items.map(i => [
+        `"${(i.token_no || '').replace(/"/g, '""')}"`,
+        `"${new Date(i.created_at).toLocaleDateString()}"`,
+        `"${(i.name || '').replace(/"/g, '""')}"`,
+        `"${(i.email || '').replace(/"/g, '""')}"`,
+        `"${(i.phone || '').replace(/"/g, '""')}"`,
+        `"${(i.gender || '').replace(/"/g, '""')}"`,
+        `"${(i.college_name || '').replace(/"/g, '""')}"`,
+        `"${(i.degree_department || '').replace(/"/g, '""')}"`,
+        `"${(i.year_of_study || '').replace(/"/g, '""')}"`,
+        `"${(i.roll_no || '').replace(/"/g, '""')}"`,
+        `"${(i.domain || '').replace(/"/g, '""')}"`,
+        `"${(i.training_period || '').replace(/"/g, '""')}"`,
+        `"${(i.preferred_mode || '').replace(/"/g, '""')}"`,
+        `"${(i.start_date || '').replace(/"/g, '""')}"`,
+        `"${(i.status || '').replace(/"/g, '""')}"`,
+        `"${(i.notes || '').replace(/"/g, '""')}"`,
+        `"${i.certificate_issued ? 'YES' : 'NO'}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `sst_internship_registrations_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`Exported ${items.length} internship records to CSV`);
+    }
 
     // ==========================================
     // TAB 4: EVENTS CRUD
@@ -3869,56 +4219,447 @@
     }
 
     // ==========================================
-    // UNIVERSAL MULTI-FORMAT DATA EXPORTER (CSV, JSON, PRINT)
+    // UNIVERSAL MULTI-FORMAT CUSTOM DATA EXPORTER (WITH COLUMN PICKER & COLUMN RENAMING)
     // ==========================================
-    function exportCurrentTab(format) {
-      let dataToExport = [];
-      let filenamePrefix = `sst_${currentTab}`;
+    const TAB_EXPORT_SCHEMAS = {
+      registrations: [
+        { key: 'token_no', label: 'Pass ID / Token No.', defaultChecked: true },
+        { key: 'name', label: 'Attendee Full Name', defaultChecked: true },
+        { key: 'email', label: 'Email Address', defaultChecked: true },
+        { key: 'phone', label: 'Phone Number', defaultChecked: true },
+        { key: 'event_title', label: 'Event Name', defaultChecked: true },
+        { key: 'registration_fee', label: 'Registration Fee', defaultChecked: true },
+        { key: 'transaction_id', label: 'UTR / Transaction ID', defaultChecked: true },
+        { key: 'payment_status', label: 'Payment Verification Status', defaultChecked: true },
+        { key: 'payment_method', label: 'Payment Method', defaultChecked: true },
+        { key: 'attendee_category', label: 'Attendee Category / Role', defaultChecked: true },
+        { key: 'organization', label: 'Organization / Institution / Company', defaultChecked: true },
+        { key: 'department_degree', label: 'Department / Degree', defaultChecked: true },
+        { key: 'academic_year', label: 'Academic Year / Semester', defaultChecked: true },
+        { key: 'registered_at', label: 'Registered Date & Time', defaultChecked: true },
+        { key: 'certificate_issued', label: 'Digital Certificate Issued', defaultChecked: false }
+      ],
+      events: [
+        { key: 'title', label: 'Event Title', defaultChecked: true },
+        { key: 'category', label: 'Event Category', defaultChecked: true },
+        { key: 'event_date', label: 'Event Date & Schedule', defaultChecked: true },
+        { key: 'location', label: 'Venue / Platform Location', defaultChecked: true },
+        { key: 'registration_fee', label: 'Registration Fee', defaultChecked: true },
+        { key: 'upi_id', label: 'Payment UPI ID', defaultChecked: true },
+        { key: 'whatsapp_group_link', label: 'WhatsApp Group Link', defaultChecked: true },
+        { key: 'status', label: 'Event Status', defaultChecked: true },
+        { key: 'description', label: 'Overview Description', defaultChecked: true },
+        { key: 'created_at', label: 'Date Created', defaultChecked: false }
+      ],
+      memberships: [
+        { key: 'token_no', label: 'Charter Pass / Token No.', defaultChecked: true },
+        { key: 'name', label: 'Member Full Name', defaultChecked: true },
+        { key: 'email', label: 'Email Address', defaultChecked: true },
+        { key: 'phone', label: 'Phone Number', defaultChecked: true },
+        { key: 'membership_type', label: 'Membership Charter Tier', defaultChecked: true },
+        { key: 'association_name', label: 'Association / Chapter', defaultChecked: true },
+        { key: 'present_designation', label: 'Present Designation / Title', defaultChecked: true },
+        { key: 'professional_qualification', label: 'Highest Qualification', defaultChecked: true },
+        { key: 'organization_name_address', label: 'Institution / Organization & Address', defaultChecked: true },
+        { key: 'residential_address', label: 'Residential Address', defaultChecked: false },
+        { key: 'gender', label: 'Gender', defaultChecked: true },
+        { key: 'dob', label: 'Date of Birth', defaultChecked: false },
+        { key: 'blood_group', label: 'Blood Group', defaultChecked: false },
+        { key: 'status', label: 'Charter Approval Status', defaultChecked: true },
+        { key: 'created_at', label: 'Application Date', defaultChecked: true },
+        { key: 'certificate_issued', label: 'Certificate Issued', defaultChecked: false }
+      ],
+      leads: [
+        { key: 'token_no', label: 'Inquiry Token / Lead ID', defaultChecked: true },
+        { key: 'name', label: 'Client / Inquirer Name', defaultChecked: true },
+        { key: 'email', label: 'Email Address', defaultChecked: true },
+        { key: 'phone', label: 'Phone Number', defaultChecked: true },
+        { key: 'service_category', label: 'Service Category', defaultChecked: true },
+        { key: 'subject', label: 'Subject', defaultChecked: true },
+        { key: 'message', label: 'Inquiry Message', defaultChecked: true },
+        { key: 'status', label: 'Pipeline Stage / Status', defaultChecked: true },
+        { key: 'admin_notes', label: 'Admin Remarks', defaultChecked: false },
+        { key: 'created_at', label: 'Inquiry Date & Time', defaultChecked: true }
+      ],
+      applications: [
+        { key: 'applicant_name', label: 'Candidate Full Name', defaultChecked: true },
+        { key: 'email', label: 'Email Address', defaultChecked: true },
+        { key: 'phone', label: 'Phone Number', defaultChecked: true },
+        { key: 'job_title', label: 'Applied Position', defaultChecked: true },
+        { key: 'status', label: 'Hiring Stage / Status', defaultChecked: true },
+        { key: 'message', label: 'Cover Note', defaultChecked: true },
+        { key: 'admin_notes', label: 'Review Remarks', defaultChecked: false },
+        { key: 'submitted_at', label: 'Submitted Date & Time', defaultChecked: true }
+      ],
+      careers: [
+        { key: 'title', label: 'Job Position Title', defaultChecked: true },
+        { key: 'department', label: 'Department', defaultChecked: true },
+        { key: 'job_type', label: 'Employment Type', defaultChecked: true },
+        { key: 'location', label: 'Location / Work Mode', defaultChecked: true },
+        { key: 'salary_range', label: 'Salary Range', defaultChecked: true },
+        { key: 'status', label: 'Listing Status', defaultChecked: true },
+        { key: 'description', label: 'Job Description', defaultChecked: true },
+        { key: 'created_at', label: 'Date Posted', defaultChecked: false }
+      ],
+      users: [
+        { key: 'email', label: 'Admin Email', defaultChecked: true },
+        { key: 'role', label: 'Access Role', defaultChecked: true },
+        { key: 'status', label: 'Account Status', defaultChecked: true },
+        { key: 'created_at', label: 'Registered Date', defaultChecked: true }
+      ],
+      audit: [
+        { key: 'created_at', label: 'Timestamp', defaultChecked: true },
+        { key: 'admin_name', label: 'Actor Name', defaultChecked: true },
+        { key: 'admin_email', label: 'Actor Email', defaultChecked: true },
+        { key: 'action_type', label: 'Action Type', defaultChecked: true },
+        { key: 'entity_type', label: 'Entity Scope', defaultChecked: true },
+        { key: 'status', label: 'Status', defaultChecked: true },
+        { key: 'ip_address', label: 'IP Address', defaultChecked: true },
+        { key: 'details', label: 'Log Context', defaultChecked: true }
+      ]
+    };
 
-      if (currentTab === 'leads') dataToExport = tableData.leads;
-      else if (currentTab === 'registrations') dataToExport = tableData.registrations;
-      else if (currentTab === 'events') dataToExport = tableData.events;
-      else if (currentTab === 'careers') dataToExport = tableData.careers;
-      else if (currentTab === 'applications') dataToExport = tableData.applications;
-      else if (currentTab === 'memberships') dataToExport = tableData.memberships;
-      else if (currentTab === 'announcements') dataToExport = tableData.announcements;
-      else if (currentTab === 'offerings') dataToExport = tableData.offerings;
-      else if (currentTab === 'users') dataToExport = tableData.users;
-      else if (currentTab === 'slider') dataToExport = tableData.slides;
-      else if (currentTab === 'gallery') dataToExport = tableData.gallery;
-      else if (currentTab === 'audit') dataToExport = tableData.audit;
-      else if (currentTab === 'analytics') dataToExport = (tableData.analytics && tableData.analytics.recentTransactions) ? tableData.analytics.recentTransactions : [];
+    let currentExportActiveCols = [];
+
+    function escapeAttr(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function getAllDataForTab(tab) {
+      if (tab === 'leads') return tableData.leads || [];
+      if (tab === 'registrations') return tableData.registrations || [];
+      if (tab === 'events') return tableData.events || [];
+      if (tab === 'careers') return tableData.careers || [];
+      if (tab === 'applications') return tableData.applications || [];
+      if (tab === 'memberships') return tableData.memberships || [];
+      if (tab === 'announcements') return tableData.announcements || [];
+      if (tab === 'offerings') return tableData.offerings || [];
+      if (tab === 'users') return tableData.users || [];
+      if (tab === 'slider') return tableData.slides || [];
+      if (tab === 'gallery') return tableData.gallery || [];
+      if (tab === 'audit') return tableData.audit || [];
+      if (tab === 'analytics') return (tableData.analytics && tableData.analytics.recentTransactions) ? tableData.analytics.recentTransactions : [];
+      return tableData[tab] || [];
+    }
+
+    function getCurrentFilteredDataForTab(tab) {
+      if (tab === 'leads') return filterAndSortArray(tableData.leads, 'created_at', 'name', 'status', 'service_category');
+      if (tab === 'registrations') return filterAndSortArray(tableData.registrations, 'registered_at', 'name', 'payment_status', 'payment_method');
+      if (tab === 'events') return filterAndSortArray(tableData.events, 'event_date', 'title', 'status', 'category');
+      if (tab === 'careers') return filterAndSortArray(tableData.careers, 'created_at', 'title', 'status', 'department');
+      if (tab === 'applications') return filterAndSortArray(tableData.applications, 'submitted_at', 'applicant_name', 'status', 'job_title');
+      if (tab === 'memberships') return filterAndSortArray(tableData.memberships, 'created_at', 'name', 'status', 'membership_type');
+      if (tab === 'announcements') return filterAndSortArray(tableData.announcements, 'created_at', 'title', 'category', 'category');
+      if (tab === 'offerings') return filterAndSortArray(tableData.offerings, 'created_at', 'title', 'offering_type', 'offering_type');
+      if (tab === 'users') return filterAndSortArray(tableData.users, 'created_at', 'email', 'is_active', 'role');
+      if (tab === 'slider') return filterAndSortArray(tableData.slides, 'created_at', 'title', 'is_active', 'badge');
+      if (tab === 'gallery') return filterAndSortArray(tableData.gallery, 'created_at', 'title', 'is_active', 'category');
+      if (tab === 'audit') return filterAndSortArray(tableData.audit, 'created_at', 'action_type', 'status', 'category');
+      if (tab === 'analytics') return (tableData.analytics && tableData.analytics.recentTransactions) ? tableData.analytics.recentTransactions : [];
+      return tableData[tab] || [];
+    }
+
+    function openExportModal(initialFormat = 'csv') {
+      const allData = getAllDataForTab(currentTab);
+      const filteredData = getCurrentFilteredDataForTab(currentTab);
+
+      if (!allData || allData.length === 0) {
+        showToast('No records available to export in current tab', 'error');
+        return;
+      }
+
+      const tabLabels = {
+        registrations: 'Event Registrations & Passes',
+        events: 'Events Directory',
+        memberships: 'Membership Applications Dossier',
+        leads: 'CRM Leads & Inquiries',
+        applications: 'Job Applications',
+        careers: 'Career Vacancies',
+        announcements: 'Announcements',
+        offerings: 'Courses & Services',
+        users: 'System Users',
+        slider: 'Hero Banner Slides',
+        gallery: 'Photo Gallery',
+        audit: 'System Audit Logs',
+        analytics: 'Financial Transactions'
+      };
+
+      const tabFriendlyName = tabLabels[currentTab] || (currentTab.charAt(0).toUpperCase() + currentTab.slice(1));
+
+      // Build column configuration list
+      let cols = [];
+      if (TAB_EXPORT_SCHEMAS[currentTab]) {
+        cols = JSON.parse(JSON.stringify(TAB_EXPORT_SCHEMAS[currentTab]));
+        const existingKeys = new Set(cols.map(c => c.key));
+        const sample = allData[0] || {};
+        Object.keys(sample).forEach(k => {
+          if (!existingKeys.has(k) && k !== 'password_hash' && k !== 'resume_url' && k !== 'image_url' && k !== 'payment_screenshot' && k !== 'id') {
+            const prettyLabel = k.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            cols.push({ key: k, label: prettyLabel, defaultChecked: false });
+          }
+        });
+      } else {
+        const sample = allData[0] || {};
+        Object.keys(sample).forEach(k => {
+          if (k !== 'password_hash' && k !== 'resume_url' && k !== 'image_url' && k !== 'payment_screenshot' && k !== 'id') {
+            const prettyLabel = k.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            cols.push({ key: k, label: prettyLabel, defaultChecked: true });
+          }
+        });
+      }
+
+      currentExportActiveCols = cols;
+
+      const container = document.getElementById('modal-container');
+      if (container) {
+        container.className = 'bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 w-full max-w-2xl shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto no-scrollbar';
+      }
+
+      const colsHtml = cols.map(col => `
+        <div class="flex items-center gap-2.5 p-2 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200/80 transition-colors">
+          <div class="flex items-center gap-2 shrink-0">
+            <input type="checkbox" id="export-col-${col.key}" ${col.defaultChecked ? 'checked' : ''} class="w-4 h-4 rounded text-[#123B32] focus:ring-[#123B32] border-slate-300 cursor-pointer">
+            <label for="export-col-${col.key}" class="font-mono text-[10.5px] text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded w-32 sm:w-36 truncate cursor-pointer select-none" title="${col.key}">
+              ${col.key}
+            </label>
+          </div>
+          <div class="flex-1 relative">
+            <input type="text" id="export-label-${col.key}" value="${escapeAttr(col.label)}" data-default-label="${escapeAttr(col.label)}" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#123B32] focus:ring-1 focus:ring-[#123B32]" placeholder="Header Name">
+          </div>
+        </div>
+      `).join('');
+
+      showModal(`
+        <div class="space-y-4">
+          <!-- Modal Header -->
+          <div class="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-2">
+                <span class="p-1.5 rounded-lg bg-[#123B32]/10 text-[#123B32] text-base">
+                  <i class="bi bi-file-earmark-spreadsheet"></i>
+                </span>
+                <h3 class="text-base font-bold font-heading text-slate-900">Custom Export — ${tabFriendlyName}</h3>
+              </div>
+              <p class="text-xs text-slate-500">Choose columns and customize header names before exporting.</p>
+            </div>
+            <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+              <i class="bi bi-x-lg text-sm"></i>
+            </button>
+          </div>
+
+          <!-- Scope Selector -->
+          <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block font-mono">1. Select Data Scope</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-center gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-400 transition-colors">
+                <input type="radio" name="export-scope" value="filtered" checked class="text-[#123B32] focus:ring-[#123B32] cursor-pointer">
+                <div>
+                  <span class="font-bold text-slate-900 block">Current Filtered View</span>
+                  <span class="text-[11px] text-slate-500">${filteredData.length} records currently displayed</span>
+                </div>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-400 transition-colors">
+                <input type="radio" name="export-scope" value="all" class="text-[#123B32] focus:ring-[#123B32] cursor-pointer">
+                <div>
+                  <span class="font-bold text-slate-900 block">All Loaded Records</span>
+                  <span class="text-[11px] text-slate-500">${allData.length} total records in tab</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Column Selection & Renaming Area -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-mono">2. Choose Columns &amp; Edit Header Names</span>
+              <div class="flex items-center gap-1.5 text-[11px]">
+                <button type="button" onclick="toggleAllExportCols(true)" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-md cursor-pointer transition-colors">
+                  <i class="bi bi-check-all"></i> Select All
+                </button>
+                <button type="button" onclick="toggleAllExportCols(false)" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-md cursor-pointer transition-colors">
+                  <i class="bi bi-dash"></i> Deselect All
+                </button>
+                <button type="button" onclick="resetExportColNames()" class="px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold rounded-md cursor-pointer transition-colors" title="Reset all headers to default names">
+                  <i class="bi bi-arrow-counterclockwise"></i> Reset Names
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 max-h-[42vh] overflow-y-auto pr-1 no-scrollbar border border-slate-200/60 rounded-2xl p-2 bg-slate-50/50">
+              ${colsHtml}
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between gap-2 pt-3 border-t border-slate-100 flex-wrap">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs cursor-pointer">
+              Cancel
+            </button>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="executeCustomExport('csv')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl font-bold text-xs shadow-md cursor-pointer transition-colors flex items-center gap-1.5">
+                <i class="bi bi-file-earmark-spreadsheet"></i> <span>Download CSV</span>
+              </button>
+              <button type="button" onclick="executeCustomExport('json')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-md cursor-pointer transition-colors flex items-center gap-1.5">
+                <i class="bi bi-file-earmark-code"></i> <span>Download JSON</span>
+              </button>
+              <button type="button" onclick="executeCustomExport('print')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-xs shadow-md cursor-pointer transition-colors flex items-center gap-1.5">
+                <i class="bi bi-printer"></i> <span>Print Report</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+
+    function toggleAllExportCols(select) {
+      currentExportActiveCols.forEach(col => {
+        const checkEl = document.getElementById(`export-col-${col.key}`);
+        if (checkEl) checkEl.checked = !!select;
+      });
+    }
+
+    function resetExportColNames() {
+      currentExportActiveCols.forEach(col => {
+        const inputEl = document.getElementById(`export-label-${col.key}`);
+        if (inputEl) {
+          const defaultVal = inputEl.getAttribute('data-default-label') || col.label || col.key;
+          inputEl.value = defaultVal;
+        }
+      });
+      showToast('Column header names reset to defaults');
+    }
+
+    function executeCustomExport(format) {
+      const scopeRadio = document.querySelector('input[name="export-scope"]:checked');
+      const scope = scopeRadio ? scopeRadio.value : 'filtered';
+      const dataToExport = scope === 'all' ? getAllDataForTab(currentTab) : getCurrentFilteredDataForTab(currentTab);
 
       if (!dataToExport || dataToExport.length === 0) {
-        showToast('No records available to export', 'error');
+        showToast('No records available to export for selected scope', 'error');
+        return;
+      }
+
+      const selectedColumns = [];
+      currentExportActiveCols.forEach(col => {
+        const checkEl = document.getElementById(`export-col-${col.key}`);
+        const labelEl = document.getElementById(`export-label-${col.key}`);
+        if (checkEl && checkEl.checked) {
+          const customLabel = labelEl ? labelEl.value.trim() : col.label;
+          selectedColumns.push({
+            key: col.key,
+            label: customLabel || col.label || col.key
+          });
+        }
+      });
+
+      if (selectedColumns.length === 0) {
+        showToast('Please select at least one column to export', 'error');
         return;
       }
 
       const todayStr = new Date().toISOString().slice(0, 10);
+      const filenamePrefix = `sst_${currentTab}_${todayStr}`;
 
-      if (format === 'json') {
-        const jsonStr = JSON.stringify(dataToExport, null, 2);
-        const blob = new Blob([jsonStr], { type: 'application/json' });
-        downloadBlob(blob, `${filenamePrefix}_${todayStr}.json`);
-        showToast(`Exported ${dataToExport.length} records to JSON!`);
-      } else if (format === 'csv') {
-        const keys = Object.keys(dataToExport[0]).filter(k => k !== 'password_hash' && k !== 'resume_url' && k !== 'image_url');
-        let csv = keys.join(',') + '\n';
-        dataToExport.forEach(row => {
-          const line = keys.map(k => {
-            let val = row[k] === null || row[k] === undefined ? '' : String(row[k]);
+      if (format === 'csv') {
+        const headers = selectedColumns.map(c => `"${c.label.replace(/"/g, '""')}"`).join(',');
+        const rows = dataToExport.map(row => {
+          return selectedColumns.map(c => {
+            let val = row[c.key];
+            if (val === null || val === undefined) val = '';
+            else if (typeof val === 'boolean') val = val ? 'Yes' : 'No';
+            else if (typeof val === 'object') val = JSON.stringify(val);
+            else val = String(val);
             val = val.replace(/"/g, '""');
             return `"${val}"`;
           }).join(',');
-          csv += line + '\n';
         });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        downloadBlob(blob, `${filenamePrefix}_${todayStr}.csv`);
-        showToast(`Exported ${dataToExport.length} records to CSV!`);
+        const csvContent = '\uFEFF' + headers + '\n' + rows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        downloadBlob(blob, `${filenamePrefix}.csv`);
+        closeModal();
+        showToast(`Exported ${dataToExport.length} records (${selectedColumns.length} columns) to CSV!`);
+      } else if (format === 'json') {
+        const formattedJson = dataToExport.map(row => {
+          const item = {};
+          selectedColumns.forEach(c => {
+            item[c.label] = row[c.key] !== undefined ? row[c.key] : null;
+          });
+          return item;
+        });
+        const jsonStr = JSON.stringify(formattedJson, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        downloadBlob(blob, `${filenamePrefix}.json`);
+        closeModal();
+        showToast(`Exported ${dataToExport.length} records to JSON!`);
       } else if (format === 'print') {
-        window.print();
+        closeModal();
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          const tableHeaderHtml = selectedColumns.map(c => `<th style="border: 1px solid #cbd5e1; padding: 8px 10px; background: #f8fafc; font-size: 11px; text-align: left; color: #1e293b;">${escapeHtml(c.label)}</th>`).join('');
+          const tableRowsHtml = dataToExport.map((row, idx) => {
+            const cells = selectedColumns.map(c => {
+              let val = row[c.key];
+              if (val === null || val === undefined) val = '-';
+              else if (typeof val === 'boolean') val = val ? 'Yes' : 'No';
+              else if (typeof val === 'object') val = JSON.stringify(val);
+              return `<td style="border: 1px solid #e2e8f0; padding: 7px 10px; font-size: 11px; color: #334155;">${escapeHtml(String(val))}</td>`;
+            }).join('');
+            return `<tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">${cells}</tr>`;
+          }).join('');
+
+          printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>Export Report — ${currentTab.toUpperCase()}</title>
+                <style>
+                  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 24px; color: #0f172a; }
+                  h1 { font-size: 18px; margin: 0 0 4px 0; color: #123b32; font-weight: bold; }
+                  p { font-size: 12px; color: #64748b; margin: 0 0 16px 0; }
+                  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+                  @media print { body { margin: 0; } }
+                </style>
+              </head>
+              <body>
+                <h1>Shazu Soft Technologies — ${currentTab.toUpperCase()} Report</h1>
+                <p>Generated on ${new Date().toLocaleString()} • Total Records: ${dataToExport.length} • Selected Columns: ${selectedColumns.length}</p>
+                <table>
+                  <thead><tr>${tableHeaderHtml}</tr></thead>
+                  <tbody>${tableRowsHtml}</tbody>
+                </table>
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
+          printWindow.focus();
+          setTimeout(() => { printWindow.print(); }, 350);
+        }
       }
     }
+
+    function exportCurrentTab(format) {
+      openExportModal(format);
+    }
+
+    const openExportCustomizerModal = openExportModal;
+    const toggleAllExportColumns = toggleAllExportCols;
+    const resetExportColumnNames = resetExportColNames;
+    window.openExportCustomizerModal = openExportCustomizerModal;
+    window.openExportModal = openExportModal;
+    window.toggleAllExportColumns = toggleAllExportColumns;
+    window.resetExportColumnNames = resetExportColumnNames;
+    window.executeCustomExport = executeCustomExport;
 
     function downloadBlob(blob, filename) {
       const url = window.URL.createObjectURL(blob);
@@ -5377,6 +6118,19 @@
             rec.email,
             `${rec.membership_type} Charter Certification`,
             rec.association_name || 'Shazu Soft Technologies',
+            rec.token_no || ''
+          );
+        }
+      } else if (sourceType === 'internship') {
+        rec = (tableData.internships || []).find(i => i.id === parseInt(sourceId, 10));
+        if (rec) {
+          openIssueCertificateModal(
+            'internship',
+            rec.id,
+            rec.name,
+            rec.email,
+            `Winter Internship Programme in ${rec.domain} (${rec.training_period})`,
+            'Shazu Soft Technologies',
             rec.token_no || ''
           );
         }

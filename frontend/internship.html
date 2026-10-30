@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Performance Preconnect CDNs -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unicons.iconscout.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Winter Internship Programme | Shazu Soft Technologies</title>
+  <meta name="description" content="Apply for the Winter Internship Programme at Shazu Soft Technologies. 1, 2, or 4 week industry practical exposure and certification.">
+  <link rel="canonical" href="https://shazusofttechnologies.org/internship.html">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              white: '#F5F3EC',
+              cardBg: '#FFFFFF',
+              lightGreen: '#E8EFEB',
+              green: '#123B32',
+              secGreen: '#2F5B4E',
+              accent: '#527A68',
+              copper: '#C47D4C',
+              darkText: '#26322E',
+              secText: '#334E43',
+              border: '#D3DDD7',
+              softGreen: '#E8EFEB',
+              hoverGreen: '#2F5B4E'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="js/theme.js"></script>
+  <script src="js/config.js"></script>
+  <link rel="icon" href="img/logo.png" type="image/png">
+
+  <style>
+    /* Technical subtle grid background referencing technical poster feel */
+    .blueprint-grid {
+      background-size: 24px 24px;
+      background-image: 
+        linear-gradient(to right, rgba(18, 59, 50, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(18, 59, 50, 0.04) 1px, transparent 1px);
+    }
+    .dark .blueprint-grid {
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-brand-white dark:bg-[#0b131f] text-brand-darkText dark:text-[#E2E8F0] antialiased min-h-screen flex flex-col blueprint-grid transition-colors duration-200">
+
+  <!-- Mobile Off-Canvas Backdrop -->
+  <div id="mobile-backdrop" class="mobile-drawer-backdrop"></div>
+
+  <!-- Mobile Off-Canvas Navigation Drawer -->
+  <div id="mobile-drawer" class="mobile-drawer fixed top-0 right-0 h-full w-[280px] bg-white dark:bg-[#111c2e] z-[99999] shadow-2xl flex flex-col justify-between border-l border-[#D3DDD7] dark:border-slate-800 transition-transform duration-300 translate-x-full">
+    <div>
+      <div class="p-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-2">
+          <img src="img/logo.png" alt="Shazu Soft Technologies Logo" class="h-8 w-auto">
+          <span class="font-heading font-black text-sm tracking-tight text-[#123B32] dark:text-emerald-400">SHAZU SOFT</span>
+        </a>
+        <button id="mobile-drawer-close" type="button" class="p-1.5 text-[#334E43] dark:text-slate-400 hover:text-[#123B32] text-lg rounded-lg">
+          <i class="uil uil-multiply"></i>
+        </button>
+      </div>
+
+      <nav class="p-3 space-y-1.5 text-xs">
+        <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
+          <i class="uil uil-estate text-base text-[#123B32]"></i>
+          <span>Home</span>
+        </a>
+        <a href="about.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
+          <i class="uil uil-info-circle text-base text-[#123B32]"></i>
+          <span>About Us</span>
+        </a>
+        <a href="internship.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-[#E8EFEB] dark:bg-emerald-950/40 border-l-3 border-[#123B32]">
+          <div class="flex items-center gap-3">
+            <i class="bi bi-mortarboard-fill text-base text-[#123B32] dark:text-emerald-400"></i>
+            <span>Winter Internship</span>
+          </div>
+          <span class="px-2 py-0.5 text-[9px] bg-emerald-700 text-white rounded-full uppercase font-bold">Open</span>
+        </a>
+        <a href="education.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
+          <i class="uil uil-graduation-cap text-base text-[#123B32]"></i>
+          <span>Education Services</span>
+        </a>
+        <a href="events.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
+          <i class="uil uil-calendar-alt text-base text-[#123B32]"></i>
+          <span>Events</span>
+        </a>
+        <a href="gallery.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
+          <i class="bi bi-images text-base text-[#123B32]"></i>
+          <span>Gallery</span>
+        </a>
+        <a href="careers.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB]">
+          <i class="uil uil-briefcase-alt text-base text-[#123B32]"></i>
+          <span>Careers</span>
+        </a>
+        <a href="contact.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB]">
+          <i class="uil uil-envelope text-base text-[#123B32]"></i>
+          <span>Contact Us</span>
+        </a>
+        <a href="track.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30">
+          <i class="bi bi-search text-base"></i>
+          <span>Track Application</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-4 border-t border-[#E2E8F0] dark:border-slate-800 bg-[#E8EFEB] dark:bg-[#0c1626]">
+      <a href="#apply-form" class="flex items-center justify-center gap-2 w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-lg text-xs shadow-xs">
+        <i class="bi bi-send-check"></i> Apply For Winter Internship
+      </a>
+    </div>
+  </div>
+
+  <!-- Announcement Bar (Poster Contact Info) -->
+  <div class="bg-gradient-to-r from-[#123B32] via-[#1c4b40] to-[#123B32] text-white text-[11px] py-2 px-4 shadow-sm border-b border-emerald-900/40">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 font-medium">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-400/30 text-[10px] uppercase tracking-wider">
+          <i class="bi bi-snow2"></i> Applications Open
+        </span>
+        <span class="hidden sm:inline text-slate-200">Shazu Soft Technologies Winter Internship Programme 2026</span>
+      </div>
+      <div class="flex items-center gap-4 text-[11px]">
+        <a href="tel:+919080388211" class="hover:text-emerald-300 transition-colors flex items-center gap-1.5 font-bold">
+          <i class="bi bi-telephone-fill text-emerald-400"></i> +91 90803 88211
+        </a>
+        <span class="hidden md:inline text-emerald-700">•</span>
+        <a href="mailto:info@shazusofttechnologies.org" class="hidden md:flex items-center gap-1.5 hover:text-emerald-300 transition-colors">
+          <i class="bi bi-envelope-fill text-emerald-400"></i> info@shazusofttechnologies.org
+        </a>
+        <a href="track.html" class="px-2.5 py-0.5 bg-white/10 hover:bg-white/20 rounded font-semibold transition-all inline-flex items-center gap-1">
+          <i class="bi bi-search"></i> Track Status
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-[#111c2e]/95 backdrop-blur-md border-b border-[#D3DDD7] dark:border-slate-800 transition-colors duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+      
+      <!-- Logo Branding -->
+      <a href="index.html" class="flex items-center gap-3 shrink-0 group">
+        <img src="img/logo.png" alt="Shazu Soft Technologies Logo" class="h-10 w-auto group-hover:scale-105 transition-transform duration-200">
+        <div>
+          <div class="font-heading font-black text-lg tracking-tight text-[#123B32] dark:text-emerald-400 leading-none">SHAZU</div>
+          <div class="text-[10px] tracking-widest font-semibold text-slate-500 uppercase mt-0.5">SOFT TECHNOLOGIES</div>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden lg:flex items-center space-x-1 font-heading text-xs font-semibold text-[#26322E] dark:text-[#E2E8F0]">
+        <a href="index.html" class="nav-link-pill">Home</a>
+        <a href="about.html" class="nav-link-pill">About Us</a>
+
+        <!-- Services Dropdown -->
+        <div class="relative group">
+          <a href="services.html" class="nav-link-pill flex items-center gap-1">
+            <span>Services</span>
+            <i class="bi bi-chevron-down text-[10px] group-hover:rotate-180 transition-transform"></i>
+          </a>
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[250px]">
+            <div class="nav-dropdown-menu p-1.5 space-y-1 bg-white dark:bg-[#1e293b] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700">
+              <a href="education.html" class="block px-3.5 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200">
+                <span class="font-bold">Education Services</span>
+                <span class="block text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">Hackathons &amp; Mentoring</span>
+              </a>
+              <a href="software.html" target="_blank" rel="noopener noreferrer" class="block px-3.5 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200">
+                <span class="font-bold">Software Services</span>
+                <span class="block text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">Full Stack Development</span>
+              </a>
+              <a href="research.html" class="block px-3.5 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200">
+                <span class="font-bold">Research Services</span>
+                <span class="block text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">Conferences &amp; Papers</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Events Dropdown -->
+        <div class="relative group">
+          <a href="events.html" class="nav-link-pill flex items-center gap-1">
+            <span>Events</span>
+            <i class="bi bi-chevron-down text-[10px] group-hover:rotate-180 transition-transform"></i>
+          </a>
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[250px]">
+            <div class="p-1.5 space-y-1 bg-white dark:bg-[#1e293b] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 text-xs">
+              <a href="internship.html" class="block px-3.5 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-[#123B32] dark:text-emerald-400 font-bold">
+                <div class="flex items-center justify-between">
+                  <span class="flex items-center gap-1.5">
+                    <i class="bi bi-mortarboard-fill text-emerald-600 dark:text-emerald-400"></i> Winter Internship
+                  </span>
+                  <span class="px-1.5 py-0.5 bg-emerald-700 text-white rounded text-[9px] uppercase font-bold">Open</span>
+                </div>
+                <span class="block text-[11px] font-normal text-slate-500 dark:text-slate-400 mt-0.5 pl-5">1, 2 &amp; 4 Week Practical Training</span>
+              </a>
+              <a href="events.html?type=conference" class="block px-3 py-2 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                <i class="bi bi-mortarboard text-amber-500"></i> Conferences &amp; Symposia
+              </a>
+              <a href="events.html?type=hackathon" class="block px-3 py-2 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                <i class="bi bi-trophy text-emerald-500"></i> Hackathons &amp; Contests
+              </a>
+              <a href="events.html?type=courses" class="block px-3 py-2 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                <i class="bi bi-journal-code text-purple-500"></i> Professional Courses
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <a href="gallery.html" class="nav-link-pill">Gallery</a>
+        <a href="careers.html" class="nav-link-pill">Careers</a>
+        <a href="contact.html" class="nav-link-pill">Contact Us</a>
+        <a href="membership.html" class="nav-link-pill">Membership</a>
+      </nav>
+
+      <!-- Action Buttons & Theme Switcher -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Dark/Light Mode Switcher -->
+        <button id="theme-toggle" type="button" class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors" title="Toggle color theme">
+          <i class="bi bi-sun-fill hidden dark:inline text-amber-400"></i>
+          <i class="bi bi-moon-stars-fill dark:hidden text-[#123B32]"></i>
+        </button>
+
+        <a href="#apply-form" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-xl shadow-sm transition-all hover:shadow-md cursor-pointer">
+          <i class="bi bi-pencil-square"></i> Apply Now
+        </a>
+
+        <!-- Mobile Drawer Hamburger -->
+        <button id="mobile-drawer-toggle" type="button" class="lg:hidden p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <i class="bi bi-list text-2xl"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1">
+
+    <!-- ======================================================== -->
+    <!-- HERO SECTION (POSTER REPLICATION & BRAND INTEGRATION)    -->
+    <!-- ======================================================== -->
+    <section class="relative pt-10 pb-16 overflow-hidden">
+      <!-- Ambient Glow Behind Hero -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-emerald-500/10 dark:bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <!-- Institutional Badge Header -->
+        <div class="text-center max-w-3xl mx-auto space-y-3">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 dark:bg-emerald-950/60 border border-emerald-300/80 dark:border-emerald-800/80 text-emerald-900 dark:text-emerald-300 text-xs font-bold shadow-2xs tracking-wide">
+            <i class="bi bi-stars text-amber-600 dark:text-amber-400"></i>
+            <span>EDUCATION • SOFTWARE • RESEARCH</span>
+          </div>
+
+          <!-- Hero Main Title -->
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black font-heading tracking-tight text-[#123B32] dark:text-white leading-[1.1]">
+            WINTER <span class="text-emerald-700 dark:text-emerald-400">INTERNSHIP</span>
+            <div class="mt-2 block">
+              <span class="inline-block bg-[#123B32] text-white px-4 sm:px-6 py-1.5 rounded-2xl transform -skew-x-3 shadow-lg">
+                PROGRAMME
+              </span>
+            </div>
+          </h1>
+
+          <!-- Applications Open Pill -->
+          <div class="pt-2">
+            <span class="inline-block px-4 py-1 bg-emerald-600 text-white font-extrabold uppercase text-xs tracking-widest rounded-lg shadow-sm">
+              Applications Open Now
+            </span>
+          </div>
+
+          <!-- Tagline from Poster -->
+          <p class="text-base sm:text-xl font-semibold text-slate-700 dark:text-slate-300 pt-2">
+            Build Skills. <span class="text-emerald-700 dark:text-emerald-400">Gain Experience.</span> Shape Your Future.
+          </p>
+
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+            A comprehensive, industry-guided winter internship by Shazu Soft Technologies tailored for college and university students to develop real-world engineering competency.
+          </p>
+
+          <!-- Fast Links -->
+          <div class="pt-4 flex flex-wrap justify-center items-center gap-3">
+            <a href="#apply-form" class="px-6 py-3 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-sm font-bold rounded-xl shadow-md transition-all hover:scale-105 inline-flex items-center gap-2 cursor-pointer">
+              <i class="bi bi-file-earmark-check-fill"></i> Register Now
+            </a>
+            <a href="track.html" class="px-5 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all inline-flex items-center gap-2">
+              <i class="bi bi-search text-emerald-600"></i> Track Application
+            </a>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- TWO FLYER HIGHLIGHT CARDS (TRAINING PERIOD & BENEFITS)   -->
+        <!-- ======================================================== -->
+        <div class="mt-14 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
+          
+          <!-- Card 1: TRAINING PERIOD (Exact match to Flyer Left Card) -->
+          <div class="bg-white dark:bg-[#111c2e] rounded-3xl p-6 sm:p-8 border-2 border-emerald-900/10 dark:border-emerald-500/20 shadow-xl relative overflow-hidden transition-all hover:shadow-2xl hover:border-emerald-600/40">
+            <div class="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 flex items-center justify-center text-2xl shadow-inner">
+                <i class="bi bi-calendar-check-fill"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">Flexible Durations</span>
+                <h3 class="text-xl font-bold font-heading text-slate-900 dark:text-white uppercase tracking-tight">Training Period</h3>
+              </div>
+            </div>
+
+            <ul class="space-y-4 mb-8">
+              <li class="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span class="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+                <div>
+                  <strong class="block text-sm font-bold text-slate-900 dark:text-white">1 Week Training</strong>
+                  <span class="text-xs text-slate-500 dark:text-slate-400">Crash project sprint, core tool stack orientation, and fundamental live coding.</span>
+                </div>
+              </li>
+              <li class="flex items-start gap-3 p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60">
+                <span class="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+                <div>
+                  <strong class="block text-sm font-bold text-slate-900 dark:text-white">2 Week Training (Most Popular)</strong>
+                  <span class="text-xs text-slate-500 dark:text-slate-400">Modular implementation, guided code review, unit tests, and feature deployment.</span>
+                </div>
+              </li>
+              <li class="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <span class="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</span>
+                <div>
+                  <strong class="block text-sm font-bold text-slate-900 dark:text-white">4 Week Training</strong>
+                  <span class="text-xs text-slate-500 dark:text-slate-400">Deep-dive enterprise project residency, system architecture, and production readiness.</span>
+                </div>
+              </li>
+            </ul>
+
+            <a href="#apply-form" class="w-full py-3 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-xl text-center block text-xs uppercase tracking-wider shadow-md transition-all">
+              Apply Now <i class="bi bi-arrow-right ml-1"></i>
+            </a>
+          </div>
+
+          <!-- Card 2: WHAT YOU WILL GET ? (Exact match to Flyer Right Card) -->
+          <div class="bg-white dark:bg-[#111c2e] rounded-3xl p-6 sm:p-8 border-2 border-emerald-900/10 dark:border-emerald-500/20 shadow-xl relative overflow-hidden transition-all hover:shadow-2xl hover:border-emerald-600/40">
+            <div class="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 flex items-center justify-center text-2xl shadow-inner">
+                <i class="bi bi-bar-chart-line-fill"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">Programme Perks</span>
+                <h3 class="text-xl font-bold font-heading text-slate-900 dark:text-white uppercase tracking-tight">What You Will Get ?</h3>
+              </div>
+            </div>
+
+            <div class="space-y-5 mb-8">
+              <!-- Practical Exposure -->
+              <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <div class="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 font-bold text-sm mb-1">
+                  <i class="bi bi-laptop text-base"></i>
+                  <span>Practical Exposure</span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300">
+                  <strong>Industry level Practical Exposure</strong> — Work on realistic business workflows, source code repositories, and modern DevOps tools.
+                </p>
+              </div>
+
+              <!-- Certification -->
+              <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <div class="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 font-bold text-sm mb-1">
+                  <i class="bi bi-patch-check-fill text-base"></i>
+                  <span>Certification</span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300">
+                  <strong>Certificate on Successful Completion</strong> — Official verifiable digital credential recognized by institutions with QR validation.
+                </p>
+              </div>
+
+              <!-- Live Mentorship -->
+              <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                <div class="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 font-bold text-sm mb-1">
+                  <i class="bi bi-people-fill text-base"></i>
+                  <span>Direct Mentorship</span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300">
+                  Continuous guidance from experienced software professionals, regular code reviews, and project evaluations.
+                </p>
+              </div>
+            </div>
+
+            <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800/60 text-center">
+              <span class="text-xs font-bold text-emerald-900 dark:text-emerald-300">
+                🎯 Winter Internship Programme • Applications Open
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- INTERNSHIP APPLICATION FORM SECTION                      -->
+    <!-- ======================================================== -->
+    <section id="apply-form" class="py-16 scroll-mt-20">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="bg-white dark:bg-[#111c2e] rounded-3xl border-2 border-emerald-900/15 dark:border-emerald-500/20 shadow-2xl p-6 sm:p-10 relative">
+          
+          <!-- Top Badge Ribbon -->
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8">
+            <div>
+              <span class="text-xs font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">Candidate Registration Dossier</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 dark:text-white">
+                Winter Internship Application Form
+              </h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Fill in your student and academic credentials to register for the Winter Internship Programme.
+              </p>
+            </div>
+            <div class="px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5">
+              <i class="bi bi-shield-check"></i> Verified SST Application
+            </div>
+          </div>
+
+          <!-- Alert Notification Box -->
+          <div id="form-alert" class="hidden mb-6 p-4 rounded-xl text-xs font-semibold flex items-start gap-2.5"></div>
+
+          <!-- Form Element -->
+          <form id="internship-form" onsubmit="submitInternshipForm(event)" class="space-y-8">
+            
+            <!-- SECTION 1: PERSONAL DETAILS -->
+            <div>
+              <div class="flex items-center gap-2 mb-4 text-[#123B32] dark:text-emerald-400 font-heading font-bold text-sm">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs">1</span>
+                <span>Personal &amp; Contact Information</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Name <span class="text-red-500">*</span></label>
+                  <input type="text" id="intern-name" name="name" required placeholder="e.g. John Doe" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address <span class="text-red-500">*</span></label>
+                  <input type="email" id="intern-email" name="email" required placeholder="e.g. student@college.edu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Mobile / WhatsApp Number <span class="text-red-500">*</span></label>
+                  <input type="tel" id="intern-phone" name="phone" required placeholder="e.g. +91 98765 43210" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Gender</label>
+                  <select id="intern-gender" name="gender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all cursor-pointer">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other / Prefer not to say</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2: COLLEGE & ACADEMIC CREDENTIALS -->
+            <div>
+              <div class="flex items-center gap-2 mb-4 text-[#123B32] dark:text-emerald-400 font-heading font-bold text-sm">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs">2</span>
+                <span>College &amp; Academic Credentials</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">College / University / Institution Name <span class="text-red-500">*</span></label>
+                  <input type="text" id="intern-college" name="college_name" required placeholder="e.g. Government Engineering College / Anna University" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Degree &amp; Department <span class="text-red-500">*</span></label>
+                  <input type="text" id="intern-dept" name="degree_department" required placeholder="e.g. B.E Computer Science / B.Tech IT / BCA" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Year of Study <span class="text-red-500">*</span></label>
+                  <select id="intern-year" name="year_of_study" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all cursor-pointer">
+                    <option value="">Select Academic Year</option>
+                    <option value="1st Year">1st Year (UG)</option>
+                    <option value="2nd Year">2nd Year (UG)</option>
+                    <option value="3rd Year">3rd Year (UG)</option>
+                    <option value="Final Year">Final Year (UG)</option>
+                    <option value="Post Graduate (PG)">Post Graduate (PG / Master's)</option>
+                    <option value="Recent Graduate">Recent Graduate</option>
+                  </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Preferred Mode of Training</label>
+                  <select id="intern-mode" name="preferred_mode" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all cursor-pointer">
+                    <option value="Online / Virtual" selected>Online / Virtual (Live Google Meet Sessions)</option>
+                    <option value="Offline / On-Site">Offline / On-Site</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 3: INTERNSHIP PROGRAMME PREFERENCES -->
+            <div>
+              <div class="flex items-center gap-2 mb-4 text-[#123B32] dark:text-emerald-400 font-heading font-bold text-sm">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs">3</span>
+                <span>Internship Domain &amp; Training Duration</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Preferred Domain <span class="text-red-500">*</span></label>
+                  <select id="intern-domain" name="domain" required onchange="handleDomainChange(this.value)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all cursor-pointer">
+                    <option value="">Select Domain</option>
+                    <option value="Full Stack Web Development">Full Stack Web Development</option>
+                    <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
+                    <option value="Data Science & Analytics">Data Science & Analytics</option>
+                    <option value="Python & Cloud Engineering">Python & Cloud Engineering</option>
+                    <option value="Cyber Security & Ethical Hacking">Cyber Security & Ethical Hacking</option>
+                    <option value="Mobile App Development (Flutter/React Native)">Mobile App Development</option>
+                    <option value="Embedded Systems & IoT">Embedded Systems & IoT</option>
+                    <option value="UI/UX Design & Front-End">UI/UX Design & Front-End</option>
+                    <option value="Other">Other (Custom Domain based on Student Requirement)</option>
+                  </select>
+                  <input type="text" id="intern-custom-domain" placeholder="Specify your custom domain..." class="hidden mt-2 w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Training Period Duration <span class="text-red-500">*</span></label>
+                  <select id="intern-duration" name="training_period" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-600 focus:outline-none transition-all cursor-pointer">
+                    <option value="1 Week">1 Week Training (Crash Sprint)</option>
+                    <option value="2 Weeks" selected>2 Weeks Training (Recommended)</option>
+                    <option value="4 Weeks">4 Weeks Training (In-Depth Residency)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- DECLARATION & TERMS -->
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 space-y-2">
+              <label class="flex items-start gap-2.5 cursor-pointer">
+                <input type="checkbox" id="intern-declaration" required class="mt-0.5 rounded text-emerald-700 focus:ring-emerald-600 w-4 h-4 cursor-pointer">
+                <span>
+                  I confirm that the academic details provided are true and accurate. I understand that this Winter Internship Programme involves hands-on practical project tasks and that an official verifiable completion certificate will be awarded upon meeting evaluation benchmarks.
+                </span>
+              </label>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <div class="pt-2">
+              <button type="submit" id="submit-btn" class="w-full py-4 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-sm font-bold rounded-2xl shadow-lg transition-all hover:shadow-xl hover:scale-[1.01] flex items-center justify-center gap-2 cursor-pointer">
+                <i class="bi bi-send-check-fill text-lg"></i>
+                <span id="btn-text">Submit Winter Internship Registration</span>
+              </button>
+              <p class="text-center text-[11px] text-slate-500 mt-2">
+                Upon submission, a unique Reference Token will be issued instantly to track review progress.
+              </p>
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- CONTACT FOOTER BANNER (MATCHING POSTER FOOTER)          -->
+    <!-- ======================================================== -->
+    <section class="py-12 bg-gradient-to-r from-[#123B32] via-[#1c4b40] to-[#123B32] text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          <div class="space-y-1">
+            <span class="text-xs uppercase tracking-widest text-emerald-300 font-bold">Have Questions About the Internship?</span>
+            <h3 class="text-2xl font-bold font-heading">Get in Touch with our Academic Mentors</h3>
+            <p class="text-xs text-slate-300">Shazu Soft Technologies • Empowering Next-Gen Software Leaders</p>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center gap-4">
+            <a href="tel:+919080388211" class="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center gap-2 transition-all">
+              <i class="bi bi-telephone-fill text-emerald-400 text-sm"></i>
+              <span>+91 90803 88211</span>
+            </a>
+            <a href="mailto:info@shazusofttechnologies.org" class="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center gap-2 transition-all">
+              <i class="bi bi-envelope-fill text-emerald-400 text-sm"></i>
+              <span>info@shazusofttechnologies.org</span>
+            </a>
+            <a href="https://shazusofttechnologies.org" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md">
+              <i class="bi bi-globe2 text-sm"></i>
+              <span>shazusofttechnologies.org</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SUCCESS CONFIRMATION MODAL -->
+  <div id="success-modal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#111c2e] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full p-6 sm:p-8 text-center space-y-4 animate-scaleUp">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 mx-auto flex items-center justify-center text-3xl shadow-inner">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+
+      <div>
+        <span class="text-[10px] font-mono uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">Registration Confirmed</span>
+        <h3 class="text-xl sm:text-2xl font-bold font-heading text-slate-900 dark:text-white mt-0.5">
+          Winter Internship Dossier Registered!
+        </h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="success-message">
+          Your application for the Winter Internship Programme has been recorded successfully.
+        </p>
+      </div>
+
+      <!-- Reference Token Box -->
+      <div class="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/40 border-2 border-dashed border-emerald-400 dark:border-emerald-700">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-300">Your Official Reference Token</span>
+        <div class="flex items-center justify-center gap-2 mt-1">
+          <span id="modal-token-display" class="font-mono font-black text-xl sm:text-2xl text-[#123B32] dark:text-emerald-400 tracking-wider">SST-INT-...</span>
+          <button type="button" onclick="copyTokenToClipboard()" class="p-1.5 text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-300" title="Copy Token">
+            <i class="bi bi-clipboard text-base"></i>
+          </button>
+        </div>
+        <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">Keep this token safe to check your application review and track completion status.</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-2 pt-2">
+        <a id="track-btn-link" href="track.html" class="w-full py-3 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <i class="bi bi-search"></i> Track Application Real-Time
+        </a>
+        <button type="button" onclick="closeSuccessModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl transition-all cursor-pointer">
+          Done &amp; Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard SST Footer -->
+  <footer class="bg-[#123B32] text-white pt-12 pb-6 border-t border-emerald-900/60 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-emerald-900/40 text-xs">
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <img src="img/logo.png" alt="Shazu Logo" class="h-8 w-auto">
+            <span class="font-bold text-sm tracking-wide">SHAZU SOFT TECHNOLOGIES</span>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            Delivering cutting-edge solutions across education, enterprise software engineering, and scientific research.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-bold uppercase tracking-wider text-emerald-400 mb-3">Programmes</h4>
+          <ul class="space-y-2 text-slate-300">
+            <li><a href="internship.html" class="text-emerald-300 font-semibold hover:text-white">&bull; Winter Internship Programme</a></li>
+            <li><a href="education.html" class="hover:text-white">&bull; Hackathons &amp; Innovation Contests</a></li>
+            <li><a href="education.html" class="hover:text-white">&bull; Faculty Development Programs</a></li>
+            <li><a href="membership.html" class="hover:text-white">&bull; Professional Memberships</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-bold uppercase tracking-wider text-emerald-400 mb-3">Quick Links</h4>
+          <ul class="space-y-2 text-slate-300">
+            <li><a href="events.html" class="hover:text-white">&bull; Tech Events &amp; Symposia</a></li>
+            <li><a href="track.html" class="hover:text-white">&bull; Track Token Dossier</a></li>
+            <li><a href="careers.html" class="hover:text-white">&bull; Careers &amp; Opportunities</a></li>
+            <li><a href="gallery.html" class="hover:text-white">&bull; MoU Conventions &amp; Gallery</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-bold uppercase tracking-wider text-emerald-400 mb-3">Connect With Us</h4>
+          <ul class="space-y-2 text-slate-300">
+            <li><i class="bi bi-telephone text-emerald-400 mr-1.5"></i> +91 90803 88211</li>
+            <li><i class="bi bi-envelope text-emerald-400 mr-1.5"></i> info@shazusofttechnologies.org</li>
+            <li><i class="bi bi-geo-alt text-emerald-400 mr-1.5"></i> Tamil Nadu, India</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
+        <div>&copy; 2026 Shazu Soft Technologies. All rights reserved.</div>
+        <div class="flex items-center gap-4">
+          <a href="privacy.html" class="hover:text-slate-200">Privacy Policy</a>
+          <a href="terms.html" class="hover:text-slate-200">Terms &amp; Conditions</a>
+          <a href="admin.html" class="hover:text-slate-200">Admin Portal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+
+  <script>
+    function handleDomainChange(val) {
+      const customInput = document.getElementById('intern-custom-domain');
+      if (val === 'Other') {
+        customInput.classList.remove('hidden');
+        customInput.required = true;
+      } else {
+        customInput.classList.add('hidden');
+        customInput.required = false;
+      }
+    }
+
+    async function submitInternshipForm(e) {
+      e.preventDefault();
+      const formAlert = document.getElementById('form-alert');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+
+      formAlert.className = 'hidden';
+
+      // Read form values
+      const name = document.getElementById('intern-name').value.trim();
+      const email = document.getElementById('intern-email').value.trim();
+      const phone = document.getElementById('intern-phone').value.trim();
+      const gender = document.getElementById('intern-gender').value;
+      const college_name = document.getElementById('intern-college').value.trim();
+      const degree_department = document.getElementById('intern-dept').value.trim();
+      const year_of_study = document.getElementById('intern-year').value;
+      const roll_no = '';
+      const preferred_mode = document.getElementById('intern-mode').value;
+      let domain = document.getElementById('intern-domain').value;
+      if (domain === 'Other') {
+        domain = document.getElementById('intern-custom-domain').value.trim() || 'Custom Student Domain';
+      }
+      const training_period = document.getElementById('intern-duration').value;
+
+      if (!name || !email || !phone || !college_name || !domain) {
+        showFormAlert('Please fill out all required fields marked with an asterisk (*).', 'error');
+        return;
+      }
+
+      // Disable button with spinner
+      submitBtn.disabled = true;
+      btnText.innerHTML = '<span class="inline-block animate-spin mr-2"><i class="bi bi-arrow-repeat"></i></span> Registering Your Dossier...';
+
+      const apiBase = window.API_BASE || (window.ENV && window.ENV.API_BASE) || '';
+
+      try {
+        const response = await fetch(`${apiBase}/api/public/internships/apply`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            phone,
+            gender,
+            college_name,
+            degree_department,
+            year_of_study,
+            roll_no,
+            preferred_mode,
+            domain,
+            training_period
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (response.status === 409 && data.token_no) {
+            // Already registered
+            showSuccessModal(data.token_no, data.error);
+            return;
+          }
+          throw new Error(data.error || 'Failed to submit registration. Please try again.');
+        }
+
+        // Success!
+        document.getElementById('internship-form').reset();
+        showSuccessModal(data.token_no, data.message);
+
+      } catch (err) {
+        showFormAlert(err.message || 'An error occurred while submitting your application.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        btnText.innerHTML = 'Submit Winter Internship Registration';
+      }
+    }
+
+    function showFormAlert(message, type) {
+      const alert = document.getElementById('form-alert');
+      alert.className = type === 'error' 
+        ? 'mb-6 p-4 rounded-xl text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-800 dark:bg-rose-950/40 dark:border-rose-800 dark:text-rose-200 flex items-start gap-2.5'
+        : 'mb-6 p-4 rounded-xl text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-200 flex items-start gap-2.5';
+      alert.innerHTML = `<i class="bi ${type === 'error' ? 'bi-exclamation-triangle-fill text-rose-600' : 'bi-check-circle-fill text-emerald-600'} text-base mt-0.5"></i> <span>${message}</span>`;
+      alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function showSuccessModal(token, msg) {
+      document.getElementById('modal-token-display').textContent = token;
+      if (msg) document.getElementById('success-message').textContent = msg;
+      document.getElementById('track-btn-link').href = `track.html?token=${encodeURIComponent(token)}`;
+      document.getElementById('success-modal').classList.remove('hidden');
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('success-modal').classList.add('hidden');
+    }
+
+    function copyTokenToClipboard() {
+      const token = document.getElementById('modal-token-display').textContent;
+      navigator.clipboard.writeText(token).then(() => {
+        alert(`Reference token "${token}" copied to clipboard!`);
+      }).catch(() => {
+        prompt('Copy your token:', token);
+      });
+    }
+  </script>
+</body>
+</html>

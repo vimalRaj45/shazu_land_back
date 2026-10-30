@@ -390,6 +390,7 @@
           <!-- Quick Token Prefix Helpers -->
           <div class="flex flex-wrap items-center justify-center gap-2 pt-3 text-[11px] text-slate-500 dark:text-slate-400">
             <span class="font-bold uppercase tracking-wider text-[10px]">Supported Tokens:</span>
+            <button type="button" onclick="quickFillToken('SST-INT-')" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-300 rounded-md font-mono text-[10px] cursor-pointer transition-colors font-bold">SST-INT-* (Internships)</button>
             <button type="button" onclick="quickFillToken('SST-PASS-')" class="px-2.5 py-1 bg-slate-200/70 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md font-mono text-[10px] cursor-pointer transition-colors">SST-PASS-* (Events)</button>
             <button type="button" onclick="quickFillToken('SST-APP-')" class="px-2.5 py-1 bg-slate-200/70 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md font-mono text-[10px] cursor-pointer transition-colors">SST-APP-* (Careers)</button>
             <button type="button" onclick="quickFillToken('SST-MEM-')" class="px-2.5 py-1 bg-slate-200/70 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md font-mono text-[10px] cursor-pointer transition-colors">SST-MEM-* (Memberships)</button>
@@ -675,7 +676,7 @@
       }, 500);
 
       try {
-        const apiBase = (window.ENV && window.ENV.API_BASE) || window.API_BASE || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? (window.location.port === '5000' ? '' : 'http://localhost:5000') : 'https://shazu-land-back.onrender.com');
+        const apiBase = (window.ENV && window.ENV.API_BASE) || window.API_BASE || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? (window.location.port === '5000' ? '' : 'http://localhost:5000') : 'https://shazu-land-back-wiuk.onrender.com');
         const res = await fetch(`${apiBase}/api/public/track/${encodeURIComponent(token)}`);
         const data = await res.json();
 
