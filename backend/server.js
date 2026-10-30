@@ -2329,6 +2329,16 @@ app.post('/api/public/internships/apply', async (request, reply) => {
     created_at: new Date()
   };
 
+  // Training Fee Structure: 1 week -> ₹500, 2 weeks -> ₹1000, 4 weeks -> ₹1500
+  let applicableFee = '₹1,000';
+  if (cleanDuration.includes('1')) {
+    applicableFee = '₹500';
+  } else if (cleanDuration.includes('4')) {
+    applicableFee = '₹1,500';
+  } else if (cleanDuration.includes('2')) {
+    applicableFee = '₹1,000';
+  }
+
   // Automated Branded Confirmation Email
   const internHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #123B32; border-radius: 16px; padding: 28px; color: #0f172a; background-color: #ffffff;">
@@ -2357,6 +2367,10 @@ app.post('/api/public/internships/apply', async (request, reply) => {
           <td style="padding: 8px 0; color: #0f172a;">${cleanDuration}</td>
         </tr>
         <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 0; color: #64748b;"><strong>Applicable Training Fee:</strong></td>
+          <td style="padding: 8px 0; color: #123B32; font-weight: bold; font-size: 14px;">${applicableFee}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 8px 0; color: #64748b;"><strong>College / Institute:</strong></td>
           <td style="padding: 8px 0; color: #0f172a;">${cleanCollege}</td>
         </tr>
@@ -2365,6 +2379,41 @@ app.post('/api/public/internships/apply', async (request, reply) => {
           <td style="padding: 8px 0; color: #0f172a;">${cleanMode}</td>
         </tr>
       </table>
+
+      <!-- Training Fee Structure Details -->
+      <div style="background-color: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 18px; margin: 22px 0;">
+        <div style="font-size: 13px; font-weight: bold; color: #123B32; margin-bottom: 8px;">
+          💳 Training Fee Structure (Payment Details):
+        </div>
+        <p style="margin: 0 0 12px 0; font-size: 13px; color: #334155; line-height: 1.5;">
+          Please note the training fee to be paid based on the training duration:
+        </p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0;">
+          <thead>
+            <tr style="background-color: #123B32; color: #ffffff; text-align: left;">
+              <th style="padding: 9px 14px; font-size: 12px; text-transform: uppercase;">Training Duration</th>
+              <th style="padding: 9px 14px; font-size: 12px; text-transform: uppercase;">Fee to Pay</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid #f1f5f9; ${cleanDuration.includes('1') ? 'background-color: #ecfdf5; font-weight: bold;' : ''}">
+              <td style="padding: 10px 14px; color: #1e293b;">1 Week Training</td>
+              <td style="padding: 10px 14px; color: #15803d; font-weight: bold;">₹500</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #f1f5f9; ${cleanDuration.includes('2') ? 'background-color: #ecfdf5; font-weight: bold;' : ''}">
+              <td style="padding: 10px 14px; color: #1e293b;">2 Weeks Training</td>
+              <td style="padding: 10px 14px; color: #15803d; font-weight: bold;">₹1,000</td>
+            </tr>
+            <tr style="${cleanDuration.includes('4') ? 'background-color: #ecfdf5; font-weight: bold;' : ''}">
+              <td style="padding: 10px 14px; color: #1e293b;">4 Weeks Training</td>
+              <td style="padding: 10px 14px; color: #15803d; font-weight: bold;">₹1,500</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin: 12px 0 0 0; font-size: 12px; color: #64748b; line-height: 1.5;">
+          * For your selected duration (<strong>${cleanDuration}</strong>), the fee to pay is <strong>${applicableFee}</strong>. Payment verification instructions will be provided by your academic mentor.
+        </p>
+      </div>
 
       <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px; margin: 20px 0;">
         <strong style="color: #166534; font-size: 13px;">What You Will Experience:</strong>
@@ -3169,6 +3218,16 @@ app.put('/api/admin/internships/:id/status', { preValidation: [app.authenticate]
           <span style="font-size: 11px; text-transform: uppercase; color: #166534; font-weight: bold; letter-spacing: 1px;">OFFICIAL INTERNSHIP TOKEN NUMBER</span>
           <div style="font-size: 24px; font-family: monospace; font-weight: bold; color: #15803d; letter-spacing: 2px; margin: 8px 0;">${intern.token_no}</div>
           <span style="font-size: 12px; color: #166534;">Domain: <strong>${intern.domain}</strong> | Duration: <strong>${intern.training_period}</strong></span>
+        </div>
+
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin: 18px 0; font-size: 13px;">
+          <strong style="color: #123B32; display: block; margin-bottom: 6px;">💳 Prescribed Training Fee Structure:</strong>
+          <ul style="margin: 4px 0 8px; padding-left: 18px; color: #334155; line-height: 1.6;">
+            <li><strong>1 Week Training:</strong> ₹500</li>
+            <li><strong>2 Weeks Training:</strong> ₹1,000</li>
+            <li><strong>4 Weeks Training:</strong> ₹1,500</li>
+          </ul>
+          <span style="font-size: 12px; color: #64748b;">Fee to pay corresponds to your approved duration (${intern.training_period}). Payment settlement details will be shared during kickoff.</span>
         </div>
 
         ${admin_notes ? `
