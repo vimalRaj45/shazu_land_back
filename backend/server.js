@@ -2345,16 +2345,52 @@ app.post('/api/public/internships/apply', async (request, reply) => {
       <div style="text-align: center; border-bottom: 2px solid #E8EFEB; padding-bottom: 18px; margin-bottom: 22px;">
         <h2 style="color: #123B32; margin: 0; font-size: 22px; letter-spacing: 0.5px;">SHAZU SOFT TECHNOLOGIES</h2>
         <p style="margin: 4px 0 0; color: #64748b; font-size: 12px; font-weight: bold; letter-spacing: 1px;">EDUCATION • SOFTWARE • RESEARCH</p>
-        <span style="display: inline-block; background-color: #dcfce7; color: #15803d; padding: 6px 16px; border-radius: 99px; font-size: 12px; font-weight: bold; margin-top: 12px;">🎓 WINTER INTERNSHIP REGISTRATION CONFIRMED</span>
+      </div>
+
+      <!-- Top Alert: 30 Free Seats Filled Notice & Amount to Pay -->
+      <div style="background-color: #fff7ed; border: 2px solid #ea580c; border-radius: 14px; padding: 18px 20px; margin-bottom: 22px; text-align: center;">
+        <div style="font-size: 17px; font-weight: 800; color: #c2410c; margin-bottom: 6px;">
+          ⚠️ Oops! Our 30 Free Seats Are Filled!
+        </div>
+        <p style="margin: 0 0 14px 0; font-size: 13.5px; color: #9a3412; line-height: 1.5;">
+          All first 30 free seats have been filled! You can still confirm your seat in the <strong>Winter Internship Programme</strong> by paying the training fee below:
+        </p>
+        
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1.5px solid #fdba74;">
+          <thead>
+            <tr style="background-color: #c2410c; color: #ffffff; text-align: left;">
+              <th style="padding: 10px 14px; font-size: 12px; text-transform: uppercase;">Training Duration</th>
+              <th style="padding: 10px 14px; font-size: 12px; text-transform: uppercase;">Amount to Pay</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid #fed7aa; ${cleanDuration.includes('1') ? 'background-color: #ffedd5; font-weight: bold;' : ''}">
+              <td style="padding: 10px 14px; color: #1e293b;">1 Week</td>
+              <td style="padding: 10px 14px; color: #c2410c; font-weight: bold; font-size: 14px;">₹500</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #fed7aa; ${cleanDuration.includes('2') ? 'background-color: #ffedd5; font-weight: bold;' : ''}">
+              <td style="padding: 10px 14px; color: #1e293b;">2 Weeks</td>
+              <td style="padding: 10px 14px; color: #c2410c; font-weight: bold; font-size: 14px;">₹1,000</td>
+            </tr>
+            <tr style="${cleanDuration.includes('4') ? 'background-color: #ffedd5; font-weight: bold;' : ''}">
+              <td style="padding: 10px 14px; color: #1e293b;">4 Weeks</td>
+              <td style="padding: 10px 14px; color: #c2410c; font-weight: bold; font-size: 14px;">₹1,500</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top: 12px; background-color: #ffedd5; border: 1px solid #f97316; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #9a3412; font-weight: bold;">
+          👉 Amount to pay for your duration (${cleanDuration}): <span style="font-size: 16px; color: #c2410c; font-family: monospace;">${applicableFee}</span>
+        </div>
       </div>
       
       <p style="font-size: 15px; line-height: 1.6;">Dear <strong>${trimmedName}</strong>,</p>
-      <p style="font-size: 14px; color: #334155; line-height: 1.6;">Thank you for registering for the <strong>Winter Internship Programme</strong> at Shazu Soft Technologies! We have successfully registered your application profile.</p>
+      <p style="font-size: 14px; color: #334155; line-height: 1.6;">Thank you for registering for the <strong>Winter Internship Programme</strong> at Shazu Soft Technologies! Your application profile has been registered.</p>
       
       <div style="background-color: #f8fafc; border: 2px dashed #123B32; border-radius: 14px; padding: 20px; text-align: center; margin: 22px 0;">
         <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: bold; letter-spacing: 1px;">Your Official Internship Reference Token:</span>
         <div style="font-size: 24px; font-family: 'Courier New', monospace; font-weight: bold; color: #123B32; letter-spacing: 2px; margin: 8px 0;">${tokenNo}</div>
-        <span style="display: inline-block; background-color: #fef3c7; color: #b45309; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: bold;">Status: Pending Academic Review</span>
+        <span style="display: inline-block; background-color: #fef3c7; color: #b45309; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: bold;">Status: Pending Fee Payment & Verification</span>
       </div>
 
       <table style="width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 13px;">
@@ -2368,7 +2404,7 @@ app.post('/api/public/internships/apply', async (request, reply) => {
         </tr>
         <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 8px 0; color: #64748b;"><strong>Applicable Training Fee:</strong></td>
-          <td style="padding: 8px 0; color: #123B32; font-weight: bold; font-size: 14px;">${applicableFee}</td>
+          <td style="padding: 8px 0; color: #c2410c; font-weight: bold; font-size: 14px;">${applicableFee}</td>
         </tr>
         <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 8px 0; color: #64748b;"><strong>College / Institute:</strong></td>
@@ -2380,39 +2416,10 @@ app.post('/api/public/internships/apply', async (request, reply) => {
         </tr>
       </table>
 
-      <!-- Training Fee Structure Details -->
-      <div style="background-color: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 18px; margin: 22px 0;">
-        <div style="font-size: 13px; font-weight: bold; color: #123B32; margin-bottom: 8px;">
-          💳 Training Fee Structure (Payment Details):
-        </div>
-        <p style="margin: 0 0 12px 0; font-size: 13px; color: #334155; line-height: 1.5;">
-          Please note the training fee to be paid based on the training duration:
-        </p>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0;">
-          <thead>
-            <tr style="background-color: #123B32; color: #ffffff; text-align: left;">
-              <th style="padding: 9px 14px; font-size: 12px; text-transform: uppercase;">Training Duration</th>
-              <th style="padding: 9px 14px; font-size: 12px; text-transform: uppercase;">Fee to Pay</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom: 1px solid #f1f5f9; ${cleanDuration.includes('1') ? 'background-color: #ecfdf5; font-weight: bold;' : ''}">
-              <td style="padding: 10px 14px; color: #1e293b;">1 Week Training</td>
-              <td style="padding: 10px 14px; color: #15803d; font-weight: bold;">₹500</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #f1f5f9; ${cleanDuration.includes('2') ? 'background-color: #ecfdf5; font-weight: bold;' : ''}">
-              <td style="padding: 10px 14px; color: #1e293b;">2 Weeks Training</td>
-              <td style="padding: 10px 14px; color: #15803d; font-weight: bold;">₹1,000</td>
-            </tr>
-            <tr style="${cleanDuration.includes('4') ? 'background-color: #ecfdf5; font-weight: bold;' : ''}">
-              <td style="padding: 10px 14px; color: #1e293b;">4 Weeks Training</td>
-              <td style="padding: 10px 14px; color: #15803d; font-weight: bold;">₹1,500</td>
-            </tr>
-          </tbody>
-        </table>
-        <p style="margin: 12px 0 0 0; font-size: 12px; color: #64748b; line-height: 1.5;">
-          * For your selected duration (<strong>${cleanDuration}</strong>), the fee to pay is <strong>${applicableFee}</strong>. Payment verification instructions will be provided by your academic mentor.
-        </p>
+      <!-- Payment & Onboarding Note -->
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; margin: 20px 0; font-size: 13px; color: #475569;">
+        <strong style="color: #123B32; display: block; margin-bottom: 4px;">💳 Payment Instructions:</strong>
+        Payment settlement instructions and verification link will be shared by your assigned technical mentor coordinator during onboarding. Please retain your reference token for verification.
       </div>
 
       <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px; margin: 20px 0;">
