@@ -1717,6 +1717,7 @@
       const fetchMap = {
         applications: loadApplications,
         registrations: loadRegistrations,
+        internships: loadInternships,
         memberships: loadMemberships,
         leads: loadLeads,
         events: loadEvents,
@@ -1729,296 +1730,6 @@
       }
 
       openRowDetails(tab, recordId);
-    }
-
-    // ==========================================
-    // 🔍 UNIVERSAL RECORD DOSSIER MODAL
-    // ==========================================
-    function openRowDetails(tab, id) {
-      id = parseInt(id, 10);
-      const records = tableData[tab] || [];
-      const rec = records.find(r => r.id === id);
-
-      if (!rec) {
-        showToast(`Record #${id} not found or still syncing...`, 'error');
-        return;
-      }
-
-      if (tab === 'registrations') {
-        showModal(`
-          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-            <div class="flex items-center gap-2">
-              <span class="p-2 bg-emerald-100 text-emerald-800 rounded-xl text-lg"><i class="bi bi-pass-fill"></i></span>
-              <div>
-                <h3 class="text-base font-bold text-slate-900 leading-tight">Event Registration Dossier</h3>
-                <span class="text-xs font-mono font-bold text-emerald-700">${rec.token_no || 'Token Pending'}</span>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-md text-xs font-bold ${rec.payment_status === 'Verified' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : (rec.payment_status === 'Rejected' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800 border border-amber-300')}">${rec.payment_status || 'Pending'}</span>
-          </div>
-
-          <div class="space-y-3 py-2 text-xs">
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Attendee Name</span>
-                <span class="font-bold text-slate-900 text-sm block mt-0.5">${rec.name}</span>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Registered At</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${new Date(rec.registered_at).toLocaleString()}</span>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Email Address</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5 break-all">${rec.email}</span>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone Number</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.phone || '—'}</span>
-              </div>
-            </div>
-
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Target Event</span>
-              <span class="font-black text-slate-900 text-sm block">${rec.event_title}</span>
-              <div class="flex items-center gap-2 pt-1 flex-wrap">
-                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-900 font-mono font-bold text-[11px] rounded">${rec.registration_fee || 'Free'}</span>
-                <span class="text-slate-400">•</span>
-                <span class="text-slate-600 font-mono text-[11px]">Method: ${rec.payment_method || 'Online'}</span>
-                ${rec.transaction_id ? `<span class="text-slate-400">•</span><span class="font-mono font-bold text-emerald-800 text-[11px]">UTR: ${rec.transaction_id}</span>` : ''}
-              </div>
-            </div>
-
-            <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
-              <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">Update Verification Status</span>
-              <div class="flex gap-2 pt-1 flex-wrap">
-                <button onclick="updateRegistrationPaymentStatus(${rec.id}, 'Verified'); closeModal();" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-check-circle-fill"></i> Mark Verified & Email Pass</button>
-                <button onclick="updateRegistrationPaymentStatus(${rec.id}, 'Rejected'); closeModal();" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-x-circle"></i> Reject</button>
-                ${isEventRegistrationEligible(rec) ? `<button onclick="closeModal(); quickProvideCertificate('event', ${rec.id})" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-patch-check-fill"></i> Provide Certificate</button>` : ''}
-              </div>
-            </div>
-          </div>
-
-          <div class="flex justify-between items-center pt-3 border-t border-slate-200">
-            <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'Event Pass Confirmation: ${rec.event_title}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Send Email</button>
-            <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
-          </div>
-        `);
-      } else if (tab === 'internships') {
-        const isApproved = rec.status === 'Approved' || rec.status === 'Shortlisted';
-        const isCompleted = rec.status === 'Completed';
-        const isRejected = rec.status === 'Rejected';
-        showModal(`
-          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-            <div class="flex items-center gap-2">
-              <span class="p-2 bg-emerald-100 text-emerald-800 rounded-xl text-lg"><i class="bi bi-mortarboard-fill"></i></span>
-              <div>
-                <h3 class="text-base font-bold text-slate-900 leading-tight">Internship Candidate Dossier</h3>
-                <span class="text-xs font-mono font-bold text-emerald-700">${rec.token_no || 'Token Pending'}</span>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-md text-xs font-bold ${isApproved ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : (isCompleted ? 'bg-purple-100 text-purple-800 border border-purple-300' : (isRejected ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800 border border-amber-300'))}">${rec.status || 'Pending Review'}</span>
-          </div>
-
-          <div class="space-y-3 py-2 text-xs">
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Student Name</span>
-                <span class="font-bold text-slate-900 text-sm block mt-0.5">${rec.name}</span>
-                <span class="text-[11px] text-slate-500">${rec.gender || 'Not specified'}</span>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Registration Date</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${new Date(rec.created_at).toLocaleString()}</span>
-                <span class="text-[11px] font-mono text-emerald-700">${rec.training_period} • ${rec.preferred_mode || 'Online'}</span>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Email Address</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5 break-all">${rec.email}</span>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone / WhatsApp</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.phone || '—'}</span>
-              </div>
-            </div>
-
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">College & Academic Details</span>
-              <span class="font-black text-slate-900 text-sm block">${rec.college_name}</span>
-              <div class="flex items-center gap-2 pt-1 flex-wrap text-slate-600">
-                <span class="font-semibold text-slate-800">${rec.degree_department || 'Department N/A'}</span>
-                <span>•</span>
-                <span>${rec.year_of_study || 'Year N/A'}</span>
-                ${rec.roll_no ? `<span>•</span><span class="font-mono text-slate-700">Roll: ${rec.roll_no}</span>` : ''}
-              </div>
-            </div>
-
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Chosen Domain & Training Program</span>
-              <div class="flex items-center justify-between flex-wrap gap-2">
-                <span class="font-bold text-emerald-800 text-sm">${rec.domain}</span>
-                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-900 font-bold rounded text-[11px]">${rec.training_period}</span>
-              </div>
-              ${rec.start_date ? `<div class="text-[11px] text-slate-500 pt-1">Preferred Start Date: <strong>${rec.start_date}</strong></div>` : ''}
-              ${rec.notes ? `<div class="p-2 bg-white rounded border border-slate-200 text-slate-700 text-[11px] mt-1 whitespace-pre-line">${rec.notes}</div>` : ''}
-            </div>
-
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Admin Notes & Remarks</span>
-              <textarea id="modal-intern-notes" rows="2" placeholder="Add administrative remarks or onboarding instructions..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-emerald-700">${rec.admin_notes || ''}</textarea>
-            </div>
-
-            <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1">
-              <span class="text-[10px] font-bold text-emerald-900 uppercase tracking-wider block">Update Allocation & Status</span>
-              <div class="flex gap-2 pt-1 flex-wrap">
-                <button onclick="saveInternshipModalStatus(${rec.id}, 'Approved')" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-check-circle-fill"></i> Approve & Send Email</button>
-                <button onclick="saveInternshipModalStatus(${rec.id}, 'In Progress')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-play-circle-fill"></i> In Progress</button>
-                <button onclick="saveInternshipModalStatus(${rec.id}, 'Completed')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-trophy-fill"></i> Mark Completed</button>
-                <button onclick="saveInternshipModalStatus(${rec.id}, 'Rejected')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-x-circle"></i> Reject</button>
-                <button onclick="closeModal(); quickProvideCertificate('internship', ${rec.id})" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"><i class="bi bi-patch-check-fill"></i> Issue Certificate</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex justify-between items-center pt-3 border-t border-slate-200">
-            <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'SST Winter Internship Update: ${rec.domain}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Send Email</button>
-            <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
-          </div>
-        `);
-      } else if (tab === 'applications') {
-        viewApplicationDetailModal(rec.id);
-      } else if (tab === 'memberships') {
-        showModal(`
-          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-            <div class="flex items-center gap-2">
-              <span class="p-2 bg-amber-100 text-amber-800 rounded-xl text-lg"><i class="bi bi-award-fill"></i></span>
-              <div>
-                <h3 class="text-base font-bold text-slate-900 leading-tight">Membership Charter Dossier</h3>
-                <span class="text-xs font-mono font-bold text-amber-700">${rec.token_no || 'Token Pending'}</span>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-md text-xs font-bold ${rec.status === 'Approved' || rec.status === 'Active Member' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300'}">${rec.status || 'Pending'}</span>
-          </div>
-
-          <div class="space-y-2.5 py-2 text-xs">
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Member Full Name</span>
-                <span class="font-bold text-slate-900 text-sm block mt-0.5">${rec.name}</span>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Charter Type</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.membership_type || 'Professional'}</span>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Email & Phone</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5 break-all">${rec.email}</span>
-                <span class="text-slate-500 text-[11px] block mt-0.5">${rec.phone || '—'}</span>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Chapter / Association</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.association_name || 'SST Network'}</span>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Designation</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.present_designation || '—'}</span>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Highest Qualification</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.professional_qualification || '—'}</span>
-              </div>
-            </div>
-
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Organization & Address</span>
-              <span class="font-medium text-slate-800 text-xs block mt-0.5">${rec.organization_name_address || '—'}</span>
-            </div>
-
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Admin Notes & Remarks</span>
-              <textarea id="modal-membership-notes" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800" placeholder="Add administrative remark for candidate...">${rec.admin_notes || ''}</textarea>
-              <div class="flex justify-end pt-1">
-                <button onclick="updateMembershipStatus(${rec.id}, '${rec.status || 'Pending Review'}', document.getElementById('modal-membership-notes').value); closeModal();" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-lg text-xs cursor-pointer">Save Notes</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex justify-between items-center pt-3 border-t border-slate-200">
-            <div class="flex gap-2 flex-wrap">
-              <button onclick="updateMembershipStatus(${rec.id}, 'Approved', document.getElementById('modal-membership-notes').value); closeModal();" class="px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-patch-check"></i> Grant Charter</button>
-              <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'Membership Update: ${rec.membership_type}')" class="px-3 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Email</button>
-              ${isMembershipEligible(rec) ? `<button onclick="closeModal(); quickProvideCertificate('membership', ${rec.id})" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-patch-check-fill"></i> Provide Certificate</button>` : ''}
-            </div>
-            <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
-          </div>
-        `);
-      } else if (tab === 'leads') {
-        showModal(`
-          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-            <div class="flex items-center gap-2">
-              <span class="p-2 bg-blue-100 text-blue-800 rounded-xl text-lg"><i class="bi bi-chat-left-quote-fill"></i></span>
-              <div>
-                <h3 class="text-base font-bold text-slate-900 leading-tight">CRM Lead Inquiry Dossier</h3>
-                <span class="text-xs font-mono font-bold text-blue-700">${rec.token_no || 'Token Pending'}</span>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">${rec.status || 'New Lead'}</span>
-          </div>
-
-          <div class="space-y-3 py-2 text-xs">
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Lead Name</span>
-                <span class="font-bold text-slate-900 text-sm block mt-0.5">${rec.name}</span>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Inquiry Category</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.service_category || 'General'}</span>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Email Address</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5 break-all">${rec.email}</span>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone Number</span>
-                <span class="font-bold text-slate-900 text-xs block mt-0.5">${rec.phone || '—'}</span>
-              </div>
-            </div>
-
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Subject</span>
-              <span class="font-bold text-slate-900 text-xs block">${rec.subject || 'General Inquiry'}</span>
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block pt-1">Inquiry Message</span>
-              <p class="whitespace-pre-line text-slate-800 leading-relaxed font-medium bg-white p-2.5 rounded-lg border border-slate-200">${rec.message || 'No additional text provided.'}</p>
-            </div>
-          </div>
-
-          <div class="flex justify-between items-center pt-3 border-t border-slate-200">
-            <button onclick="openSendEmailModal('${rec.email}', '${rec.name}', 'RE: ${rec.subject || 'Inquiry Follow-up'}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"><i class="bi bi-send"></i> Send Reply via Hostinger</button>
-            <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-xs cursor-pointer">Close</button>
-          </div>
-        `);
-      } else if (tab === 'events') {
-        openEventModal(rec.id);
-      } else if (tab === 'careers') {
-        openCareerModal(rec.id);
-      } else if (tab === 'announcements') {
-        openAnnouncementModal(rec.id);
-      }
     }
 
     // ==========================================
@@ -4677,6 +4388,7 @@
     // UNIVERSAL RECORD DETAILS MODAL
     // ==========================================
     function openRowDetails(tabName, id) {
+      id = parseInt(id, 10);
       const dataList = tableData[tabName] || [];
       const item = dataList.find(x => x.id === id);
       if (!item) {
@@ -4817,6 +4529,123 @@
           <button onclick="openSendEmailModal('${item.email}', '${item.name}', 'Pass Update: ${item.event_title || 'SST Event'}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-envelope-fill"></i> Email Pass</button>
           ${item.payment_status !== 'Verified' ? `<button onclick="updateRegistrationPaymentStatus(${item.id}, 'Verified'); closeModal();" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-check-circle"></i> Verify Payment</button>` : ''}
           <button onclick="confirmDeleteRegistration(${item.id}); closeModal();" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold">Delete Record</button>
+        `;
+      } else if (tabName === 'internships') {
+        const isApproved = item.status === 'Approved' || item.status === 'Shortlisted';
+        const isCompleted = item.status === 'Completed';
+        const isRejected = item.status === 'Rejected';
+        const statusBadgeClass = isApproved 
+          ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+          : (isCompleted ? 'bg-purple-100 text-purple-800 border-purple-300' 
+          : (isRejected ? 'bg-rose-100 text-rose-800 border-rose-300' 
+          : 'bg-amber-100 text-amber-800 border-amber-300'));
+
+        title = `Winter Internship Dossier: ${item.name}`;
+        contentHtml = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <!-- Student & Contact Card -->
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400 font-mono text-[10px] uppercase">Candidate Profile</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${statusBadgeClass}">${item.status || 'Pending Review'}</span>
+              </div>
+              <span class="font-bold text-slate-900 text-sm block pt-0.5">${item.name}</span>
+              <span class="block text-slate-600 font-mono text-[11px]">${item.email}</span>
+              <span class="block text-slate-600 text-[11px]">${item.phone || 'No phone'} ${item.gender ? `• ${item.gender}` : ''}</span>
+              <div class="pt-1.5 flex items-center gap-2 flex-wrap">
+                <span class="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-xs rounded-lg">
+                  <i class="bi bi-mortarboard-fill"></i> ${item.token_no || 'Token Pending'}
+                </span>
+                ${item.certificate_issued ? `<span class="inline-block px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 font-bold text-[10px] rounded"><i class="bi bi-patch-check-fill"></i> Certified</span>` : ''}
+              </div>
+            </div>
+
+            <!-- Program & Timeline Card -->
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span class="block text-slate-400 font-mono text-[10px] uppercase">Domain &amp; Training Details</span>
+              <span class="font-bold text-emerald-900 text-xs block">${item.domain}</span>
+              <div class="flex items-center gap-2 pt-1 flex-wrap">
+                <span class="px-2 py-0.5 rounded font-mono font-bold text-xs bg-emerald-100 text-emerald-900">${item.training_period}</span>
+                <span class="px-2 py-0.5 rounded font-bold text-xs bg-slate-200 text-slate-800">${item.preferred_mode || 'Online'}</span>
+              </div>
+              <div class="text-slate-500 text-[11px] pt-1 space-y-0.5">
+                <div>Preferred Start: <strong class="text-slate-800">${item.start_date || 'Flexible / Immediate'}</strong></div>
+                <div class="font-mono text-[10px] text-slate-400">Registered: ${new Date(item.created_at).toLocaleString()}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Academic & Institutional Details Bento -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+            <h4 class="font-bold text-slate-700 text-xs flex items-center gap-1.5 border-b border-slate-200 pb-1.5">
+              <i class="bi bi-building text-[#123B32]"></i> College &amp; Academic Credentials
+            </h4>
+            <div class="grid grid-cols-2 gap-3 text-[11.5px]">
+              <div class="col-span-2 sm:col-span-1">
+                <span class="text-slate-400 block text-[10px] uppercase font-mono">College / University:</span>
+                <span class="font-bold text-slate-900">${item.college_name || 'N/A'}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-mono">Degree &amp; Department:</span>
+                <span class="font-semibold text-slate-800">${item.degree_department || 'N/A'}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-mono">Year of Study:</span>
+                <span class="font-semibold text-slate-800">${item.year_of_study || 'N/A'}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-mono">Roll No / Student ID:</span>
+                <span class="font-mono font-semibold text-slate-800">${item.roll_no || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+
+          ${item.notes ? `
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+              <span class="block text-slate-500 font-bold mb-1">Student Notes &amp; Objectives:</span>
+              <p class="whitespace-pre-line text-slate-700 leading-relaxed">${item.notes}</p>
+            </div>
+          ` : ''}
+
+          <!-- Quick Status Actions -->
+          <div class="p-3.5 bg-emerald-50/60 rounded-xl border border-emerald-200 text-xs space-y-2">
+            <span class="font-bold text-emerald-950 text-xs flex items-center gap-1.5">
+              <i class="bi bi-sliders2 text-emerald-700"></i> Update Application Status &amp; Onboarding
+            </span>
+            <div class="flex gap-2 flex-wrap">
+              <button onclick="updateInternshipStatus(${item.id}, 'Approved'); closeModal();" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs inline-flex items-center gap-1">
+                <i class="bi bi-check-circle-fill"></i> Approve &amp; Dispatch Offer Email
+              </button>
+              <button onclick="updateInternshipStatus(${item.id}, 'Shortlisted'); closeModal();" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs inline-flex items-center gap-1">
+                <i class="bi bi-bookmark-star-fill"></i> Shortlist
+              </button>
+              <button onclick="updateInternshipStatus(${item.id}, 'In Progress'); closeModal();" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs inline-flex items-center gap-1">
+                <i class="bi bi-play-circle-fill"></i> In Progress
+              </button>
+              <button onclick="updateInternshipStatus(${item.id}, 'Completed'); closeModal();" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs inline-flex items-center gap-1">
+                <i class="bi bi-trophy-fill"></i> Mark Completed
+              </button>
+              <button onclick="updateInternshipStatus(${item.id}, 'Rejected'); closeModal();" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs inline-flex items-center gap-1">
+                <i class="bi bi-x-circle"></i> Reject
+              </button>
+            </div>
+          </div>
+
+          <!-- Admin Remarks -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+            <label class="block text-slate-700 font-bold flex items-center gap-1.5">
+              <i class="bi bi-pencil-square text-[#123B32]"></i> Admin Remarks &amp; Internal Notes (Candidate can view via Token)
+            </label>
+            <textarea id="modal-admin-notes-${item.id}" rows="2" placeholder="e.g. Mentor assigned: Dr. Ramesh. Orientation link dispatched..." class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#123B32]">${item.admin_notes || ''}</textarea>
+            <div class="flex justify-end">
+              <button onclick="saveRowNotes('internships', ${item.id})" class="px-3 py-1.5 bg-[#123B32] hover:bg-[#1A4B40] text-white rounded-lg text-xs font-bold cursor-pointer">Save Remarks</button>
+            </div>
+          </div>
+        `;
+        actionsHtml = `
+          <button onclick="openSendEmailModal('${item.email}', '${item.name}', 'SST Winter Internship Update: ${item.domain}')" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-envelope-fill"></i> Send Email</button>
+          <button onclick="closeModal(); quickProvideCertificate('internship', ${item.id})" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-patch-check-fill"></i> ${item.certificate_issued ? 'Re-Issue Cert' : 'Issue Certificate'}</button>
+          <button onclick="confirmDeleteInternship(${item.id}); closeModal();" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold">Delete Application</button>
         `;
       } else if (tabName === 'events') {
         title = `Event Details: ${item.title}`;
@@ -5169,6 +4998,10 @@
           endpoint = `${API_BASE}/api/admin/memberships/${id}/status`;
           const item = tableData.memberships.find(x => x.id === id);
           body.status = item ? item.status : 'Pending Review';
+        } else if (tab === 'internships') {
+          endpoint = `${API_BASE}/api/admin/internships/${id}/status`;
+          const item = (tableData.internships || []).find(x => x.id === id);
+          body.status = item ? item.status : 'Pending Review';
         }
 
         if (!endpoint) return;
@@ -5186,6 +5019,7 @@
         const item = (tableData[tab] || []).find(x => x.id === id);
         if (item) item.admin_notes = notes;
 
+        if (tab === 'internships') loadInternships();
         renderCurrentTabFiltered();
       } catch (err) {
         showToast(err.message, 'error');
@@ -5198,6 +5032,7 @@
     function renderCurrentTabFiltered() {
       if (currentTab === 'leads') renderLeadsTable();
       else if (currentTab === 'registrations') renderRegistrationsTable();
+      else if (currentTab === 'internships') renderInternshipsTable();
       else if (currentTab === 'events') renderEventsTable();
       else if (currentTab === 'careers') renderCareersTable();
       else if (currentTab === 'applications') renderApplicationsTable();
