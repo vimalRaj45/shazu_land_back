@@ -104,102 +104,110 @@
     }
   </style>
 </head>
-<body class="bg-brand-white dark:bg-[#0b131f] text-brand-darkText dark:text-[#E2E8F0] antialiased min-h-screen flex flex-col blueprint-grid transition-colors duration-200">
+<body class="bg-brand-white text-brand-darkText antialiased min-h-screen flex flex-col blueprint-grid">
 
   <!-- Mobile Off-Canvas Backdrop -->
   <div id="mobile-backdrop" class="mobile-drawer-backdrop"></div>
 
-  <!-- Mobile Off-Canvas Navigation Drawer -->
-  <div id="mobile-drawer" class="mobile-drawer fixed top-0 right-0 h-full w-[280px] bg-white dark:bg-[#111c2e] z-[99999] shadow-2xl flex flex-col justify-between border-l border-[#D3DDD7] dark:border-slate-800 transition-transform duration-300 translate-x-full">
-    <div>
-      <div class="p-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between">
-        <a href="index.html" class="flex items-center gap-2">
-          <img src="img/logo.png" alt="Shazu Soft Technologies Logo" class="h-8 w-auto">
-          <span class="font-heading font-black text-sm tracking-tight text-[#123B32] dark:text-emerald-400">SHAZU SOFT</span>
+  <!-- Mobile Side Navigation Drawer -->
+  <aside id="mobile-menu" class="mobile-drawer-content font-heading text-[#0F172A]">
+    <div class="flex-1 overflow-y-auto">
+      <div class="p-4 border-b border-[#E2E8F0] flex items-center justify-between bg-white">
+        <a href="index.html" class="flex items-center space-x-2.5">
+          <img loading="lazy" decoding="async" src="img/logo.png" alt="SST Logo" class="h-10 w-auto">
+          <div class="brand-text-container">
+            <span class="brand-title-text text-sm">SHAZU SOFT</span>
+            <span class="brand-sub-text"><span>T</span><span>E</span><span>C</span><span>H</span><span>N</span><span>O</span><span>L</span><span>O</span><span>G</span><span>I</span><span>E</span><span>S</span></span>
+          </div>
         </a>
-        <button id="mobile-drawer-close" type="button" class="p-1.5 text-[#334E43] dark:text-slate-400 hover:text-[#123B32] text-lg rounded-lg">
-          <i class="uil uil-multiply"></i>
+        <button id="mobile-close-btn" class="w-8 h-8 rounded-full bg-[#E8EFEB] hover:bg-[#E8EFEB] text-[#64748B] hover:text-[#123B32] flex items-center justify-center transition-colors cursor-pointer" aria-label="Close Navigation Menu">
+          <i class="bi bi-x-lg text-xs pointer-events-none"></i>
         </button>
       </div>
 
       <nav class="p-3 space-y-1.5 text-xs">
-        <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
+        <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <i class="uil uil-estate text-base text-[#123B32]"></i>
           <span>Home</span>
         </a>
-        <a href="about.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
+        <a href="about.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <i class="uil uil-info-circle text-base text-[#123B32]"></i>
           <span>About Us</span>
         </a>
-        <a href="internship.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-[#E8EFEB] dark:bg-emerald-950/40 border-l-3 border-[#123B32]">
-          <div class="flex items-center gap-3">
-            <i class="bi bi-mortarboard-fill text-base text-[#123B32] dark:text-emerald-400"></i>
-            <span>Winter Internship</span>
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="uil uil-setting text-base text-[#123B32]"></i>
+              <span>Services</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
+          </button>
+          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 ml-4">
+            <a href="education.html" class="block py-1 text-xs text-[#64748B] hover:text-[#123B32]">Education Services</a>
+            <a href="software.html" target="_blank" rel="noopener noreferrer" class="block py-1 text-xs text-[#64748B] hover:text-[#123B32]">Software Services</a>
+            <a href="research.html" class="block py-1 text-xs text-[#64748B] hover:text-[#123B32]">Research Services</a>
           </div>
-          <span class="px-2 py-0.5 text-[9px] bg-emerald-700 text-white rounded-full uppercase font-bold">Open</span>
-        </a>
-        <a href="education.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
-          <i class="uil uil-graduation-cap text-base text-[#123B32]"></i>
-          <span>Education Services</span>
-        </a>
-        <a href="events.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
-          <i class="uil uil-calendar-alt text-base text-[#123B32]"></i>
-          <span>Events</span>
-        </a>
-        <a href="gallery.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b]">
+        </div>
+
+        <!-- Events Accordion -->
+        <div class="mobile-accordion space-y-1">
+          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-[#E8EFEB] border-l-3 border-[#123B32] transition-all cursor-pointer">
+            <div class="flex items-center gap-3">
+              <i class="bi bi-mortarboard-fill text-base text-[#123B32]"></i>
+              <span>Events &amp; Internships</span>
+            </div>
+            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow rotate-180"></i>
+          </button>
+          <div class="mobile-accordion-menu pl-9 space-y-1.5 pt-1 border-l border-slate-100 ml-4">
+            <a href="internship.html" class="block py-1 text-xs text-[#123B32] font-bold flex items-center gap-1.5">
+              <i class="bi bi-mortarboard-fill text-emerald-600 text-[10px]"></i> Winter Internship Programme
+            </a>
+            <a href="events.html?type=conference" class="block py-1 text-xs text-[#64748B] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-mortarboard text-amber-500 text-[10px]"></i> Conferences &amp; Symposia
+            </a>
+            <a href="events.html?type=hackathon" class="block py-1 text-xs text-[#64748B] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-trophy text-emerald-500 text-[10px]"></i> Hackathons &amp; Contests
+            </a>
+            <a href="events.html?type=courses" class="block py-1 text-xs text-[#64748B] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-journal-code text-purple-500 text-[10px]"></i> Professional Courses
+            </a>
+          </div>
+        </div>
+
+        <a href="gallery.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <i class="bi bi-images text-base text-[#123B32]"></i>
           <span>Gallery</span>
         </a>
-        <a href="careers.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB]">
+        <a href="careers.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <i class="uil uil-briefcase-alt text-base text-[#123B32]"></i>
           <span>Careers</span>
         </a>
-        <a href="contact.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB]">
+        <a href="contact.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <i class="uil uil-envelope text-base text-[#123B32]"></i>
           <span>Contact Us</span>
         </a>
-        <a href="track.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30">
+        <a href="track.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-emerald-800 bg-emerald-50">
           <i class="bi bi-search text-base"></i>
           <span>Track Application</span>
+        </a>
+        <a href="membership.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <i class="bi bi-award text-base text-[#123B32]"></i>
+          <span>Membership</span>
         </a>
       </nav>
     </div>
 
     <!-- Drawer Footer -->
-    <div class="p-4 border-t border-[#E2E8F0] dark:border-slate-800 bg-[#E8EFEB] dark:bg-[#0c1626]">
-      <a href="#apply-form" class="flex items-center justify-center gap-2 w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-lg text-xs shadow-xs">
+    <div class="p-4 border-t border-[#E2E8F0] bg-[#E8EFEB]">
+      <a href="#apply-form" onclick="window.closeMobileDrawer()" class="flex items-center justify-center gap-2 w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-lg text-xs shadow-xs">
         <i class="bi bi-send-check"></i> Apply For Winter Internship
       </a>
     </div>
-  </div>
-
-  <!-- Announcement Bar (Poster Contact Info) -->
-  <div class="bg-gradient-to-r from-[#123B32] via-[#1c4b40] to-[#123B32] text-white text-[11px] py-2 px-4 shadow-sm border-b border-emerald-900/40">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 font-medium">
-      <div class="flex items-center gap-2">
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-400/30 text-[10px] uppercase tracking-wider">
-          <i class="bi bi-snow2"></i> Applications Open
-        </span>
-        <span class="hidden sm:inline text-slate-200">Shazu Soft Technologies Winter Internship Programme 2026</span>
-      </div>
-      <div class="flex items-center gap-4 text-[11px]">
-        <a href="tel:+919080388211" class="hover:text-emerald-300 transition-colors flex items-center gap-1.5 font-bold">
-          <i class="bi bi-telephone-fill text-emerald-400"></i> +91 90803 88211
-        </a>
-        <span class="hidden md:inline text-emerald-700">•</span>
-        <a href="mailto:info@shazusofttechnologies.org" class="hidden md:flex items-center gap-1.5 hover:text-emerald-300 transition-colors">
-          <i class="bi bi-envelope-fill text-emerald-400"></i> info@shazusofttechnologies.org
-        </a>
-        <a href="track.html" class="px-2.5 py-0.5 bg-white/10 hover:bg-white/20 rounded font-semibold transition-all inline-flex items-center gap-1">
-          <i class="bi bi-search"></i> Track Status
-        </a>
-      </div>
-    </div>
-  </div>
+  </aside>
 
   <!-- Top Sticky Navigation Bar -->
-  <header class="sticky top-0 z-40 bg-white/95 dark:bg-[#111c2e]/95 backdrop-blur-md border-b border-[#D3DDD7] dark:border-slate-800 transition-colors duration-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#D3DDD7] transition-colors duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[4rem] py-2.5 flex items-center justify-between gap-4">
       
       <!-- Logo Branding -->
       <a href="index.html" class="flex items-center gap-3 shrink-0 group">
@@ -275,21 +283,18 @@
         <a href="membership.html" class="nav-link-pill">Membership</a>
       </nav>
 
-      <!-- Action Buttons & Theme Switcher -->
+      <!-- Action Buttons -->
       <div class="flex items-center gap-2 sm:gap-3">
-        <!-- Dark/Light Mode Switcher -->
-        <button id="theme-toggle" type="button" class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors" title="Toggle color theme">
-          <i class="bi bi-sun-fill hidden dark:inline text-amber-400"></i>
-          <i class="bi bi-moon-stars-fill dark:hidden text-[#123B32]"></i>
-        </button>
 
         <a href="#apply-form" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-xl shadow-sm transition-all hover:shadow-md cursor-pointer">
           <i class="bi bi-pencil-square"></i> Apply Now
         </a>
 
         <!-- Mobile Drawer Hamburger -->
-        <button id="mobile-drawer-toggle" type="button" class="lg:hidden p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-          <i class="bi bi-list text-2xl"></i>
+        <button id="mobile-menu-btn" class="lg:hidden p-2 text-[#0F172A] hover:text-[#123B32] focus:outline-none cursor-pointer relative z-40 flex flex-col justify-center items-center w-10 h-10 space-y-1.5" aria-label="Toggle Navigation Menu">
+          <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+          <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+          <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
         </button>
       </div>
     </div>
@@ -325,10 +330,16 @@
           </h1>
 
           <!-- Applications Open Pill -->
-          <div class="pt-2">
+          <div class="pt-2 flex flex-col items-center gap-2.5">
             <span class="inline-block px-4 py-1 bg-emerald-600 text-white font-extrabold uppercase text-xs tracking-widest rounded-lg shadow-sm">
               Applications Open Now
             </span>
+            <!-- Special Offer Banner: First 30 Members Free (Only on internship.html) -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-gradient-to-r from-amber-500/15 via-emerald-500/15 to-amber-500/15 border border-amber-400/50 text-emerald-950 font-extrabold text-xs sm:text-sm shadow-xs">
+              <span class="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[10px] font-black uppercase tracking-wider">Special Offer</span>
+              <i class="bi bi-gift-fill text-amber-600 text-sm"></i>
+              <span>Free for First 30 Members • Limited Seats</span>
+            </div>
           </div>
 
           <!-- Tagline from Poster -->
@@ -465,34 +476,22 @@
         <div class="bg-white dark:bg-[#111c2e] rounded-3xl border-2 border-emerald-900/15 dark:border-emerald-500/20 shadow-2xl p-6 sm:p-10 relative">
           
           <!-- Top Badge Ribbon -->
-          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-8">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8">
             <div>
               <div class="flex items-center gap-2.5 mb-2 flex-wrap">
-                <span class="text-xs font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">Candidate Registration Dossier</span>
-                
-                <!-- Blinking & Shaking Free Intern Pill -->
-                <span class="pill-free-intern px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-md border-2 border-emerald-300 dark:border-emerald-400">
-                  <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
-                  </span>
-                  <i class="bi bi-gift-fill text-amber-300"></i>
-                  <span>100% Free Internship</span>
-                </span>
+                <span class="text-xs font-mono font-bold uppercase text-emerald-700 tracking-wider">Candidate Registration Dossier</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Open For All Students</span>
               </div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 dark:text-white">
+              <h2 class="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900">
                 Winter Internship Application Form
               </h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p class="text-xs text-slate-500 mt-1">
                 Fill in your student and academic credentials to register for the Winter Internship Programme.
               </p>
             </div>
             <div class="flex items-center gap-2.5 flex-wrap">
-              <span class="pill-free-intern px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-md border border-amber-300">
-                <i class="bi bi-lightning-charge-fill text-slate-950"></i> Free Intern • No Fees
-              </span>
-              <div class="px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5">
-                <i class="bi bi-shield-check"></i> Verified SST Application
+              <div class="px-3.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                <i class="bi bi-shield-check text-emerald-600"></i> Verified SST Application
               </div>
             </div>
           </div>
@@ -629,7 +628,7 @@
             <div class="pt-2">
               <button type="submit" id="submit-btn" class="w-full py-4 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-sm font-bold rounded-2xl shadow-lg transition-all hover:shadow-xl hover:scale-[1.01] flex items-center justify-center gap-2 cursor-pointer">
                 <i class="bi bi-send-check-fill text-lg"></i>
-                <span id="btn-text">Submit Free Winter Internship Registration (100% Free)</span>
+                <span id="btn-text">Submit Winter Internship Registration</span>
               </button>
               <p class="text-center text-[11px] text-slate-500 mt-2">
                 Upon submission, a unique Reference Token will be issued instantly to track review progress.
@@ -893,6 +892,18 @@
         prompt('Copy your token:', token);
       });
     }
+  </script>
+
+  <!-- Fallback Navbar Controller for Internship Page -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('mobile-menu-btn');
+      const closeBtn = document.getElementById('mobile-close-btn');
+      const backdrop = document.getElementById('mobile-backdrop');
+      if (btn) btn.addEventListener('click', (e) => { if (window.toggleMobileDrawer) window.toggleMobileDrawer(e); });
+      if (closeBtn) closeBtn.addEventListener('click', (e) => { if (window.closeMobileDrawer) window.closeMobileDrawer(e); });
+      if (backdrop) backdrop.addEventListener('click', (e) => { if (window.closeMobileDrawer) window.closeMobileDrawer(e); });
+    });
   </script>
 </body>
 </html>

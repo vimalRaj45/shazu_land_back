@@ -466,28 +466,12 @@ async function runFullPlaywrightSuite() {
       await page.waitForTimeout(200);
     });
 
-    console.log('\n--- 10. THEME SWITCHER (DARK & LIGHT MODE) ---');
+    console.log('\n--- 10. LIGHT THEME ENFORCEMENT (NO THEME CHANGE) ---');
 
-    await test('Theme Switcher toggles dark class on HTML root element', async () => {
+    await test('Light theme is strictly enforced on HTML root element without toggle', async () => {
       await page.goto(`${BASE_URL}/index.html`, { waitUntil: 'domcontentloaded' });
-      
-      // Toggle to Dark Mode
-      await page.evaluate(() => {
-        const toggle = document.querySelector('.theme-toggle-input');
-        if (toggle) toggle.click();
-      });
-      await page.waitForTimeout(200);
-      const isDark = await page.evaluate(() => document.documentElement.classList.contains('dark'));
-      assert(isDark, 'HTML root should contain "dark" class');
-
-      // Toggle back to Light Mode
-      await page.evaluate(() => {
-        const toggle = document.querySelector('.theme-toggle-input');
-        if (toggle) toggle.click();
-      });
-      await page.waitForTimeout(200);
       const isLight = await page.evaluate(() => !document.documentElement.classList.contains('dark'));
-      assert(isLight, 'HTML root should revert to light mode');
+      assert(isLight, 'HTML root should remain strictly in light mode');
     });
 
     console.log('\n--- 11. ADMIN PANEL INTERFACE & EVENT MODAL CONTROLS (admin.html) ---');
@@ -589,6 +573,44 @@ async function runFullPlaywrightSuite() {
         if (btn) btn.click();
       });
       await page.waitForTimeout(200);
+    });
+
+    await test('internship.html: Mobile drawer operates properly and special offer shows outside form', async () => {
+      await page.setViewportSize({ width: 375, height: 667 });
+      await page.goto(`${BASE_URL}/internship.html`, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(300);
+
+      // Verify hamburger button is visible on mobile
+      const btn = page.locator('#mobile-menu-btn');
+      assert(await btn.isVisible(), 'Mobile menu button should be visible on internship.html');
+
+      // Click to open mobile drawer
+      await page.evaluate(() => {
+        const b = document.getElementById('mobile-menu-btn');
+        if (b) b.click();
+      });
+      await page.waitForTimeout(300);
+
+      const isDrawerOpen = await page.evaluate(() => {
+        const menu = document.getElementById('mobile-menu');
+        return menu && (menu.classList.contains('active') || menu.classList.contains('open'));
+      });
+      assert(isDrawerOpen, 'Mobile menu drawer on internship.html should open');
+
+      // Close mobile drawer
+      await page.evaluate(() => {
+        const closeBtn = document.getElementById('mobile-close-btn');
+        if (closeBtn) closeBtn.click();
+      });
+      await page.waitForTimeout(200);
+
+      // Verify First 30 Members Free message is present on internship.html
+      const pageContent = await page.content();
+      assert(pageContent.includes('First 30 Members Free') || pageContent.includes('Free for First 30 Members'), 'Special message should show on internship.html');
+
+      // Verify form does NOT contain 'just for first 30 members free'
+      const formText = await page.locator('#internship-form').innerText();
+      assert(!formText.toLowerCase().includes('30 members'), 'Form should not mention 30 members free');
     });
 
     await test('Mobile Viewport (375x667): 3-Tier Filter Command Deck adapts and functions', async () => {

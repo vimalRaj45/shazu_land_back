@@ -6,7 +6,7 @@
 (function () {
   var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   var defaultApiBase = isLocal
-    ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
+    ? (window.location.port === '5000' || window.location.port === '8089' ? '' : 'http://localhost:5000')
     : 'https://shazu-land-back-wiuk.onrender.com';
 
   window.ENV = window.ENV || {

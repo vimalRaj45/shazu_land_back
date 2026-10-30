@@ -2,26 +2,24 @@
 // Shazu Soft Technologies - Core Engine & Seamless SPA Page Router
 // ==========================================================================
 
-// Global Mobile Drawer Controller
+// Global Mobile Drawer Controller (Universal for all pages including internship.html)
 window.toggleMobileDrawer = function (e) {
-  if (e) {
+  if (e && e.preventDefault) {
     e.preventDefault();
     e.stopPropagation();
   }
-  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenu = document.getElementById('mobile-menu') || document.getElementById('mobile-drawer');
   const mobileBackdrop = document.getElementById('mobile-backdrop');
-  const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn');
+  const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn') || document.getElementById('mobile-drawer-toggle');
 
-  if (mobileMenu && mobileBackdrop) {
-    const isActive = mobileMenu.classList.contains('active');
+  if (mobileMenu) {
+    const isActive = mobileMenu.classList.contains('active') || !mobileMenu.classList.contains('translate-x-full');
     if (isActive) {
-      mobileMenu.classList.remove('active');
-      mobileBackdrop.classList.remove('active');
-      if (menuBtn) menuBtn.classList.remove('open');
-      document.body.style.overflow = '';
+      window.closeMobileDrawer(e);
     } else {
       mobileMenu.classList.add('active');
-      mobileBackdrop.classList.add('active');
+      mobileMenu.classList.remove('translate-x-full');
+      if (mobileBackdrop) mobileBackdrop.classList.add('active');
       if (menuBtn) menuBtn.classList.add('open');
       document.body.style.overflow = 'hidden';
     }
@@ -32,10 +30,13 @@ window.closeMobileDrawer = function (e) {
   if (e && e.stopPropagation) {
     e.stopPropagation();
   }
-  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenu = document.getElementById('mobile-menu') || document.getElementById('mobile-drawer');
   const mobileBackdrop = document.getElementById('mobile-backdrop');
-  const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn');
-  if (mobileMenu) mobileMenu.classList.remove('active');
+  const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn') || document.getElementById('mobile-drawer-toggle');
+  if (mobileMenu) {
+    mobileMenu.classList.remove('active');
+    mobileMenu.classList.add('translate-x-full');
+  }
   if (mobileBackdrop) mobileBackdrop.classList.remove('active');
   if (menuBtn) menuBtn.classList.remove('open');
   document.body.style.overflow = '';
