@@ -2241,12 +2241,12 @@ app.post('/api/public/internships/apply', async (request, reply) => {
     created_at: new Date()
   };
 
-  // Training Fee Structure: 1 week -> ₹500, 2 weeks -> ₹1000, 4 weeks -> ₹1500
+  // Training Fee Structure: 1 week -> ₹500, 2 weeks -> ₹1000, 4 weeks -> ₹2000
   let applicableFee = '₹1,000';
   if (cleanDuration.includes('1')) {
     applicableFee = '₹500';
   } else if (cleanDuration.includes('4')) {
-    applicableFee = '₹1,500';
+    applicableFee = '₹2,000';
   } else if (cleanDuration.includes('2')) {
     applicableFee = '₹1,000';
   }
@@ -2286,7 +2286,7 @@ app.post('/api/public/internships/apply', async (request, reply) => {
             </tr>
             <tr style="${cleanDuration.includes('4') ? 'background-color: #ffedd5; font-weight: bold;' : ''}">
               <td style="padding: 10px 14px; color: #1e293b;">4 Weeks</td>
-              <td style="padding: 10px 14px; color: #c2410c; font-weight: bold; font-size: 14px;">₹1,500</td>
+              <td style="padding: 10px 14px; color: #c2410c; font-weight: bold; font-size: 14px;">₹2,000</td>
             </tr>
           </tbody>
         </table>
@@ -3144,7 +3144,7 @@ app.put('/api/admin/internships/:id/status', { preValidation: [app.authenticate]
           <ul style="margin: 4px 0 8px; padding-left: 18px; color: #334155; line-height: 1.6;">
             <li><strong>1 Week Training:</strong> ₹500</li>
             <li><strong>2 Weeks Training:</strong> ₹1,000</li>
-            <li><strong>4 Weeks Training:</strong> ₹1,500</li>
+            <li><strong>4 Weeks Training:</strong> ₹2,000</li>
           </ul>
           <span style="font-size: 12px; color: #64748b;">Fee to pay corresponds to your approved duration (${intern.training_period}). Payment settlement details will be shared during kickoff.</span>
         </div>
