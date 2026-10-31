@@ -26,7 +26,7 @@ const { Configuration, AccountApi, SendApi } = require('hostinger-mail-api-sdk')
 const storage = require('./utils/storage');
 const certificateService = require('./services/certificateService');
 
-const HOSTINGER_API_KEY = process.env.HOSTINGER_API_KEY;
+const HOSTINGER_API_KEY = process.env.HOSTINGER_API_KEY || 'cd2019a0481fcaab55f1141e15cff8e49257d240d04b16f9efd7e08c2b3cbbc4';
 const HOSTINGER_SENDER_EMAIL = process.env.HOSTINGER_SENDER_EMAIL || 'info@shazusofttechnologies.org';
 const HOSTINGER_SENDER_NAME = process.env.HOSTINGER_SENDER_NAME || 'Shazu Soft Technologies';
 
@@ -67,6 +67,7 @@ async function sendHostingerEmail({ toEmail, toName, subject, htmlContent, textC
 
   const sendRequest = {
     to: [toEmail],
+    displayName: toName || HOSTINGER_SENDER_NAME,
     subject: subject || 'Notification from Shazu Soft Technologies',
     html: htmlContent || `<p>${textContent || subject}</p>`,
     text: textContent || subject
@@ -74,11 +75,12 @@ async function sendHostingerEmail({ toEmail, toName, subject, htmlContent, textC
 
   try {
     const response = await hostingerSendApi.sendEmail(cachedMailboxResourceId, sendRequest);
-    if (app && app.log) app.log.info(`Hostinger SDK email dispatched successfully to ${toEmail}.`);
-    return { success: true, statusCode: response ? response.status || 200 : 200 };
+    const statusCode = response ? response.status || 200 : 200;
+    if (app && app.log) app.log.info(`Hostinger SDK email dispatched successfully to ${toEmail} [Status: ${statusCode}].`);
+    return { success: true, statusCode };
   } catch (err) {
     const errorMsg = err.response && err.response.data ? JSON.stringify(err.response.data) : err.message;
-    if (app && app.log) app.log.warn(`Hostinger SDK API error for ${toEmail}: ${errorMsg}`);
+    if (app && app.log) app.log.error(`Hostinger SDK API error for ${toEmail}: ${errorMsg}`);
     return { success: false, error: errorMsg };
   }
 }
@@ -2352,12 +2354,23 @@ app.post('/api/public/internships/apply', async (request, reply) => {
     </div>
   `;
 
-  sendHostingerEmail({
-    toEmail: trimmedEmail,
-    toName: trimmedName,
-    subject: `🎓 Winter Internship Registration Confirmed [Ref: ${tokenNo}] - SST`,
-    htmlContent: internHtml
-  });
+  // Dispatch Automated Branded Confirmation Email (Awaited with error guard)
+  try {
+    const emailResult = await sendHostingerEmail({
+      toEmail: trimmedEmail,
+      toName: trimmedName,
+      subject: `🎓 Winter Internship Registration Confirmed [Ref: ${tokenNo}] - SST`,
+      htmlContent: internHtml,
+      textContent: `Dear ${trimmedName},\n\nYour Winter Internship registration has been confirmed with Reference Token: ${tokenNo}.\nDomain: ${cleanDomain}\nTraining Period: ${cleanDuration}\nStatus: Pending Fee Payment & Verification\n\nYou can track your real-time application status anytime at ${FRONTEND_URL}/track.html using your reference token.\n\nNeed assistance? Call: +91 90803 88211 | Email: info@shazusofttechnologies.org\nShazu Soft Technologies`
+    });
+    if (app && app.log) {
+      app.log.info(`[INTERNSHIP APPLY] Email dispatched for token ${tokenNo} to ${trimmedEmail}: success=${emailResult && emailResult.success}`);
+    }
+  } catch (emailErr) {
+    if (app && app.log) {
+      app.log.error(`[INTERNSHIP APPLY] Email dispatch exception for token ${tokenNo}: ${emailErr.message}`);
+    }
+  }
 
   return {
     message: 'Internship application submitted successfully! Your reference token is ready.',
@@ -3160,12 +3173,17 @@ app.put('/api/admin/internships/:id/status', { preValidation: [app.authenticate]
         <p style="font-size: 13px; color: #64748b; margin-top: 20px;">Warm regards,<br><strong>Academic & Internship Council</strong><br>Shazu Soft Technologies</p>
       </div>
     `;
-    sendHostingerEmail({
-      toEmail: intern.email,
-      toName: intern.name,
-      subject: `🎉 CONGRATULATIONS! SST Internship Approved [Ref: ${intern.token_no}]`,
-      htmlContent: approvalHtml
-    });
+    try {
+      await sendHostingerEmail({
+        toEmail: intern.email,
+        toName: intern.name,
+        subject: `🎉 CONGRATULATIONS! SST Internship Approved [Ref: ${intern.token_no}]`,
+        htmlContent: approvalHtml,
+        textContent: `Congratulations ${intern.name}! Your application for the Winter Internship Programme in ${intern.domain} (${intern.training_period}) has been APPROVED! Reference Token: ${intern.token_no}`
+      });
+    } catch (e) {
+      if (app && app.log) app.log.error(`Approval email dispatch failed for ${intern.email}: ${e.message}`);
+    }
   }
 
   return { internship: intern };
