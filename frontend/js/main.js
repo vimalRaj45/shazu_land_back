@@ -13,7 +13,7 @@ window.toggleMobileDrawer = function (e) {
   const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn') || document.getElementById('mobile-drawer-toggle');
 
   if (mobileMenu) {
-    const isActive = mobileMenu.classList.contains('active') || !mobileMenu.classList.contains('translate-x-full');
+    const isActive = mobileMenu.classList.contains('active');
     if (isActive) {
       window.closeMobileDrawer(e);
     } else {
@@ -122,10 +122,10 @@ function syncActiveNavLinks() {
 
 // 1. Mobile Drawer Listeners
 function initMobileDrawer() {
-  const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn');
-  const closeBtn = document.getElementById('mobile-close-btn');
+  const menuBtn = document.getElementById('mobile-menu-btn') || document.getElementById('mobile-hamburger-btn') || document.getElementById('mobile-drawer-toggle');
+  const closeBtn = document.getElementById('mobile-close-btn') || document.getElementById('mobile-drawer-close');
   const mobileBackdrop = document.getElementById('mobile-backdrop');
-  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenu = document.getElementById('mobile-menu') || document.getElementById('mobile-drawer');
 
   if (menuBtn && !menuBtn.dataset.bound) {
     menuBtn.dataset.bound = 'true';
@@ -763,7 +763,9 @@ document.addEventListener('click', (e) => {
     link.getAttribute('target') === '_blank' ||
     link.hasAttribute('data-no-spa') ||
     href.includes('admin.html') ||
-    href.includes('/admin')
+    href.includes('/admin') ||
+    href.includes('internship.html') ||
+    href.includes('/internship')
   ) {
     if (href.startsWith('#')) {
       window.closeMobileDrawer();

@@ -1085,95 +1085,7 @@ async function initDatabase() {
       );
     `);
 
-    // Seed default hero slides if empty
-    const slideCheck = await client.query('SELECT COUNT(*) FROM hero_slides');
-    if (parseInt(slideCheck.rows[0].count, 10) === 0) {
-      await client.query(`
-        INSERT INTO hero_slides (badge, title, subtitle, image_url, display_order, is_active) VALUES
-        ('INAUGURATION', 'Official Launch & Keynote Ceremony', 'Shazu Soft Technologies Official Inaugural Event at Salem Headquarters', 'images/MDwith Inaugural.jpeg', 1, true),
-        ('TECH INNOVATION', 'Engineering Summits & Applied Projects', 'Collaborative technology workshops with leading technical institutions', 'images/mahendra.jpeg', 2, true),
-        ('DELEGATIONS', 'Professional Memberships & Global Academic Network', 'Welcoming delegates, industry leaders, and institutional partners', 'images/member.jpeg', 3, true),
-        ('COLLABORATIONS', 'Institutional MoUs & Research Partnerships', 'Strengthening industry-academia collaboration across South India', 'images/moui.jpeg', 4, true),
-        ('TECH PLATFORM', 'AI, Software & Cloud Ecosystem', 'Engineering enterprise digital solutions, cloud systems, and student learning tools', 'images/software.png', 5, true);
-      `);
-    }
-
-
-
-
-    // 9. Analytics Events & Page Views
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS analytics_events (
-        id SERIAL PRIMARY KEY,
-        page_path VARCHAR(255),
-        user_agent TEXT,
-        ip_address VARCHAR(100),
-        device_type VARCHAR(50) DEFAULT 'Desktop',
-        referrer TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    await client.query(`
-      ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS device_type VARCHAR(50) DEFAULT 'Desktop';
-      ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS referrer TEXT;
-    `);
-
-    // 10. Gallery Management (Base64 / BLOB Storage)
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS gallery (
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        category VARCHAR(100) DEFAULT 'General',
-        image_blob TEXT NOT NULL,
-        description TEXT,
-        is_active BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    // Seed default gallery images if empty
-    const galleryCheck = await client.query('SELECT COUNT(*) FROM gallery');
-    if (parseInt(galleryCheck.rows[0].count, 10) === 0) {
-      await client.query(`
-        INSERT INTO gallery (title, category, image_blob, description, is_active) VALUES
-        ('Inaugural Ceremony & Keynote Address', 'Conferences & MoUs', 'images/MDwith Inaugural.jpeg', 'Official launch and inaugural convention of Shazu Soft Technologies at headquarters.', true),
-        ('Academic Delegation & Research Summit', 'Conferences', 'images/mahendra.jpeg', 'Engineering leadership panel addressing neural models and cloud database architecture.', true),
-        ('MoU Signing with Partner Institutions', 'MoUs & Delegations', 'images/moui.jpeg', 'Strengthening industry-academia collaboration for student internships and research.', true),
-        ('Professional Memberships Induction', 'Memberships', 'images/member.jpeg', 'Welcoming scientific delegates and researchers into international chapter bodies.', true);
-      `);
-    }
-
-    // 11. System Audit Logs & Security Activity Trail
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS audit_logs (
-        id SERIAL PRIMARY KEY,
-        admin_id INTEGER,
-        admin_name VARCHAR(255),
-        admin_email VARCHAR(255),
-        action_type VARCHAR(100) NOT NULL,
-        entity_type VARCHAR(100) NOT NULL,
-        entity_id VARCHAR(100),
-        details TEXT,
-        ip_address VARCHAR(100),
-        status VARCHAR(50) DEFAULT 'SUCCESS',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    // Seed initial system startup audit log if table is empty
-    const auditCheck = await client.query('SELECT COUNT(*) FROM audit_logs');
-    if (parseInt(auditCheck.rows[0].count, 10) === 0) {
-      await client.query(`
-        INSERT INTO audit_logs (admin_name, admin_email, action_type, entity_type, entity_id, details, ip_address, status)
-        VALUES
-        ('System Kernel', 'system@shazusofttechnologies.org', 'SYSTEM_BOOT', 'SYSTEM', 'NODE_FASTIFY', 'Fastify core runtime engine and Neon DB migration initialized', '127.0.0.1', 'SUCCESS'),
-        ('Security Engine', 'security@shazusofttechnologies.org', 'SECURITY_CHECK', 'RBAC', 'SUPER_ADMIN', 'Dual-factor OTP and Google SSO authentication guard active', '127.0.0.1', 'SUCCESS');
-      `);
-    }
-
-    // Seed Super Admin Account
+    // Ensure Super Admin Account exists
     const adminCheck = await client.query('SELECT * FROM admins WHERE LOWER(email) = $1', [(ADMIN_EMAIL || '').toLowerCase()]);
     if (adminCheck.rows.length === 0) {
       const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
@@ -1183,7 +1095,7 @@ async function initDatabase() {
       );
     }
 
-    app.log.info('Database schema and seed data initialized successfully!');
+    app.log.info('Production database schema verified successfully.');
   } catch (err) {
     app.log.error('Database initialization error:', err);
   } finally {
